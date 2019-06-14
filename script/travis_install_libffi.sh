@@ -12,7 +12,7 @@ fi
 cd libffi
 git checkout 80d07104c33045ea34a4d5185600495dc7461a12
 ./autogen.sh
-./configure
+./configure --disable-docs
 make
 make check
 sudo make install
