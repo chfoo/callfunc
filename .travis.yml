@@ -7,7 +7,7 @@ haxe:
 
 before_install:
   # libraries used for testing
-  - sudo apt-get install -y libcairo2 nstall libpng-dev libturbojpeg-dev libvorbis-dev libopenal-dev libsdl2-dev libmbedtls-dev libuv1-dev
+  - sudo apt-get install -y libcairo2 libpng-dev libturbojpeg-dev libvorbis-dev libopenal-dev libsdl2-dev libmbedtls-dev libuv1-dev
   # dependencies
   - ./script/travis_install_libffi.sh
   - ./script/travis_install_hashlink.sh
