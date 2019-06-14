@@ -1,0 +1,12 @@
+<xml>
+    <files id="haxe">
+        <compilerflag value="-I/usr/local/include/" unless="windows" />
+        <compilerflag value="-I${this_dir}/src/c/" unless="haxelib:callfunc" />
+        <compilerflag value="-I${haxelib:callfunc}/src/c/" if="haxelib:callfunc" />
+        <file name="${this_dir}/src/c/callfunc.c" />
+    </files>
+    <target id="haxe">
+        <lib name="-lffi" />
+        <flag value="-L/usr/local/lib/" unless="windows" />
+    </target>
+</xml>

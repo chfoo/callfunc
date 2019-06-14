@@ -1,0 +1,7 @@
+libs.hxml
+-lib utest
+-cp src/haxe/
+-cp test/haxe/
+-main callfunc.TestAll
+-debug
+--macro nullSafety("callfunc", Loose)

@@ -1,0 +1,21 @@
+dist: xenial
+
+language: haxe
+
+haxe:
+  - "4.0.0-rc.2"
+
+before_install:
+  # libraries used for testing
+  - sudo apt-get install -y libcairo2
+
+install:
+  - yes | haxelib install hxcpp
+  - yes | haxelib install test.hxml
+
+script:
+  - cd test/c/examplelib/ && make
+  - cd src/c && make
+  - haxe hxml/test.cpp.hxml
+  - haxe hxml/test.hl.hxml
+  - ./script/out_cpp_run.sh

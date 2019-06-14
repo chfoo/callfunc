@@ -1,0 +1,3 @@
+test.hxml
+# -lib hxcpp-debug-server
+-cpp out/cpp
