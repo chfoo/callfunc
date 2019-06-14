@@ -1,5 +1,8 @@
 package callfunc;
 
+/**
+ * Represents C data types.
+ */
 @:enum
 abstract DataType(Int) {
     var Void = 0;

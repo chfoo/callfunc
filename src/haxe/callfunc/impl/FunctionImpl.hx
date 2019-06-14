@@ -8,7 +8,7 @@ class FunctionImpl implements Function {
 
     public var name(get, never):String;
     public var params(get, never):Array<DataType>;
-    public var returnType(get, never):Null<DataType>;
+    public var returnType(get, never):DataType;
 
     final _name:String;
     final _params:Array<DataType>;
@@ -68,7 +68,7 @@ class FunctionImpl implements Function {
         return _params;
     }
 
-    function get_returnType():Null<DataType> {
+    function get_returnType():DataType {
         return _returnType;
     }
 

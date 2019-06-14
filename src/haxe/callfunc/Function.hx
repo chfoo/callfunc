@@ -1,8 +1,39 @@
 package callfunc;
 
+/**
+ * A handle to a function in a dynamic library.
+ */
 interface Function extends Disposable {
+    /**
+     * Symbol name of the function.
+     */
     public var name(get, never):String;
+
+    /**
+     * Data types of the function parameters.
+     */
     public var params(get, never):Array<DataType>;
-    public var returnType(get, never):Null<DataType>;
+
+    /**
+     * Data type of the return value.
+     *
+     * If the function has no return value, `DataType.Void` is used.
+     */
+    public var returnType(get, never):DataType;
+
+    /**
+     * Execute the function.
+     *
+     * @param args Arguments that correspond the parameter data types.
+     *     Arguments can be `Int`, `haxe.io.Int64`, `Float`, or `Pointer`.
+     *     Numeric types will be promoted and casted appropriately.
+     * @return If `returnType` is not `DataType.Void`, the return value
+     *     will be converted to either `Int`, `haxe.io.Int64`, `Float`, or
+     *     `Pointer`.
+     *
+     *     Integer data types that fit within 32 bits will be
+     *     promoted to `Int` while wider integers will be promoted
+     *     to `haxe.io.Int64`.
+     */
     public function call(?args:Array<Any>):Any;
 }

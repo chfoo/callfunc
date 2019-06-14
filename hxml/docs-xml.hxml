@@ -1,0 +1,9 @@
+-cp src/haxe
+libs.hxml
+-D doc-gen
+--macro include('callfunc')
+--no-output
+
+-xml out/xml/sys.xml
+-hl out/dummy.hl
+
