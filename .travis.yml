@@ -14,8 +14,8 @@ install:
   - yes | haxelib install test.hxml
 
 script:
-  - cd test/c/examplelib/ && make
-  - cd src/c && make
+  - cd test/c/examplelib/ && make; cd -
+  - cd src/c && make; cd -
   - haxe hxml/test.cpp.hxml
   - haxe hxml/test.hl.hxml
   - ./script/out_cpp_run.sh
