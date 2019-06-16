@@ -181,45 +181,44 @@ API docs: https://chfoo.github.io/callfunc/api/
 
 #### Windows
 
-I would recommend vcpkg, but it doesn't support compiling from the latest git version. You will need to edit the CONTROL file. (More info to be determined later.)
+vcpkg can be used to build libffi, but it doesn't support compiling from the latest git version. You will need to edit the CONTROL file yourself to the lastest git version. (More info TBD.)
+
+If you are compiling to HashLink, note that the HashLink binary from the website is 32-bit, so you will need to build 32-bit versions of the libraries.
+
+For the CPP target, you may optionally use MinGW-w64 if you have trouble compiling. Under the "VARS" section, set `mingw` to `1`.
 
 #### MacOS
 
-I would recommend homebrew, but the brew file head points to an outdated fork for some reason. (More info to be determined later.)
+You can use homebrew to install libffi, but at the time of writing, it points to an outdated fork. You will need to run `brew edit libffi` to edit the brew recipe to use the official fork and install the head version. Then run `brew install libffi` and `brew info libffi` to get the library path.
 
 #### Linux
 
-The library can be built and installed following the instructions in the libffi readme file. Running the install step will install it to /usr/local/lib. On Debian-based distributions, you can replace the install step with `checkinstall` to create and install a deb package.
+Typically libraries are provided your distribution's package manager, but only stable versions. In this case, the library can be built and installed following the instructions in the libffi readme file. Running the install step will install it to /usr/local/lib. On Debian-based distributions, you can replace the install step with `checkinstall` to create and install a deb package.
+
+The paths for searching for libraries is more restricted when executing applications. The `LD_LIBRARY_PATH` environment can be provided to the executable. For example:
+
+`LD_LIBRARY_PATH="./:/usr/local/lib/:$LD_LIBRARY_PATH"`
+
+### callfunc.hdll (HashLink)
+
+You will need CMake.
+
+Run `cmake CMakeLists.txt -DCMAKE_BUILD_TYPE=Release` to generate build files.
+
+On Linux and MacOS, this will be a makefile which you can run `make`. On Windows, this will generate a Visual Studio project file or nmake config by default. Consult documentation on CMake generators for other configs such as Mingw-w64.
+
+The generated library will be in `out/lib/callfunc/`.
 
 ### CPP target
 
-You may need edit your `~/.hxcpp_config.xml` or `%HOMEPATH%/.hxcpp_config.xml` file to specify include and linking flags for libffi.
+The Callfunc binding library is statically built by hxcpp.
 
-* To add the header include path `-I` flag, add `<flag value="-I/usr/local/include">` to the `<compiler>` section.
-* To add the dynamic library link path `-L` flag, add `<flag value="-L/usr/local/lib">` to the `<linker>` section.
+By default, the hxcpp build config (hxcpp_build.hxml) is configured to include libffi files only for a testing setup. You may need edit your `~/.hxcpp_config.xml` or `%HOMEPATH%/.hxcpp_config.xml` file to specify include and linking flags for libffi.
 
-On Windows, you may optionally use MinGW-w64 if you have trouble compiling. Under the "VARS" section, set `mingw` to `1`.
+For example:
 
-### callfunc.hdll (HashLink target)
-
-A makefile is provided in `src/c/`. You can run it:
-
-    cd src/c
-    make hdll
-
-It will be generated to `out/hl/callfunc.hdll`.
-
-On Windows for Mingw-w64, use:
-
-    mingw32-make.exe hdll GCC=i686-w64-mingw32-gcc.exe INCLUDEPATH=/c/path/to/includes/ LIBPATH=/c/path/to/dlls/
-
-Adjust the paths as needed.
-
-### Library paths
-
-On Linux, the paths for searching for libraries is more restricted. The `LD_LIBRARY_PATH` environment can be provided to the executable. For example:
-
-`LD_LIBRARY_PATH="./:/usr/local/lib/:$LD_LIBRARY_PATH"`
+* To add the header include path `-I` flag, add `<flag value="-I/usr/local/include"/>` to the `<compiler>` section.
+* To add the dynamic library link path `-L` flag, add `<flag value="-L/usr/local/lib"/>` to the `<linker>` section.
 
 ## Contributing
 

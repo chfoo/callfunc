@@ -138,7 +138,7 @@ CallfuncError callfunc_function_define(
     assert(function != NULL);
     assert(definition != NULL);
 
-    function->function = target_function;
+    function->function = (void(*)(void)) target_function;
 
     int32_t num_params = ((int32_t *) definition)[0];
     ffi_type ** parameter_types = malloc(sizeof(ffi_type *) * num_params);
@@ -149,7 +149,7 @@ CallfuncError callfunc_function_define(
         return CALLFUNC_FAILURE;
     }
 
-    for (uint32_t param_index = 0; param_index < num_params; param_index++) {
+    for (int32_t param_index = 0; param_index < num_params; param_index++) {
         parameter_types[param_index] =
             _callfunc_constant_to_ffi_type(definition[5 + param_index]);
     }
@@ -173,7 +173,7 @@ void callfunc_function_call(struct CallfuncFunction * function,
 
     void * arg_pointers[num_args];
 
-    for (size_t arg_index = 0; arg_index < num_args; arg_index++) {
+    for (int32_t arg_index = 0; arg_index < num_args; arg_index++) {
         size_t arg_size = argument_buffer[buffer_index];
         buffer_index += 1;
 
@@ -182,7 +182,8 @@ void callfunc_function_call(struct CallfuncFunction * function,
         buffer_index += arg_size;
     }
 
-    ffi_call(&function->cif, function->function, &return_value, arg_pointers);
+    ffi_call(&function->cif, function->function,
+        &return_value, arg_pointers);
 
     memcpy(&argument_buffer[4], &return_value, sizeof(ffi_arg));
 }
@@ -225,7 +226,7 @@ CallfuncError callfunc_struct_type_define(
         return CALLFUNC_FAILURE;
     }
 
-    for (uint32_t field_index = 0; field_index < num_fields; field_index++) {
+    for (int32_t field_index = 0; field_index < num_fields; field_index++) {
         field_types[field_index] =
             _callfunc_constant_to_ffi_type(definition[4 + field_index]);
     }
@@ -240,7 +241,7 @@ CallfuncError callfunc_struct_type_define(
 
     ((int32_t *) resultInfo)[0] = struct_type->type.size;
 
-    for (uint32_t field_index = 0; field_index < num_fields; field_index++) {
+    for (int32_t field_index = 0; field_index < num_fields; field_index++) {
         ((int32_t *) resultInfo)[1 + field_index] = (int32_t) offsets[field_index];
     }
 
@@ -264,7 +265,7 @@ void callfunc_pointer_get(void * pointer, uint8_t data_type, uint8_t * buffer,
 
     assert(data_type_size > 0);
 
-    memcpy(buffer, pointer + offset, data_type_size);
+    memcpy(buffer, (char *) pointer + offset, data_type_size);
 }
 
 void callfunc_pointer_set(void * pointer, uint8_t data_type, uint8_t * buffer,
@@ -276,7 +277,7 @@ void callfunc_pointer_set(void * pointer, uint8_t data_type, uint8_t * buffer,
 
     assert(data_type_size > 0);
 
-    memcpy(pointer + offset, buffer, data_type_size);
+    memcpy((char *) pointer + offset, buffer, data_type_size);
 }
 
 size_t _callfunc_data_type_size(uint8_t data_type) {
@@ -401,25 +402,25 @@ void * hl_callfunc_int64_to_pointer(vdynamic * obj) {
 #define HL_DEF(name,t,args) DEFINE_PRIM_WITH_NAME(t,name,args,name)
 #define HL_DEF2(name,impl_name,t,args) DEFINE_PRIM_WITH_NAME(t,impl_name,args,name)
 
-HL_DEF(callfunc_get_error_message, _BYTES, _NO_ARG);
-HL_DEF(callfunc_get_sizeof_table, _VOID, _BYTES);
-HL_DEF(callfunc_alloc, _ABSTRACT(void*), _I32 _BOOL);
-HL_DEF(callfunc_free, _VOID, _ABSTRACT(void*));
-HL_DEF(callfunc_new_library, _ABSTRACT(struct CallfuncLibrary), _NO_ARG);
-HL_DEF(callfunc_del_library, _VOID, _ABSTRACT(struct CallfuncLibrary));
-HL_DEF(callfunc_library_open, _I32, _ABSTRACT(struct CallfuncLibrary) _BYTES);
-HL_DEF(callfunc_library_close, _VOID, _ABSTRACT(struct CallfuncLibrary));
-HL_DEF(callfunc_library_get_address, _I32, _ABSTRACT(struct CallfuncLibrary) _BYTES _REF(_ABSTRACT(void*)));
-HL_DEF(callfunc_new_function, _ABSTRACT(struct CallfuncFunction), _ABSTRACT(struct CallfuncLibrary));
-HL_DEF(callfunc_del_function, _VOID, _ABSTRACT(struct CallfuncFunction));
-HL_DEF(callfunc_function_define, _I32, _ABSTRACT(struct CallfuncFunction) _ABSTRACT(void*) _BYTES);
-HL_DEF(callfunc_function_call, _VOID, _ABSTRACT(struct CallfuncFunction) _BYTES);
-HL_DEF(callfunc_new_struct_type, _ABSTRACT(struct CallfuncStructType), _NO_ARG);
-HL_DEF(callfunc_del_struct_type, _VOID, _ABSTRACT(struct CallfuncStructType));
-HL_DEF(callfunc_struct_type_define, _I32, _ABSTRACT(struct CallfuncStructType) _BYTES _BYTES);
-HL_DEF2(callfunc_pointer_to_int64, hl_callfunc_pointer_to_int64, _OBJ(_I32 _I32), _ABSTRACT(void*));
-HL_DEF2(callfunc_int64_to_pointer, hl_callfunc_int64_to_pointer, _ABSTRACT(void*), _OBJ(_I32 _I32));
-HL_DEF(callfunc_pointer_get, _VOID, _ABSTRACT(void*) _I8 _BYTES _I32);
-HL_DEF(callfunc_pointer_set, _VOID, _ABSTRACT(void*) _I8 _BYTES _I32);
+HL_DEF(callfunc_get_error_message, _BYTES, _NO_ARG)
+HL_DEF(callfunc_get_sizeof_table, _VOID, _BYTES)
+HL_DEF(callfunc_alloc, _ABSTRACT(void*), _I32 _BOOL)
+HL_DEF(callfunc_free, _VOID, _ABSTRACT(void*))
+HL_DEF(callfunc_new_library, _ABSTRACT(struct CallfuncLibrary), _NO_ARG)
+HL_DEF(callfunc_del_library, _VOID, _ABSTRACT(struct CallfuncLibrary))
+HL_DEF(callfunc_library_open, _I32, _ABSTRACT(struct CallfuncLibrary) _BYTES)
+HL_DEF(callfunc_library_close, _VOID, _ABSTRACT(struct CallfuncLibrary))
+HL_DEF(callfunc_library_get_address, _I32, _ABSTRACT(struct CallfuncLibrary) _BYTES _REF(_ABSTRACT(void*)))
+HL_DEF(callfunc_new_function, _ABSTRACT(struct CallfuncFunction), _ABSTRACT(struct CallfuncLibrary))
+HL_DEF(callfunc_del_function, _VOID, _ABSTRACT(struct CallfuncFunction))
+HL_DEF(callfunc_function_define, _I32, _ABSTRACT(struct CallfuncFunction) _ABSTRACT(void*) _BYTES)
+HL_DEF(callfunc_function_call, _VOID, _ABSTRACT(struct CallfuncFunction) _BYTES)
+HL_DEF(callfunc_new_struct_type, _ABSTRACT(struct CallfuncStructType), _NO_ARG)
+HL_DEF(callfunc_del_struct_type, _VOID, _ABSTRACT(struct CallfuncStructType))
+HL_DEF(callfunc_struct_type_define, _I32, _ABSTRACT(struct CallfuncStructType) _BYTES _BYTES)
+HL_DEF2(callfunc_pointer_to_int64, hl_callfunc_pointer_to_int64, _OBJ(_I32 _I32), _ABSTRACT(void*))
+HL_DEF2(callfunc_int64_to_pointer, hl_callfunc_int64_to_pointer, _ABSTRACT(void*), _OBJ(_I32 _I32))
+HL_DEF(callfunc_pointer_get, _VOID, _ABSTRACT(void*) _I8 _BYTES _I32)
+HL_DEF(callfunc_pointer_set, _VOID, _ABSTRACT(void*) _I8 _BYTES _I32)
 
 #endif

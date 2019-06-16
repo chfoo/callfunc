@@ -18,9 +18,9 @@ install:
   - yes | haxelib install test.hxml
 
 script:
-  - ./script/make_examplelib.sh
-  - ./script/make_callfunc.sh
+  - cmake CMakeLists.txt -DCMAKE_BUILD_TYPE=Debug
+  - make
   - haxe hxml/test.cpp.hxml
   - haxe hxml/test.hl.hxml
-  - ./script/out_cpp_run.sh
-  - ./script/out_hl_run.sh
+  - source script/export_ld_path.sh && ./out/cpp/TestAll-debug
+  - source script/export_ld_path.sh && hl out/hl/test.hl

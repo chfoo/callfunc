@@ -56,7 +56,7 @@ struct CallfuncLibrary {
 struct CallfuncFunction {
     struct CallfuncLibrary * library;
     ffi_cif cif;
-    void * function;
+    void(*function)(void);
 };
 
 struct CallfuncStructType {
