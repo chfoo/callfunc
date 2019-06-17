@@ -6,7 +6,19 @@ import utest.Test;
 class TestExamplelib extends Test {
     public function testf1() {
         var callfunc = Callfunc.instance();
-        var library = callfunc.newLibrary("examplelib.so");
+
+        var libName;
+
+        switch Sys.systemName() {
+            case "Windows":
+                libName = "examplelib.dll";
+            case "Mac":
+                libName = "examplelib.dynlib";
+            default:
+                libName = "examplelib.so";
+        }
+
+        var library = callfunc.newLibrary(libName);
 
         var f1 = library.newFunction(
             "examplelib_f1",

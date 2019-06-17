@@ -6,7 +6,8 @@
         <file name="${this_dir}/src/c/callfunc.c" />
     </files>
     <target id="haxe">
-        <lib name="-lffi" />
+        <lib name="-lffi" unless="windows"/>
+        <lib name="libffi.lib" if="windows"/>
         <flag value="-L${this_dir}/out/libffi/destdir/lib/" unless="haxelib:callfunc" />
     </target>
 </xml>

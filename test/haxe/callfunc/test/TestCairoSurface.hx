@@ -6,6 +6,17 @@ import utest.Test;
 class TestCairoSurface extends Test {
     public function testSimpleDraw() {
         var callfunc = Callfunc.instance();
+
+        var libName;
+
+        switch Sys.systemName() {
+            case "Windows":
+                libName = "libcairo.dll";
+            case "Mac":
+                libName = "libcairo.dynlib";
+            default:
+                libName = "libcairo.so";
+        }
         var library = callfunc.newLibrary("libcairo.so");
 
         var imageSurfaceCreateFunc = library.newFunction(

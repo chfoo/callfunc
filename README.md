@@ -181,11 +181,23 @@ API docs: https://chfoo.github.io/callfunc/api/
 
 #### Windows
 
-vcpkg can be used to build libffi, but it doesn't support compiling from the latest git version. You will need to edit the CONTROL file yourself to the latest git version. (More info TBD.)
+vcpkg can be used to build libffi.
 
-If you are compiling to HashLink, note that the HashLink binary from the website is 32-bit, so you will need to build 32-bit versions of the libraries.
+At the time of writing, a [patched port](https://github.com/microsoft/vcpkg/pull/6119) of libffi for 3.3-rc0 is not in the main repository yet. The instructions below describe how to include it.
 
-For the CPP target, you may optionally use MinGW-w64 if you have trouble compiling. In your `~/.hxcpp_config.xml` or `%HOMEPATH%/.hxcpp_config.xml`, under the "VARS" section, set `mingw` to `1`.
+If you are compiling to HashLink, note that the HashLink binary from the website is 32-bit, so you will need to build and use 32-bit versions of the libraries.
+
+1. Download and set up vcpkg
+2. Install the Visual Studio C++ workload SDK in Tools, Get Tool and Features.
+3. Add the fork: `git add remote driver1998 https://github.com/driver1998/vcpkg/`
+4. Update: `git fetch driver1998 libffi`
+5. Switch to a temporary branch: `git checkout driver1998/libffi`
+6. Run `./vcpkg install libffi:x64-windows libffi:x86-windows`
+7. Run `./vcpkg export --zip libffi:x64-windows libffi:x86-windows`
+
+The header and library will be in `include` and `bin` directories of the `x64-windows` (64-bit) and `x86-windows` (32-bit).
+
+For the CPP target, you may optionally use MinGW-w64 if you have trouble compiling with the Haxe HXCPP and VS toolchain. In your `~/.hxcpp_config.xml` or `%HOMEPATH%/.hxcpp_config.xml`, under the "VARS" section, set `mingw` to `1`.
 
 #### MacOS
 
@@ -203,10 +215,22 @@ The paths for searching for libraries is more restricted when executing applicat
 
 You will need CMake. The following commands assumes a Bash shell.
 
-1. Create a build directory and change to it. `mkdir -p out/ && cd out/`
-2. Run cmake to generate build files using a release config and specifying the include and linker paths to libffi. `cmake .. -DCMAKE_BUILD_TYPE=Release -DLIBFFI_INCLUDE_PATH:PATH=/usr/local/include/ -DLIBFFI_LIB_PATH:PATH=/usr/local/lib/`
+1. Create a build directory and change to it.
 
-On Linux and MacOS, this will be a makefile which you can run `make`. On Windows, this will generate a Visual Studio project file or nmake config by default. Consult documentation on CMake generators for other configs such as Mingw-w64.
+        mkdir -p out/ && cd out/
+
+2. Run cmake to generate build files using a release config.
+
+        cmake .. -DCMAKE_BUILD_TYPE=Release
+
+To specify the include and linker paths add (adjust paths as needed):
+
+* For libffi: `-DLIBFFI_INCLUDE_PATH:PATH=/usr/local/include/ -DLIBFFI_LIB_PATH:PATH=/usr/local/lib/`. For vcpkg, please add the toolchain define as reported at the end of libffi install.
+* For HashLink: `-DHLINCLUDE_PATH:PATH=/usr/local/include/ -DHL_LIB_PATH:PATH=/usr/local/lib/`.
+
+On Linux and MacOS, this will be a makefile which you can run `make`.
+
+On Windows, add `-A win32` for 32-bit. CMake will generate a Visual Studio project file or nmake config by default. Consult documentation on CMake generators for other configs such as Mingw-w64.
 
 The generated library will be in `out/out/callfunc/`.
 

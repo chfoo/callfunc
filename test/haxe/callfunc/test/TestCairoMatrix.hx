@@ -5,6 +5,16 @@ import utest.Assert;
 class TestCairoMatrix extends utest.Test {
     public function testMatrixScale() {
         var callfunc = Callfunc.instance();
+        var libName;
+
+        switch Sys.systemName() {
+            case "Windows":
+                libName = "libcairo.dll";
+            case "Mac":
+                libName = "libcairo.dynlib";
+            default:
+                libName = "libcairo.so";
+        }
         var library = callfunc.newLibrary("libcairo.so");
 
         var initIdentityFunc = library.newFunction(
