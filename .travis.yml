@@ -6,6 +6,11 @@ haxe:
   - "4.0.0-rc.2"
 
 before_install:
+  # Cmake 1.13 minimum
+  - wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | sudo apt-key add - &&
+    sudo apt-add-repository 'deb https://apt.kitware.com/ubuntu/ xenial main' &&
+    sudo apt-get update &&
+    sudo apt-get install cmake
   # libraries used for testing
   - sudo apt-get install -y libcairo2 libpng-dev libjpeg-turbo8-dev libturbojpeg libvorbis-dev libopenal-dev libsdl2-dev libmbedtls-dev libuv1-dev
   - sudo ln -s /usr/lib/x86_64-linux-gnu/libturbojpeg.so.0.1.0 /usr/lib/x86_64-linux-gnu/libturbojpeg.so
