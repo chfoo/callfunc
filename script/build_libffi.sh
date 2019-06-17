@@ -8,5 +8,3 @@ cd "$SCRIPT_DIR/../out/libffi"
 ./configure --disable-docs --prefix "$PWD/destdir"
 make
 make install
-mkdir -p "$SCRIPT_DIR/../out/lib/libffi/"
-cp "destdir/lib/libffi.so" "$SCRIPT_DIR/../out/lib/libffi/libffi.so"

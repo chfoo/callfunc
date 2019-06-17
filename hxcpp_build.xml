@@ -7,6 +7,6 @@
     </files>
     <target id="haxe">
         <lib name="-lffi" />
-        <flag value="-L${this_dir}/out/lib/libffi/" unless="haxelib:callfunc" />
+        <flag value="-L${this_dir}/out/libffi/destdir/lib/" unless="haxelib:callfunc" />
     </target>
 </xml>

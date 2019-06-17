@@ -181,11 +181,11 @@ API docs: https://chfoo.github.io/callfunc/api/
 
 #### Windows
 
-vcpkg can be used to build libffi, but it doesn't support compiling from the latest git version. You will need to edit the CONTROL file yourself to the lastest git version. (More info TBD.)
+vcpkg can be used to build libffi, but it doesn't support compiling from the latest git version. You will need to edit the CONTROL file yourself to the latest git version. (More info TBD.)
 
 If you are compiling to HashLink, note that the HashLink binary from the website is 32-bit, so you will need to build 32-bit versions of the libraries.
 
-For the CPP target, you may optionally use MinGW-w64 if you have trouble compiling. Under the "VARS" section, set `mingw` to `1`.
+For the CPP target, you may optionally use MinGW-w64 if you have trouble compiling. In your `~/.hxcpp_config.xml` or `%HOMEPATH%/.hxcpp_config.xml`, under the "VARS" section, set `mingw` to `1`.
 
 #### MacOS
 
@@ -201,24 +201,27 @@ The paths for searching for libraries is more restricted when executing applicat
 
 ### callfunc.hdll (HashLink)
 
-You will need CMake.
+You will need CMake. The following commands assumes a Bash shell.
 
-Run `cmake CMakeLists.txt -DCMAKE_BUILD_TYPE=Release` to generate build files.
+1. Create a build directory and change to it. `mkdir -p out/ && cd out/`
+2. Run cmake to generate build files using a release config and specifying the include and linker paths to libffi. `cmake .. -DCMAKE_BUILD_TYPE=Release -DLIBFFI_INCLUDE_PATH:PATH=/usr/local/include/ -DLIBFFI_LIB_PATH:PATH=/usr/local/lib/`
 
 On Linux and MacOS, this will be a makefile which you can run `make`. On Windows, this will generate a Visual Studio project file or nmake config by default. Consult documentation on CMake generators for other configs such as Mingw-w64.
 
-The generated library will be in `out/lib/callfunc/`.
+The generated library will be in `out/out/callfunc/`.
 
 ### CPP target
 
 The Callfunc binding library is statically built by hxcpp.
 
-By default, the hxcpp build config (hxcpp_build.hxml) is configured to include libffi files only for a testing setup. You may need edit your `~/.hxcpp_config.xml` or `%HOMEPATH%/.hxcpp_config.xml` file to specify include and linking flags for libffi.
+By default, the hxcpp build config (hxcpp_build.hxml) is configured to include libffi files only for a unit testing setup. You may need edit your `~/.hxcpp_config.xml` or `%HOMEPATH%/.hxcpp_config.xml` file to specify include and linking flags for libffi if your compiler cannot find the correct libffi.
 
 For example:
 
 * To add the header include path `-I` flag, add `<flag value="-I/usr/local/include"/>` to the `<compiler>` section.
 * To add the dynamic library link path `-L` flag, add `<flag value="-L/usr/local/lib"/>` to the `<linker>` section.
+
+Adjust the paths or create new sections for your platform/compiler as needed.
 
 ## Contributing
 
