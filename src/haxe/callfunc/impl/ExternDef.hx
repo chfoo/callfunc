@@ -24,7 +24,7 @@ typedef ExternLibrary = cpp.RawPointer<CPPExternLibrary>;
 typedef ExternFunction = cpp.RawPointer<CPPExternFunction>;
 typedef ExternStructType = cpp.RawPointer<CPPExternStructType>;
 typedef ExternBytesData = cpp.Pointer<cpp.UInt8>;
-typedef ExternString = String;
+typedef ExternString = cpp.ConstCharStar;
 typedef ExternInt8 = cpp.Int8;
 
 #elseif hl

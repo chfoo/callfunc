@@ -43,15 +43,11 @@ class FunctionImpl implements Function {
 
         var error = ExternDef.libraryGetAddress(
             library.nativePointer,
-            #if hl
-            Bytes.ofString(name)
-            #else
-            name
-            #end,
+            NativeUtil.toNativeString(name),
             targetRef);
 
         if (error != 0) {
-            throw ExternDef.getErrorMessage();
+            throw NativeUtil.fromNativeString(ExternDef.getErrorMessage());
         }
 
         var buffer = library.argSerializer.serializeParams(params, returnType);

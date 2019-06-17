@@ -20,15 +20,11 @@ class LibraryImpl implements Library {
 
         var error = ExternDef.libraryOpen(
             nativePointer,
-            #if hl
-            Bytes.ofString(name)
-            #else
-            name
-            #end
+            NativeUtil.toNativeString(name)
             );
 
         if (error != 0) {
-            throw ExternDef.getErrorMessage();
+            throw NativeUtil.fromNativeString(ExternDef.getErrorMessage());
         }
     }
 

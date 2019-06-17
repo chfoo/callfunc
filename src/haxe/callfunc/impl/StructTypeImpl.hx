@@ -33,7 +33,7 @@ class StructTypeImpl implements StructType {
         );
 
         if (error != 0) {
-            throw ExternDef.getErrorMessage();
+            throw NativeUtil.fromNativeString(ExternDef.getErrorMessage());
         }
 
         var info = serializer.deserializeInfo(dataTypes, infoBuffer);
