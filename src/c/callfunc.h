@@ -10,7 +10,8 @@
     #include <dlfcn.h>
 #endif
 
-#ifdef LIBHL_EXPORTS
+#ifdef CALLFUNC_HL
+    #define HL_NAME(n) n
     #include <hl.h>
     #define CALLFUNC_API HL_PRIM
 #else
@@ -42,6 +43,8 @@
 #define CALLFUNC_SLONG (17)
 #define CALLFUNC_ULONG (18)
 #define CALLFUNC_POINTER (19)
+
+#define _CALLFUNC_ABORT_NULL(pointer) { assert(pointer != NULL); if (pointer == NULL) { abort(); } }
 
 #ifdef __cplusplus
 extern "C" {

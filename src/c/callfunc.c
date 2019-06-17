@@ -171,7 +171,8 @@ void callfunc_function_call(struct CallfuncFunction * function,
     ffi_arg return_value;
     size_t buffer_index = 4 + CALLFUNC_MAX_RETURN_SIZE;
 
-    void * arg_pointers[num_args];
+    void ** arg_pointers = malloc(num_args * sizeof(void *));
+    _CALLFUNC_ABORT_NULL(arg_pointers);
 
     for (int32_t arg_index = 0; arg_index < num_args; arg_index++) {
         size_t arg_size = argument_buffer[buffer_index];
@@ -186,6 +187,7 @@ void callfunc_function_call(struct CallfuncFunction * function,
         &return_value, arg_pointers);
 
     memcpy(&argument_buffer[4], &return_value, sizeof(ffi_arg));
+    free(arg_pointers);
 }
 
 struct CallfuncStructType * callfunc_new_struct_type() {
@@ -234,7 +236,8 @@ CallfuncError callfunc_struct_type_define(
     field_types[num_fields] = NULL;
     struct_type->type.elements = field_types;
 
-    size_t offsets[num_fields];
+    size_t * offsets = malloc(num_fields * sizeof(size_t));
+    _CALLFUNC_ABORT_NULL(offsets);
 
     ffi_status status = ffi_get_struct_offsets(FFI_DEFAULT_ABI,
         &(struct_type->type), offsets);
@@ -244,6 +247,8 @@ CallfuncError callfunc_struct_type_define(
     for (int32_t field_index = 0; field_index < num_fields; field_index++) {
         ((int32_t *) resultInfo)[1 + field_index] = (int32_t) offsets[field_index];
     }
+
+    free(offsets);
 
     return _check_ffi_status(status);
 }
@@ -307,8 +312,7 @@ size_t _callfunc_data_type_size(uint8_t data_type) {
 
 const char * _callfunc_get_dll_error_message() {
     #ifdef _WIN32
-    const size_t buffer_size = 128;
-    static const char error_message_buffer[buffer_size];
+    static char error_message_buffer[128];
 
     FormatMessage(
         FORMAT_MESSAGE_FROM_SYSTEM |
@@ -317,7 +321,7 @@ const char * _callfunc_get_dll_error_message() {
         GetLastError(),
         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
         (LPTSTR) &error_message_buffer,
-        buffer_size,
+        128,
         NULL
     );
     return error_message_buffer;
@@ -369,7 +373,7 @@ CallfuncError _check_ffi_status(ffi_status status) {
 }
 
 // Hashlink exports
-#ifdef LIBHL_EXPORTS
+#ifdef CALLFUNC_HL
 #include <hl.h>
 
 // It would be nice if I could find in the source code how this structure
