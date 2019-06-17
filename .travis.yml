@@ -23,7 +23,7 @@ install:
   - yes | haxelib install test.hxml
 
 script:
-  - mkdir -p out/ && cd out/ && cmake .. -DCMAKE_BUILD_TYPE=Debug
+  - mkdir -p out/ && cd out/ && /usr/bin/cmake .. -DCMAKE_BUILD_TYPE=Debug
   - make && make examplelib
   - cd ../
   - haxe hxml/test.cpp.hxml
