@@ -17,12 +17,18 @@ class TestCairoSurface extends Test {
             default:
                 libName = "libcairo.so";
         }
-        var library = callfunc.newLibrary("libcairo.so");
+        var library = callfunc.newLibrary(libName);
 
         var imageSurfaceCreateFunc = library.newFunction(
             "cairo_image_surface_create",
             [DataType.SInt32, DataType.SInt, DataType.SInt],
             DataType.Pointer
+        );
+
+        var surfaceStatusFunc = library.newFunction(
+            "cairo_surface_status",
+            [DataType.Pointer],
+            DataType.SInt
         );
 
         var imageSurfaceGetDataFunc = library.newFunction(
@@ -64,6 +70,10 @@ class TestCairoSurface extends Test {
         );
 
         var surface = imageSurfaceCreateFunc.call([0, 100, 100]);
+        var status = surfaceStatusFunc.call([surface]);
+
+        Assert.equals(0, status);
+
         var context = createFunc.call([surface]);
 
         rectangleFunc.call([context, 1, 0, 20, 20]);
@@ -87,6 +97,7 @@ class TestCairoSurface extends Test {
         );
 
         imageSurfaceGetDataFunc.dispose();
+        surfaceStatusFunc.dispose();
         surfaceFlushFunc.dispose();
         surfaceDestroyFunc.dispose();
         createFunc.dispose();

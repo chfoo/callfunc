@@ -15,7 +15,7 @@ class TestCairoMatrix extends utest.Test {
             default:
                 libName = "libcairo.so";
         }
-        var library = callfunc.newLibrary("libcairo.so");
+        var library = callfunc.newLibrary(libName);
 
         var initIdentityFunc = library.newFunction(
             "cairo_matrix_init_identity",

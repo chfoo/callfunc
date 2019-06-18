@@ -400,7 +400,10 @@ vdynamic * hl_callfunc_pointer_to_int64(void * pointer) {
 void * hl_callfunc_int64_to_pointer(vdynamic * obj) {
     struct hl_int64 * wrapper = (struct hl_int64 *) obj;
 
-    return callfunc_int64_to_pointer(((int64_t) wrapper->high << 32) | wrapper->low);
+    uint64_t val = (uint64_t) wrapper->high << 32;
+    val |= ((uint64_t) wrapper->low) & 0xffffffffULL;
+
+    return callfunc_int64_to_pointer(val);
 }
 
 #define HL_DEF(name,t,args) DEFINE_PRIM_WITH_NAME(t,name,args,name)
