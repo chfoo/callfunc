@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION 3.13)
 project(callfunc)
 
 set(LIBFFI_INCLUDE_PATH "${CMAKE_HOME_DIRECTORY}/out/libffi/destdir/include" CACHE PATH "Include directory for libffi (ffi.h)")
-set(LIBFFI_LIB_PATH "${CMAKE_HOME_DIRECTORY}/out/libffi/destdir/lib/" CACHE PATH "Link directory for libffi (libffi.{so,dll,dynlib})")
+set(LIBFFI_LIB_PATH "${CMAKE_HOME_DIRECTORY}/out/libffi/destdir/lib/" CACHE PATH "Link directory for libffi (libffi.{so,dll,dylib})")
 set(HL_INCLUDE_PATH "" CACHE PATH "Include directory for HashLink (hl.h)")
-set(HL_LIB_PATH "" CACHE PATH "Link directory for HashLink (libhl.{so,dll,dynlib})")
+set(HL_LIB_PATH "" CACHE PATH "Link directory for HashLink (libhl.{so,dll,dylib})")
 
 add_library(callfunc_hdll SHARED callfunc.c)
 target_include_directories(callfunc_hdll BEFORE PRIVATE "${LIBFFI_INCLUDE_PATH}" "${HL_INCLUDE_PATH}")

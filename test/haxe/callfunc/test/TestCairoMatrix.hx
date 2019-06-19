@@ -9,9 +9,9 @@ class TestCairoMatrix extends utest.Test {
 
         switch Sys.systemName() {
             case "Windows":
-                libName = "libcairo.dll";
+                libName = "cairo.dll";
             case "Mac":
-                libName = "libcairo.dynlib";
+                libName = "libcairo.dylib";
             default:
                 libName = "libcairo.so";
         }

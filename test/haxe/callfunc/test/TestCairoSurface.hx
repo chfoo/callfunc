@@ -13,7 +13,7 @@ class TestCairoSurface extends Test {
             case "Windows":
                 libName = "cairo.dll";
             case "Mac":
-                libName = "libcairo.dynlib";
+                libName = "libcairo.dylib";
             default:
                 libName = "libcairo.so";
         }

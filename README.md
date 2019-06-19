@@ -24,7 +24,7 @@ Or install the latest from GitHub:
 
     haxelib git callfunc https://github.com/chfoo/callfunc
 
-Obtain libffi.{so,dynlib,dll} (and callfunc.hdll for Hashlink) from the zip releases or see "Compiling libraries" to build them yourself.
+Obtain libffi.{so,dylib,dll} (and callfunc.hdll for Hashlink) from the zip releases or see "Compiling libraries" to build them yourself.
 
 ## Types
 
@@ -201,7 +201,19 @@ For the CPP target, you may optionally use MinGW-w64 if you have trouble compili
 
 #### MacOS
 
-You can use homebrew to install libffi, but at the time of writing, it points to an outdated fork. You will need to run `brew edit libffi` to edit the brew recipe to use the official fork and install the head version. Then run `brew install libffi` and `brew info libffi` to get the library path.
+You can use homebrew to install libffi, but at the time of writing, it points to an outdated fork. You will need to run `brew edit libffi` to edit the brew recipe to use the official fork and install the head version.
+
+On line 18, change:
+
+    head do
+        url "https://github.com/atgreen/libffi.git"
+
+To:
+
+    head do
+        url "https://github.com/libffi/libffi.git"
+
+Then run `brew install libffi --HEAD` and `brew info libffi` to get the library path.
 
 #### Linux
 
@@ -246,6 +258,10 @@ For example:
 * To add the dynamic library link path `-L` flag, add `<flag value="-L/usr/local/lib"/>` to the `<linker>` section.
 
 Adjust the paths or create new sections for your platform/compiler as needed.
+
+## Tests
+
+To run the unit tests, please look at the .travis.yml file.
 
 ## Contributing
 
