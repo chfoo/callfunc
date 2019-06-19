@@ -57,8 +57,8 @@ class LibraryImpl implements Library {
 
 
     public function newFunction(name:String, ?params:Array<DataType>,
-            ?returnType:DataType):Function {
-        return new FunctionImpl(this, name, params, returnType);
+            ?returnType:DataType, ?abi:Int):Function {
+        return new FunctionImpl(this, name, params, returnType, abi);
     }
 
     public function dispose() {

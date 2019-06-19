@@ -117,6 +117,7 @@ extern class ExternDef {
     public static function functionDefine(
         func:ExternFunction,
         targetFunc:ExternVoidStar,
+        abi:Int,
         definition:ExternBytesData):Int;
 
     #if cpp @:native("callfunc_function_call") #end

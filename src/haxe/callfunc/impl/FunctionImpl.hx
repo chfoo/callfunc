@@ -5,6 +5,7 @@ import callfunc.impl.ExternDef;
 
 class FunctionImpl implements Function {
     final MAX_RETURN_SIZE = 8;
+    final DEFAULT_ABI = -999;
 
     public var name(get, never):String;
     public var params(get, never):Array<DataType>;
@@ -13,12 +14,13 @@ class FunctionImpl implements Function {
     final _name:String;
     final _params:Array<DataType>;
     final _returnType:DataType;
+    final _abi:Int;
     final nativePointer:ExternFunction;
     final library:LibraryImpl;
     var buffer:Null<Bytes>;
 
     public function new(library:LibraryImpl, name:String,
-            ?params:Array<DataType>, ?returnType:DataType) {
+            ?params:Array<DataType>, ?returnType:DataType, ?abi:Int) {
         nativePointer = ExternDef.newFunction(library.nativePointer);
         this.library = library;
         _name = name;
@@ -26,6 +28,8 @@ class FunctionImpl implements Function {
         _params = params;
         returnType = returnType != null ? returnType : DataType.Void;
         _returnType = returnType;
+        abi = abi != null ? abi : DEFAULT_ABI;
+        _abi = abi;
 
         if (nativePointer == null) {
             throw "Failed to allocate function struct.";
@@ -35,7 +39,7 @@ class FunctionImpl implements Function {
         var pointer = cast(library.getSymbol(name), PointerImpl);
 
         var error = ExternDef.functionDefine(nativePointer,
-            pointer.nativePointer, MemoryImpl.bytesToBytesData(buffer));
+            pointer.nativePointer, abi, MemoryImpl.bytesToBytesData(buffer));
 
         if (error != 0) {
             throw NativeUtil.fromNativeString(ExternDef.getErrorMessage());

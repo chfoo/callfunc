@@ -44,6 +44,8 @@
 #define CALLFUNC_ULONG (18)
 #define CALLFUNC_POINTER (19)
 
+#define CALLFUNC_DEFAULT_ABI (-999)
+
 #define _CALLFUNC_ABORT_NULL(pointer) { assert(pointer != NULL); if (pointer == NULL) { abort(); } }
 
 #ifdef __cplusplus
@@ -104,7 +106,7 @@ void callfunc_del_function(struct CallfuncFunction * function);
 
 CALLFUNC_API
 CallfuncError callfunc_function_define(struct CallfuncFunction * function,
-    void * target_function, uint8_t * definition);
+    void * target_function, int abi, uint8_t * definition);
 
 CALLFUNC_API
 void callfunc_function_call(struct CallfuncFunction * function,

@@ -134,7 +134,7 @@ void callfunc_del_function(struct CallfuncFunction * function) {
 
 CallfuncError callfunc_function_define(
         struct CallfuncFunction * function, void * target_function,
-        uint8_t * definition) {
+        int abi, uint8_t * definition) {
     assert(function != NULL);
     assert(definition != NULL);
 
@@ -154,7 +154,10 @@ CallfuncError callfunc_function_define(
             _callfunc_constant_to_ffi_type(definition[5 + param_index]);
     }
 
-    ffi_status status = ffi_prep_cif(&function->cif, FFI_DEFAULT_ABI,
+    ffi_abi ffi_abi = (enum ffi_abi)
+        (abi == CALLFUNC_DEFAULT_ABI ? FFI_DEFAULT_ABI : abi);
+
+    ffi_status status = ffi_prep_cif(&function->cif, ffi_abi,
         num_params, return_type, parameter_types);
 
     return _check_ffi_status(status);
@@ -420,7 +423,7 @@ HL_DEF(callfunc_library_close, _VOID, _ABSTRACT(struct CallfuncLibrary))
 HL_DEF(callfunc_library_get_address, _I32, _ABSTRACT(struct CallfuncLibrary) _BYTES _REF(_ABSTRACT(void*)))
 HL_DEF(callfunc_new_function, _ABSTRACT(struct CallfuncFunction), _ABSTRACT(struct CallfuncLibrary))
 HL_DEF(callfunc_del_function, _VOID, _ABSTRACT(struct CallfuncFunction))
-HL_DEF(callfunc_function_define, _I32, _ABSTRACT(struct CallfuncFunction) _ABSTRACT(void*) _BYTES)
+HL_DEF(callfunc_function_define, _I32, _ABSTRACT(struct CallfuncFunction) _ABSTRACT(void*) _I32 _BYTES)
 HL_DEF(callfunc_function_call, _VOID, _ABSTRACT(struct CallfuncFunction) _BYTES)
 HL_DEF(callfunc_new_struct_type, _ABSTRACT(struct CallfuncStructType), _NO_ARG)
 HL_DEF(callfunc_del_struct_type, _VOID, _ABSTRACT(struct CallfuncStructType))
