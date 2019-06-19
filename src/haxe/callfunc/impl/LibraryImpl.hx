@@ -28,6 +28,34 @@ class LibraryImpl implements Library {
         }
     }
 
+    public function getSymbol(name:String):Pointer {
+        @:nullSafety(Off) var targetPointer:ExternVoidStar = null;
+
+        #if cpp
+        var targetRef = cpp.RawPointer.addressOf(targetPointer);
+        #elseif hl
+        var targetRef = hl.Ref.make(targetPointer);
+        #else
+        #error
+        #end
+
+        var error = ExternDef.libraryGetAddress(
+            nativePointer,
+            NativeUtil.toNativeString(name),
+            targetRef);
+
+        if (error != 0) {
+            throw NativeUtil.fromNativeString(ExternDef.getErrorMessage());
+        }
+
+        #if cpp
+        return new PointerImpl(cpp.Pointer.fromRaw(targetPointer), memory);
+        #else
+        return new PointerImpl(targetPointer, memory);
+        #end
+    }
+
+
     public function newFunction(name:String, ?params:Array<DataType>,
             ?returnType:DataType):Function {
         return new FunctionImpl(this, name, params, returnType);

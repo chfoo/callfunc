@@ -5,6 +5,11 @@ package callfunc;
  */
 interface Library extends Disposable {
     /**
+     * Returns a pointer to a symbol.
+     */
+    public function getSymbol(name:String):Pointer;
+
+    /**
      * Create a handle to a function.
      *
      * This method does not support variadic functions.

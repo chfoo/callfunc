@@ -31,29 +31,15 @@ class FunctionImpl implements Function {
             throw "Failed to allocate function struct.";
         }
 
-        @:nullSafety(Off) var targetPointer:ExternVoidStar = null;
+        var buffer = library.argSerializer.serializeParams(params, returnType);
+        var pointer = cast(library.getSymbol(name), PointerImpl);
 
-        #if cpp
-        var targetRef = cpp.RawPointer.addressOf(targetPointer);
-        #elseif hl
-        var targetRef = hl.Ref.make(targetPointer);
-        #else
-        #error
-        #end
-
-        var error = ExternDef.libraryGetAddress(
-            library.nativePointer,
-            NativeUtil.toNativeString(name),
-            targetRef);
+        var error = ExternDef.functionDefine(nativePointer,
+            pointer.nativePointer, MemoryImpl.bytesToBytesData(buffer));
 
         if (error != 0) {
             throw NativeUtil.fromNativeString(ExternDef.getErrorMessage());
         }
-
-        var buffer = library.argSerializer.serializeParams(params, returnType);
-
-        error = ExternDef.functionDefine(nativePointer,
-            targetPointer, MemoryImpl.bytesToBytesData(buffer));
     }
 
     function get_name():String {
