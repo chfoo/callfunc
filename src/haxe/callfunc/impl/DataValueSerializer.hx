@@ -57,12 +57,25 @@ class DataValueSerializer {
             case DataType.Double:
                 buffer.setDouble(bufferIndex, value);
             case DataType.Pointer:
-                buffer.setInt64(bufferIndex, (value:Pointer).address);
+                serializePointer(buffer, bufferIndex, value);
             default:
                 throw "Shouldn't reach here";
         }
 
         return valueSize;
+    }
+
+    function serializePointer(buffer:Bytes, bufferIndex:Int, pointer:Pointer) {
+        var valueSize = memory.sizeOf(DataType.Pointer);
+
+        switch valueSize {
+            case 8:
+                buffer.setInt64(bufferIndex, pointer.address);
+            case 4:
+                buffer.setInt32(bufferIndex, pointer.address.low);
+            default:
+                throw 'Unsupported pointer width $valueSize';
+        }
     }
 
     function toInt(value:Any):Int {
@@ -89,7 +102,7 @@ class DataValueSerializer {
         }
     }
 
-     public function deserializeValue(buffer:Bytes, bufferIndex:Int, dataType:DataType):Any {
+    public function deserializeValue(buffer:Bytes, bufferIndex:Int, dataType:DataType):Any {
         switch DataTypeAlias.normalize(memory, dataType) {
             case DataType.UInt8:
                 return buffer.get(bufferIndex);
@@ -110,11 +123,25 @@ class DataValueSerializer {
             case DataType.Float:
                 return buffer.getFloat(bufferIndex);
             case DataType.Pointer:
-                return memory.getPointer(buffer.getInt64(bufferIndex));
+                return deserializePointer(buffer, bufferIndex);
             case DataType.Void:
                 return "Void type";
             default:
                 throw "Shouldn't reach here";
+        }
+    }
+
+    function deserializePointer(buffer:Bytes, bufferIndex:Int):Pointer {
+        var valueSize = memory.sizeOf(DataType.Pointer);
+
+        switch valueSize {
+            case 8:
+                return memory.getPointer(buffer.getInt64(bufferIndex));
+            case 4:
+                return memory.getPointer(
+                    Int64.make(0, buffer.getInt32(bufferIndex)));
+            default:
+                throw 'Unsupported pointer width $valueSize';
         }
     }
 }

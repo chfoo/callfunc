@@ -11,7 +11,7 @@ class TestCairoSurface extends Test {
 
         switch Sys.systemName() {
             case "Windows":
-                libName = "libcairo.dll";
+                libName = "cairo.dll";
             case "Mac":
                 libName = "libcairo.dynlib";
             default:
