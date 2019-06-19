@@ -1,13 +1,15 @@
 <xml>
     <files id="haxe">
-        <compilerflag value="-I${this_dir}/out/libffi/destdir/include/" unless="haxelib:callfunc" />
-        <compilerflag value="-I${this_dir}/src/c/" unless="haxelib:callfunc" />
-        <compilerflag value="-I${haxelib:callfunc}/src/c/" if="haxelib:callfunc" />
+        <compilerflag value="-I${this_dir}/out/libffi/destdir/include/" if="callfunc_unit_test" />
+        <compilerflag value="-I${this_dir}/src/c/" unless="haxelib:callfunc||HXCPP_MSVC"/>
+        <compilerflag value="/I${this_dir}/src/c/" if="HXCPP_MSVC" unless="haxelib:callfunc"/>
+        <compilerflag value="-I${haxelib:callfunc}/src/c/" if="haxelib:callfunc" unless="HXCPP_MSVC" />
+        <compilerflag value="/I${haxelib:callfunc}/src/c/" if="haxelib:callfunc HXCPP_MSVC" />
         <file name="${this_dir}/src/c/callfunc.c" />
     </files>
     <target id="haxe">
-        <lib name="-lffi" unless="windows"/>
-        <lib name="libffi.lib" if="windows"/>
-        <flag value="-L${this_dir}/out/libffi/destdir/lib/" unless="haxelib:callfunc" />
+        <lib name="-lffi" unless="HXCPP_MSVC"/>
+        <lib name="libffi.lib" if="HXCPP_MSVC"/>
+        <flag value="-L${this_dir}/out/libffi/destdir/lib/" if="callfunc_unit_test" />
     </target>
 </xml>

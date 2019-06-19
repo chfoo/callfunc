@@ -26,7 +26,7 @@ script:
   - mkdir -p out/ && cd out/ && /usr/bin/cmake .. -DCMAKE_BUILD_TYPE=Debug
   - make && make examplelib
   - cd ../
-  - haxe hxml/test.cpp.hxml
-  - haxe hxml/test.hl.hxml
+  - haxe hxml/test.cpp.hxml -D callfunc_unit_test
+  - haxe hxml/test.hl.hxml -D callfunc_unit_test
   - source script/export_ld_path.sh && ./out/cpp/TestAll-debug
   - source script/export_ld_path.sh && hl out/hl/test.hl
