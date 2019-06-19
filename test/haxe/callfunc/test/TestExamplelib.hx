@@ -13,7 +13,7 @@ class TestExamplelib extends Test {
             case "Windows":
                 libName = "examplelib.dll";
             case "Mac":
-                libName = "examplelib.dynlib";
+                libName = "examplelib.dylib";
             default:
                 libName = "examplelib.so";
         }
