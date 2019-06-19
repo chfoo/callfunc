@@ -44,7 +44,22 @@ def add_bin(zip_filename: str, project_dir: str):
     print('Adding binaries')
 
     filenames = (
-
+        'bin/libffi.txt',
+        'bin/macos/callfunc-0.1.0_4cf71cb/callfunc.hdll',
+        'bin/macos/libffi-3.3-rc0_80d0710/ffi.h',
+        'bin/macos/libffi-3.3-rc0_80d0710/ffitarget.h',
+        'bin/macos/libffi-3.3-rc0_80d0710/libffi.7.dylib',
+        'bin/windows-x86-64/libffi-3.3-rc0-1_20f4c8a/ffi.h',
+        'bin/windows-x86-64/libffi-3.3-rc0-1_20f4c8a/ffitarget.h',
+        'bin/windows-x86-64/libffi-3.3-rc0-1_20f4c8a/libffi.dll',
+        'bin/windows-x86-64/libffi-3.3-rc0-1_20f4c8a/libffi.lib',
+        'bin/windows-x86-64/libffi-3.3-rc0-1_20f4c8a/libffi.pdb',
+        'bin/windows-x86/callfunc-0.1.0_c8a02b0/callfunc.hdll',
+        'bin/windows-x86/libffi-3.3-rc0-1_20f4c8a/ffi.h',
+        'bin/windows-x86/libffi-3.3-rc0-1_20f4c8a/ffitarget.h',
+        'bin/windows-x86/libffi-3.3-rc0-1_20f4c8a/libffi.dll',
+        'bin/windows-x86/libffi-3.3-rc0-1_20f4c8a/libffi.lib',
+        'bin/windows-x86/libffi-3.3-rc0-1_20f4c8a/libffi.pdb',
     )
 
     zip_file = zipfile.ZipFile(zip_filename, mode='a')

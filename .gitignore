@@ -4,6 +4,9 @@
 # Compiled output files
 out/
 
+# Libraries for zip release
+bin/
+
 # CMake
 CMakeLists.txt.user
 CMakeCache.txt
