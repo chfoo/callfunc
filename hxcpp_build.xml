@@ -1,11 +1,16 @@
 <xml>
     <files id="haxe">
+        <compilerflag value="-DCALLFUNC_CPP" unless="windows"/>
+        <compilerflag value="/DCALLFUNC_CPP" if="windows"/>
         <compilerflag value="-I${this_dir}/out/libffi/destdir/include/" if="callfunc_unit_test" />
         <compilerflag value="-I${this_dir}/src/c/" unless="haxelib:callfunc||windows"/>
         <compilerflag value="/I${this_dir}/src/c/" if="windows" unless="haxelib:callfunc"/>
         <compilerflag value="-I${haxelib:callfunc}/src/c/" if="haxelib:callfunc" unless="windows" />
         <compilerflag value="/I${haxelib:callfunc}/src/c/" if="haxelib:callfunc windows" />
-        <file name="${this_dir}/src/c/callfunc.c" />
+        <file name="${this_dir}/src/c/callfunc_hxcpp.cpp">
+            <depend name="${this_dir}/src/c/callfunc.h"/>
+            <depend name="${this_dir}/src/c/callfunc.c"/>
+        </file>
     </files>
     <target id="haxe">
         <lib name="-lffi" unless="windows"/>

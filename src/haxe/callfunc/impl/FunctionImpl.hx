@@ -21,15 +21,17 @@ class FunctionImpl implements Function {
 
     public function new(library:LibraryImpl, name:String,
             ?params:Array<DataType>, ?returnType:DataType, ?abi:Int) {
-        nativePointer = ExternDef.newFunction(library.nativePointer);
+        params = params != null ? params : [];
+        returnType = returnType != null ? returnType : DataType.Void;
+        abi = abi != null ? abi : DEFAULT_ABI;
+
         this.library = library;
         _name = name;
-        params = params != null ? params : [];
         _params = params;
-        returnType = returnType != null ? returnType : DataType.Void;
         _returnType = returnType;
-        abi = abi != null ? abi : DEFAULT_ABI;
         _abi = abi;
+
+        nativePointer = ExternDef.newFunction(library.nativePointer);
 
         if (nativePointer == null) {
             throw "Failed to allocate function struct.";

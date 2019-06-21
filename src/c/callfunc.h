@@ -54,6 +54,15 @@ extern "C" {
 
 typedef int CallfuncError;
 
+#ifdef CALLFUNC_CPP
+    typedef Dynamic CallfuncHaxeFunc;
+#elif CALLFUNC_HL
+    typedef vclosure * CallfuncHaxeFunc;
+#else
+    typedef void (*CallfuncHaxeFunc)(uint8_t *);
+#endif
+
+
 struct CallfuncLibrary {
     void * library;
 };
@@ -66,6 +75,15 @@ struct CallfuncFunction {
 
 struct CallfuncStructType {
     ffi_type type;
+};
+
+struct CallfuncCallback {
+    ffi_cif cif;
+    ffi_closure * closure;
+    void * code_location;
+    uint8_t * definition;
+    uint8_t * arg_buffer;
+    CallfuncHaxeFunc haxe_function;
 };
 
 CALLFUNC_API
@@ -124,6 +142,23 @@ CallfuncError callfunc_struct_type_define(
     uint8_t * resultInfo);
 
 CALLFUNC_API
+struct CallfuncCallback * callfunc_new_callback();
+
+CALLFUNC_API
+void callfunc_del_callback(struct CallfuncCallback * callback);
+
+CALLFUNC_API
+CallfuncError callfunc_callback_define(struct CallfuncCallback * callback,
+    uint8_t * definition);
+
+CALLFUNC_API
+CallfuncError callfunc_callback_bind(struct CallfuncCallback * callback,
+    uint8_t * arg_buffer, CallfuncHaxeFunc haxe_function);
+
+CALLFUNC_API
+void * callfunc_callback_get_pointer(struct CallfuncCallback * callback);
+
+CALLFUNC_API
 int64_t callfunc_pointer_to_int64(void * pointer);
 
 CALLFUNC_API
@@ -162,6 +197,11 @@ void _callfunc_parse_struct_definition(uint8_t * definition,
 
 void * _callfunc_get_aligned_pointer(void * pointer, uint8_t data_type,
     int32_t index);
+
+void _callfunc_closure_handler(ffi_cif * cif, void * return_value,
+    void ** args, void * user_data);
+
+void _callfunc_closure_impl(struct CallfuncCallback * callback);
 
 #ifdef __cplusplus
 }

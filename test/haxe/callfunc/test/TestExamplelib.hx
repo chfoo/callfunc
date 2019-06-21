@@ -4,21 +4,20 @@ import utest.Assert;
 import utest.Test;
 
 class TestExamplelib extends Test {
-    public function testf1() {
-        var callfunc = Callfunc.instance();
-
-        var libName;
-
+    function getLibName() {
         switch Sys.systemName() {
             case "Windows":
-                libName = "examplelib.dll";
+                return "examplelib.dll";
             case "Mac":
-                libName = "examplelib.dylib";
+                return "examplelib.dylib";
             default:
-                libName = "examplelib.so";
+                return "examplelib.so";
         }
+    }
 
-        var library = callfunc.newLibrary(libName);
+    public function testf1() {
+        var callfunc = Callfunc.instance();
+        var library = callfunc.newLibrary(getLibName());
 
         var f1 = library.newFunction(
             "examplelib_f1",
@@ -36,5 +35,37 @@ class TestExamplelib extends Test {
         callfunc.memory.free(outputPointer);
         f1.dispose();
         library.dispose();
+    }
+
+    public function testCallback() {
+        var callfunc = Callfunc.instance();
+        var library = callfunc.newLibrary(getLibName());
+
+        var f = library.newFunction(
+            "examplelib_callback",
+            [DataType.Pointer],
+            DataType.SInt32
+        );
+
+        function callback(args:Array<Any>):Any {
+            var a:Int = args[0];
+            var b:Int = args[1];
+
+            return a + b;
+        }
+
+        var callbackWrapper = callfunc.newCallback(
+            callback,
+            [DataType.SInt32, DataType.SInt32],
+            DataType.SInt32);
+        var callbackPointer = callbackWrapper.getPointer();
+
+        var result = f.call([callbackPointer]);
+
+        Assert.equals(123 + 456, result);
+
+        f.dispose();
+        library.dispose();
+        callbackWrapper.dispose();
     }
 }

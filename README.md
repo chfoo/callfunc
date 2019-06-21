@@ -173,6 +173,34 @@ var a = structPointer.get(DataType.SInt, structType.offsets[0]);
 var b = structPointer.get(DataType.Pointer, structType.offsets[1]);
 ```
 
+## Callback functions
+
+C code calling Haxe code is supported.
+
+The following C function accepts a function pointer. The function pointer accepts two integers and returns an integer.
+
+```c
+void do_something(int32_t (*callback)(int32_t a, int32_t b));
+```
+
+In Haxe, define the function parameters and return type and obtain a pointer to be passed to the C function.
+
+```haxe
+function myHaxeCallback(args:Array<Any>):Any {
+    var a:Int = args[0];
+    var b:Int = args[1];
+
+    return b - a;
+}
+
+var callfunc = Callfunc.instance();
+var callbackDef = callfunc.newCallback(myHaxeCallback, [DataType.SInt32, DataType.SInt32], DataType.SInt32);
+var callbackPointer = callbackDef.getPointer();
+var f = library.newFunction("do_something", [DataType.Pointer]);
+
+f.call([callbackPointer]);
+```
+
 ## Documentation
 
 API docs: https://chfoo.github.io/callfunc/api/

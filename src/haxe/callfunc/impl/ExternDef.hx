@@ -2,6 +2,7 @@ package callfunc.impl;
 
 import haxe.io.BytesData;
 import haxe.Int64;
+
 #if cpp
 @:include("callfunc.h")
 @:native("CallfuncLibrary")
@@ -18,11 +19,17 @@ private extern class CPPExternFunction {
 private extern class CPPExternStructType {
 }
 
+@:include("callfunc.h")
+@:native("CallfuncCallback")
+private extern class CPPExternCallback {
+}
+
 typedef ExternVoidStar = cpp.RawPointer<cpp.Void>;
 typedef ExternPointer<T> = cpp.RawPointer<T>;
 typedef ExternLibrary = cpp.RawPointer<CPPExternLibrary>;
 typedef ExternFunction = cpp.RawPointer<CPPExternFunction>;
 typedef ExternStructType = cpp.RawPointer<CPPExternStructType>;
+typedef ExternCallback = cpp.RawPointer<CPPExternCallback>;
 typedef ExternBytesData = cpp.Pointer<cpp.UInt8>;
 typedef ExternString = cpp.ConstCharStar;
 typedef ExternInt8 = cpp.Int8;
@@ -34,6 +41,7 @@ typedef ExternPointer<T> = hl.Ref<T>;
 typedef ExternLibrary = hl.Abstract<"struct CallfuncLibrary">;
 typedef ExternFunction = hl.Abstract<"struct CallfuncFunction">;
 typedef ExternStructType = hl.Abstract<"struct CallfuncStructType">;
+typedef ExternCallback = hl.Abstract<"struct CallfuncCallback">;
 typedef ExternBytesData = hl.Bytes;
 typedef ExternString = hl.Bytes;
 typedef ExternInt8 = hl.UI8;
@@ -42,9 +50,10 @@ typedef ExternInt8 = hl.UI8;
 
 typedef ExternVoidStar = Dynamic;
 typedef ExternPointer<T> = Dynamic;
-typedef ExternLibrary = Dynmaic;
-typedef ExternFunction = Dynmaic;
-typedef ExternStructType = Dynmaic;
+typedef ExternLibrary = Dynamic;
+typedef ExternFunction = Dynamic;
+typedef ExternStructType = Dynamic;
+typedef ExternCallback = Dynamic;
 typedef ExternBytesData = BytesData;
 typedef ExternString = String;
 typedef ExternInt8 = Int;
@@ -139,6 +148,32 @@ extern class ExternDef {
         structType:ExternStructType,
         definition:ExternBytesData,
         result:ExternBytesData):Int;
+
+    #if cpp @:native("callfunc_new_callback") #end
+    #if hl @:hlNative("callfunc", "callfunc_new_callback") #end
+    public static function newCallback():ExternCallback;
+
+    #if cpp @:native("callfunc_del_callback") #end
+    #if hl @:hlNative("callfunc", "callfunc_del_callback") #end
+    public static function delCallback(callback:ExternCallback):Void;
+
+    #if cpp @:native("callfunc_callback_define") #end
+    #if hl @:hlNative("callfunc", "callfunc_callback_define") #end
+    public static function callbackDefine(
+        callback:ExternCallback,
+        definition:ExternBytesData):Int;
+
+    #if cpp @:native("callfunc_callback_bind") #end
+    #if hl @:hlNative("callfunc", "callfunc_callback_bind") #end
+    public static function callbackBind(
+        callback:ExternCallback,
+        argBuffer:ExternBytesData,
+        handler:Void->Void):Int;
+
+    #if cpp @:native("callfunc_callback_get_pointer") #end
+    #if hl @:hlNative("callfunc", "callfunc_callback_get_pointer") #end
+    public static function callbackGetPointer(
+        callback:ExternCallback):ExternVoidStar;
 
     #if cpp @:native("callfunc_pointer_to_int64") #end
     #if hl @:hlNative("callfunc", "callfunc_pointer_to_int64") #end

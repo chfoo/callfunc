@@ -66,4 +66,25 @@ class Callfunc {
         throw "Not supported";
         #end
     }
+
+    /**
+     * Returns a Callback instance for passing Haxe functions to C code.
+     *
+     * Availability depends on the libffi platform support for closures.
+     *
+     * @param haxeFunction Callback function to be wrapped.
+     * @param params Data types corresponding to the function parameters
+     *     exposed to the C code.
+     * @param returnType Data type of the return value of the exposed function.
+     */
+    public function newCallback(haxeFunction:Array<Any>->Any,
+            ?params:Array<DataType>,
+            ?returnType:DataType):Callback {
+        #if (cpp || hl)
+        return new callfunc.impl.CallbackImpl(memory, haxeFunction, params,
+            returnType);
+        #else
+        throw "Not supported";
+        #end
+    }
 }

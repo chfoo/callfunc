@@ -241,6 +241,78 @@ CallfuncError callfunc_struct_type_define(
     return _check_ffi_status(status);
 }
 
+struct CallfuncCallback * callfunc_new_callback() {
+    return (struct CallfuncCallback *)
+        calloc(sizeof(struct CallfuncCallback), 1);
+}
+
+void callfunc_del_callback(struct CallfuncCallback * callback) {
+    assert(callback != NULL);
+
+    if (callback->cif.arg_types != NULL) {
+        free(callback->cif.arg_types);
+    }
+
+    if (callback->closure != NULL) {
+        ffi_closure_free(callback->closure);
+    }
+
+    if (callback->definition != NULL) {
+        free(callback->definition);
+    }
+
+    free(callback);
+}
+
+CallfuncError callfunc_callback_define(struct CallfuncCallback * callback,
+        uint8_t * definition) {
+    assert(callback != NULL);
+    assert(definition != NULL);
+
+    int32_t num_params;
+    ffi_type ** parameter_types;
+    ffi_type * return_type;
+
+    _callfunc_parse_parameter_definition(definition, &num_params,
+        &parameter_types, &return_type);
+
+    callback->definition = (uint8_t *) malloc(4 + 1 + num_params);
+    _CALLFUNC_ABORT_NULL(callback->definition);
+    memcpy(callback->definition, definition, 4 + 1 + num_params);
+
+    ffi_status status = ffi_prep_cif(&callback->cif, FFI_DEFAULT_ABI,
+        num_params, return_type, parameter_types);
+
+    return _check_ffi_status(status);
+}
+
+CallfuncError callfunc_callback_bind(struct CallfuncCallback * callback,
+        uint8_t * arg_buffer, CallfuncHaxeFunc haxe_function) {
+    assert(callback != NULL);
+    assert(arg_buffer != NULL);
+    assert(haxe_function != NULL);
+
+    callback->closure = (ffi_closure *) ffi_closure_alloc(
+        sizeof(ffi_closure), &callback->code_location);
+    callback->arg_buffer = arg_buffer;
+    callback->haxe_function = haxe_function;
+
+    _CALLFUNC_ABORT_NULL(callback->closure);
+    _CALLFUNC_ABORT_NULL(callback->code_location);
+
+    ffi_status status = ffi_prep_closure_loc(callback->closure, &callback->cif,
+        _callfunc_closure_handler, callback, callback->code_location);
+
+    return _check_ffi_status(status);
+}
+
+void * callfunc_callback_get_pointer(struct CallfuncCallback * callback) {
+    assert(callback != NULL);
+    assert(callback->code_location != NULL);
+
+    return callback->code_location;
+}
+
 int64_t callfunc_pointer_to_int64(void * pointer) {
     return (int64_t) pointer;
 }
@@ -449,8 +521,51 @@ void * _callfunc_get_aligned_pointer(void * pointer, uint8_t data_type,
 }
 #undef _CALLFUNC_ALIGN_HELPER
 
+void _callfunc_closure_handler(ffi_cif * cif, void * return_value,
+        void ** args, void * user_data) {
+    assert(user_data != NULL);
+    assert(sizeof(ffi_arg) <= 8);
+
+    struct CallfuncCallback * callback = (struct CallfuncCallback *) user_data;
+
+    assert(callback->definition != NULL);
+    assert(callback->arg_buffer != NULL);
+    assert(callback->haxe_function != NULL);
+
+    int32_t num_args = (int32_t) callback->cif.nargs;
+
+    ((int32_t *) callback->arg_buffer)[0] = num_args;
+
+    size_t buffer_index = 4 + CALLFUNC_MAX_RETURN_SIZE;
+
+    for (int32_t arg_index = 0; arg_index < num_args; arg_index++) {
+        uint8_t data_type = callback->definition[5 + arg_index];
+        size_t value_size = _callfunc_data_type_size(data_type);
+        void * arg = args[arg_index];
+
+        callback->arg_buffer[buffer_index] = value_size;
+        buffer_index += 1;
+
+        memcpy(&callback->arg_buffer[buffer_index], arg, value_size);
+
+        buffer_index += value_size;
+    }
+
+    _callfunc_closure_impl(callback);
+
+    uint8_t return_data_type = callback->definition[4];
+
+    if (return_data_type != CALLFUNC_VOID) {
+        memcpy(return_value, &callback->arg_buffer[4], sizeof(ffi_arg));
+    }
+}
+
+// HXCPP definitions
+#if CALLFUNC_CPP
+// see callfunc_hxcpp.cpp
+
 // Hashlink exports
-#ifdef CALLFUNC_HL
+#elif CALLFUNC_HL
 #include <hl.h>
 
 // It would be nice if I could find in the source code how this structure
@@ -483,6 +598,10 @@ void * hl_callfunc_int64_to_pointer(vdynamic * obj) {
     return callfunc_int64_to_pointer(val);
 }
 
+void _callfunc_closure_impl(struct CallfuncCallback * callback) {
+    hl_dyn_call(callback->haxe_function, NULL, 0);
+}
+
 #define HL_DEF(name,t,args) DEFINE_PRIM_WITH_NAME(t,name,args,name)
 #define HL_DEF2(name,impl_name,t,args) DEFINE_PRIM_WITH_NAME(t,impl_name,args,name)
 
@@ -502,11 +621,23 @@ HL_DEF(callfunc_function_call, _VOID, _ABSTRACT(struct CallfuncFunction) _BYTES)
 HL_DEF(callfunc_new_struct_type, _ABSTRACT(struct CallfuncStructType), _NO_ARG)
 HL_DEF(callfunc_del_struct_type, _VOID, _ABSTRACT(struct CallfuncStructType))
 HL_DEF(callfunc_struct_type_define, _I32, _ABSTRACT(struct CallfuncStructType) _BYTES _BYTES)
+HL_DEF(callfunc_new_callback, _ABSTRACT(struct CallfuncCallback), _NO_ARG)
+HL_DEF(callfunc_del_callback, _VOID, _ABSTRACT(struct CallfuncCallback))
+HL_DEF(callfunc_callback_define, _I32, _ABSTRACT(struct CallfuncCallback) _BYTES)
+HL_DEF(callfunc_callback_bind, _I32, _ABSTRACT(struct CallfuncCallback) _BYTES _FUN(_VOID, _NO_ARG))
+HL_DEF(callfunc_callback_get_pointer, _ABSTRACT(void*), _ABSTRACT(struct CallfuncCallback))
 HL_DEF2(callfunc_pointer_to_int64, hl_callfunc_pointer_to_int64, _OBJ(_I32 _I32), _ABSTRACT(void*))
 HL_DEF2(callfunc_int64_to_pointer, hl_callfunc_int64_to_pointer, _ABSTRACT(void*), _OBJ(_I32 _I32))
 HL_DEF(callfunc_pointer_get, _VOID, _ABSTRACT(void*) _I8 _BYTES _I32)
 HL_DEF(callfunc_pointer_set, _VOID, _ABSTRACT(void*) _I8 _BYTES _I32)
 HL_DEF(callfunc_pointer_array_get, _VOID, _ABSTRACT(void*) _I8 _BYTES _I32)
 HL_DEF(callfunc_pointer_array_set, _VOID, _ABSTRACT(void*) _I8 _BYTES _I32)
+
+#else
+
+void _callfunc_closure_impl(struct CallfuncCallback * callback) {
+    assert(0);
+    abort();
+}
 
 #endif
