@@ -44,7 +44,8 @@ void callfunc_free(void * pointer) {
 }
 
 struct CallfuncLibrary * callfunc_new_library() {
-    struct CallfuncLibrary * library = malloc(sizeof(struct CallfuncLibrary));
+    struct CallfuncLibrary * library =
+        (struct CallfuncLibrary *) malloc(sizeof(struct CallfuncLibrary));
 
     return library;
 }
@@ -113,7 +114,7 @@ struct CallfuncFunction * callfunc_new_function(
     assert(library != NULL);
 
     struct CallfuncFunction * function =
-        calloc(sizeof(struct CallfuncFunction), 1);
+        (struct CallfuncFunction *) calloc(sizeof(struct CallfuncFunction), 1);
 
     if (function != NULL) {
         function->library = library;
@@ -140,19 +141,12 @@ CallfuncError callfunc_function_define(
 
     function->function = (void(*)(void)) target_function;
 
-    int32_t num_params = ((int32_t *) definition)[0];
-    ffi_type ** parameter_types = malloc(sizeof(ffi_type *) * num_params);
-    ffi_type * return_type = _callfunc_constant_to_ffi_type(definition[4]);
+    int32_t num_params;
+    ffi_type ** parameter_types;
+    ffi_type * return_type;
 
-    if (parameter_types == NULL) {
-        _callfunc_error_message = "Alloc failure";
-        return CALLFUNC_FAILURE;
-    }
-
-    for (int32_t param_index = 0; param_index < num_params; param_index++) {
-        parameter_types[param_index] =
-            _callfunc_constant_to_ffi_type(definition[5 + param_index]);
-    }
+    _callfunc_parse_parameter_definition(definition, &num_params,
+        &parameter_types, &return_type);
 
     ffi_abi ffi_abi = (enum ffi_abi)
         (abi == CALLFUNC_DEFAULT_ABI ? FFI_DEFAULT_ABI : abi);
@@ -174,7 +168,7 @@ void callfunc_function_call(struct CallfuncFunction * function,
     ffi_arg return_value;
     size_t buffer_index = 4 + CALLFUNC_MAX_RETURN_SIZE;
 
-    void ** arg_pointers = malloc(num_args * sizeof(void *));
+    void ** arg_pointers = (void **) malloc(num_args * sizeof(void *));
     _CALLFUNC_ABORT_NULL(arg_pointers);
 
     for (int32_t arg_index = 0; arg_index < num_args; arg_index++) {
@@ -195,7 +189,7 @@ void callfunc_function_call(struct CallfuncFunction * function,
 
 struct CallfuncStructType * callfunc_new_struct_type() {
     struct CallfuncStructType * struct_type =
-        malloc(sizeof(struct CallfuncStructType));
+        (struct CallfuncStructType *) malloc(sizeof(struct CallfuncStructType));
 
     if (struct_type != NULL) {
         struct_type->type.size = 0;
@@ -223,23 +217,14 @@ CallfuncError callfunc_struct_type_define(
     assert(definition != NULL);
     assert(resultInfo != NULL);
 
-    int32_t num_fields = ((int32_t *) definition)[0];
-    ffi_type ** field_types = malloc(sizeof(ffi_type *) * (num_fields + 1));
+    int32_t num_fields;
+    ffi_type ** field_types;
 
-    if (field_types == NULL) {
-        _callfunc_error_message = "Alloc failure";
-        return CALLFUNC_FAILURE;
-    }
+    _callfunc_parse_struct_definition(definition, &num_fields, &field_types);
 
-    for (int32_t field_index = 0; field_index < num_fields; field_index++) {
-        field_types[field_index] =
-            _callfunc_constant_to_ffi_type(definition[4 + field_index]);
-    }
-
-    field_types[num_fields] = NULL;
     struct_type->type.elements = field_types;
 
-    size_t * offsets = malloc(num_fields * sizeof(size_t));
+    size_t * offsets = (size_t *) malloc(num_fields * sizeof(size_t));
     _CALLFUNC_ABORT_NULL(offsets);
 
     ffi_status status = ffi_get_struct_offsets(FFI_DEFAULT_ABI,
@@ -315,7 +300,7 @@ void callfunc_pointer_array_set(void * pointer, uint8_t data_type,
 }
 
 size_t _callfunc_data_type_size(uint8_t data_type) {
-     switch (data_type) {
+    switch (data_type) {
         case CALLFUNC_UINT8: return sizeof(uint8_t);
         case CALLFUNC_SINT8: return sizeof(int8_t);
         case CALLFUNC_UINT16: return sizeof(uint16_t);
@@ -399,6 +384,40 @@ CallfuncError _check_ffi_status(ffi_status status) {
             _callfunc_error_message = "Unknown FFI error";
             return CALLFUNC_FAILURE;
     }
+}
+
+void _callfunc_parse_parameter_definition(uint8_t * definition,
+        int32_t * num_params,
+        ffi_type *** parameter_types, ffi_type ** return_type) {
+
+    int32_t num_params_ = ((int32_t *) definition)[0];
+    *num_params = num_params_;
+    *parameter_types = (ffi_type **) malloc(sizeof(ffi_type *) * num_params_);
+    *return_type = (ffi_type *) _callfunc_constant_to_ffi_type(definition[4]);
+
+    _CALLFUNC_ABORT_NULL(*parameter_types);
+
+    for (int32_t param_index = 0; param_index < num_params_; param_index++) {
+        (*parameter_types)[param_index] =
+            _callfunc_constant_to_ffi_type(definition[5 + param_index]);
+    }
+}
+
+void _callfunc_parse_struct_definition(uint8_t * definition,
+        int32_t * num_fields, ffi_type *** field_types) {
+
+    int32_t num_fields_ = ((int32_t *) definition)[0];
+    *num_fields = num_fields_;
+    *field_types = (ffi_type **) malloc(sizeof(ffi_type *) * (num_fields_ + 1));
+
+    _CALLFUNC_ABORT_NULL(*field_types);
+
+    for (int32_t field_index = 0; field_index < num_fields_; field_index++) {
+        (*field_types)[field_index] =
+            _callfunc_constant_to_ffi_type(definition[4 + field_index]);
+    }
+
+    (*field_types)[num_fields_] = NULL;
 }
 
 #define _CALLFUNC_ALIGN_HELPER(ctype) (&((ctype *) pointer)[index])
