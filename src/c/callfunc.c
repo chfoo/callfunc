@@ -533,7 +533,7 @@ void _callfunc_closure_handler(ffi_cif * cif, void * return_value,
     assert(callback->definition != NULL);
     assert(callback->arg_buffer != NULL);
     #ifndef CALLFUNC_CPP
-        assert(haxe_function != NULL);
+        assert(callback->haxe_function != NULL);
     #endif
 
     int32_t num_args = (int32_t) callback->cif.nargs;
