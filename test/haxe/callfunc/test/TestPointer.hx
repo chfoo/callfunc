@@ -41,14 +41,14 @@ class TestPointer extends utest.Test {
 
         var pointer = memory.alloc(16);
 
-        pointer.set(1, DataType.SInt32, 0);
-        pointer.set(2, DataType.SInt32, 4);
-        pointer.set(3, DataType.SInt32, 8);
-        pointer.set(4, DataType.SInt32, 12);
+        pointer.arraySet(1, DataType.SInt32, 0);
+        pointer.arraySet(2, DataType.SInt32, 1);
+        pointer.arraySet(3, DataType.SInt32, 2);
+        pointer.arraySet(4, DataType.SInt32, 3);
 
-        Assert.equals(1, pointer.get(DataType.SInt32, 0));
-        Assert.equals(2, pointer.get(DataType.SInt32, 4));
-        Assert.equals(3, pointer.get(DataType.SInt32, 8));
-        Assert.equals(4, pointer.get(DataType.SInt32, 12));
+        Assert.equals(1, pointer.arrayGet(DataType.SInt32, 0));
+        Assert.equals(2, pointer.arrayGet(DataType.SInt32, 1));
+        Assert.equals(3, pointer.arrayGet(DataType.SInt32, 2));
+        Assert.equals(4, pointer.arrayGet(DataType.SInt32, 3));
     }
 }

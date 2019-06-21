@@ -90,6 +90,8 @@ C:
 int do_something();
 ```
 
+Haxe:
+
 ```haxe
 var f = library.newFunction("do_something", [], DataType.SInt);
 var result = f.call();
@@ -120,12 +122,12 @@ var result = p.get(DataType.SInt32);
 
 ### Arrays
 
-To access array elements, simply pass the offset to the pointer:
+To access array elements, use the array version of get/set:
 
 ```haxe
 var index = 10;
-p.set(456, DataType.SInt32, size * index);
-var value = p.set(DataType.SInt32, size * index); // => 456
+p.arraySet(456, DataType.SInt32,index);
+var value = p.arrayGet(DataType.SInt32, index); // => 456
 ```
 
 ### Interpreting pointers as Bytes

@@ -22,7 +22,7 @@ interface Pointer {
      *
      * @param dataType Data type of the value expected at the addressed memory.
      * @param offset Value in bytes used to offset the address. This is used to
-     *     access values in a C array.
+     *     access fields in a struct.
      * @return A value converted to the type `Int`, `haxe.io.Int64`,
      *     `Float`, or `Pointer`.
      *
@@ -40,7 +40,25 @@ interface Pointer {
      *      appropriately.
      * @param dataType Data type of the value expected at the addressed memory.
      * @param offset Value in bytes used to offset the address. This is used to
-     *     access values in a C array.
+     *     access fields in a struct.
      */
     public function set(value:Any, dataType:DataType, offset:Int = 0):Void;
+
+    /**
+     * Returns the element value at the addressed C array location.
+     *
+     * @param dataType Data type of the array.
+     * @param index Element index of the array.
+     * @see `get()` for return types.
+     */
+    public function arrayGet(dataType:DataType, index:Int):Any;
+
+    /**
+     * Sets the element value at the address C array location.
+     * @param value Element value.
+     * @param dataType Data type of the array.
+     * @param index Element index.
+     * @see `set()` for parameter types.
+     */
+    public function arraySet(value:Any, dataType:DataType, index:Int):Void;
 }

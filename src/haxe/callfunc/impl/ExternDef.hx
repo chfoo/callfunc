@@ -159,4 +159,16 @@ extern class ExternDef {
     public static function pointerSet(
         pointer:ExternVoidStar, dataType:ExternInt8,
         buffer:ExternBytesData, offset:Int):Void;
+
+    #if cpp @:native("callfunc_pointer_array_get") #end
+    #if hl @:hlNative("callfunc", "callfunc_pointer_array_get") #end
+    public static function pointerArrayGet(
+        pointer:ExternVoidStar, dataType:ExternInt8,
+        buffer:ExternBytesData, index:Int):Void;
+
+    #if cpp @:native("callfunc_pointer_array_set") #end
+    #if hl @:hlNative("callfunc", "callfunc_pointer_array_set") #end
+    public static function pointerArraySet(
+        pointer:ExternVoidStar, dataType:ExternInt8,
+        buffer:ExternBytesData, index:Int):Void;
 }

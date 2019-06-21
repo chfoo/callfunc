@@ -137,6 +137,14 @@ CALLFUNC_API
 void callfunc_pointer_set(void * pointer, uint8_t data_type, uint8_t * buffer,
     int32_t offset);
 
+CALLFUNC_API
+void callfunc_pointer_array_get(void * pointer, uint8_t data_type,
+    uint8_t * buffer, int32_t index);
+
+CALLFUNC_API
+void callfunc_pointer_array_set(void * pointer, uint8_t data_type,
+    uint8_t * buffer, int32_t index);
+
 size_t _callfunc_data_type_size(uint8_t data_type);
 
 ffi_type * _callfunc_constant_to_ffi_type(int constant);
@@ -144,6 +152,9 @@ ffi_type * _callfunc_constant_to_ffi_type(int constant);
 const char * _callfunc_get_dll_error_message();
 
 CallfuncError _check_ffi_status(ffi_status status);
+
+void * _callfunc_get_aligned_pointer(void * pointer, uint8_t data_type,
+    int32_t index);
 
 #ifdef __cplusplus
 }

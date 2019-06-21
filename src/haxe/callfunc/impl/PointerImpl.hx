@@ -52,4 +52,18 @@ class PointerImpl implements Pointer {
         ExternDef.pointerSet(nativePointer, dataType.toInt(),
             MemoryImpl.bytesToBytesData(buffer), offset);
     }
+
+    public function arrayGet(dataType:DataType, index:Int):Any {
+        ExternDef.pointerArrayGet(nativePointer, dataType.toInt(),
+            MemoryImpl.bytesToBytesData(buffer), index);
+
+        return serializer.deserializeValue(buffer, 0, dataType);
+    }
+
+    public function arraySet(value:Any, dataType:DataType, index:Int) {
+        serializer.serializeValue(buffer, 0, dataType, value);
+
+        ExternDef.pointerArraySet(nativePointer, dataType.toInt(),
+            MemoryImpl.bytesToBytesData(buffer), index);
+    }
 }

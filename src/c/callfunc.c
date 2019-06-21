@@ -288,6 +288,32 @@ void callfunc_pointer_set(void * pointer, uint8_t data_type, uint8_t * buffer,
     memcpy((char *) pointer + offset, buffer, data_type_size);
 }
 
+void callfunc_pointer_array_get(void * pointer, uint8_t data_type,
+        uint8_t * buffer, int32_t index) {
+    assert(pointer != NULL);
+    assert(buffer != NULL);
+
+    size_t data_type_size = _callfunc_data_type_size(data_type);
+
+    assert(data_type_size > 0);
+
+    memcpy(buffer, _callfunc_get_aligned_pointer(pointer, data_type, index),
+        data_type_size);
+}
+
+void callfunc_pointer_array_set(void * pointer, uint8_t data_type,
+        uint8_t * buffer, int32_t index) {
+    assert(pointer != NULL);
+    assert(buffer != NULL);
+
+    size_t data_type_size = _callfunc_data_type_size(data_type);
+
+    assert(data_type_size > 0);
+
+    memcpy(_callfunc_get_aligned_pointer(pointer, data_type, index),
+        buffer, data_type_size);
+}
+
 size_t _callfunc_data_type_size(uint8_t data_type) {
      switch (data_type) {
         case CALLFUNC_UINT8: return sizeof(uint8_t);
@@ -375,6 +401,35 @@ CallfuncError _check_ffi_status(ffi_status status) {
     }
 }
 
+#define _CALLFUNC_ALIGN_HELPER(ctype) (&((ctype *) pointer)[index])
+
+void * _callfunc_get_aligned_pointer(void * pointer, uint8_t data_type,
+        int32_t index) {
+    switch (data_type) {
+        case CALLFUNC_UINT8: return _CALLFUNC_ALIGN_HELPER(uint8_t);
+        case CALLFUNC_SINT8: return _CALLFUNC_ALIGN_HELPER(int8_t);
+        case CALLFUNC_UINT16: return _CALLFUNC_ALIGN_HELPER(uint16_t);
+        case CALLFUNC_SINT16: return _CALLFUNC_ALIGN_HELPER(int16_t);
+        case CALLFUNC_UINT32: return _CALLFUNC_ALIGN_HELPER(uint32_t);
+        case CALLFUNC_SINT32: return _CALLFUNC_ALIGN_HELPER(int32_t);
+        case CALLFUNC_UINT64: return _CALLFUNC_ALIGN_HELPER(uint64_t);
+        case CALLFUNC_SINT64: return _CALLFUNC_ALIGN_HELPER(int64_t);
+        case CALLFUNC_FLOAT: return _CALLFUNC_ALIGN_HELPER(float);
+        case CALLFUNC_DOUBLE: return _CALLFUNC_ALIGN_HELPER(double);
+        case CALLFUNC_UCHAR: return _CALLFUNC_ALIGN_HELPER(unsigned char);
+        case CALLFUNC_SCHAR: return _CALLFUNC_ALIGN_HELPER(signed char);
+        case CALLFUNC_USHORT: return _CALLFUNC_ALIGN_HELPER(unsigned short);
+        case CALLFUNC_SSHORT: return _CALLFUNC_ALIGN_HELPER(short);
+        case CALLFUNC_SINT: return _CALLFUNC_ALIGN_HELPER(int);
+        case CALLFUNC_UINT: return _CALLFUNC_ALIGN_HELPER(unsigned int);
+        case CALLFUNC_SLONG: return _CALLFUNC_ALIGN_HELPER(long);
+        case CALLFUNC_ULONG: return _CALLFUNC_ALIGN_HELPER(unsigned long);
+        case CALLFUNC_POINTER: return _CALLFUNC_ALIGN_HELPER(void *);
+        default: assert(0); return 0;
+    }
+}
+#undef _CALLFUNC_ALIGN_HELPER
+
 // Hashlink exports
 #ifdef CALLFUNC_HL
 #include <hl.h>
@@ -432,5 +487,7 @@ HL_DEF2(callfunc_pointer_to_int64, hl_callfunc_pointer_to_int64, _OBJ(_I32 _I32)
 HL_DEF2(callfunc_int64_to_pointer, hl_callfunc_int64_to_pointer, _ABSTRACT(void*), _OBJ(_I32 _I32))
 HL_DEF(callfunc_pointer_get, _VOID, _ABSTRACT(void*) _I8 _BYTES _I32)
 HL_DEF(callfunc_pointer_set, _VOID, _ABSTRACT(void*) _I8 _BYTES _I32)
+HL_DEF(callfunc_pointer_array_get, _VOID, _ABSTRACT(void*) _I8 _BYTES _I32)
+HL_DEF(callfunc_pointer_array_set, _VOID, _ABSTRACT(void*) _I8 _BYTES _I32)
 
 #endif
