@@ -82,7 +82,7 @@ void callfunc_library_close(struct CallfuncLibrary * library) {
 
     if (library->library != NULL) {
         #ifdef _WIN32
-        FreeLibrary(library->library);
+        FreeLibrary((HMODULE) library->library);
         #else
         dlclose(library->library);
         #endif
@@ -95,7 +95,7 @@ CallfuncError callfunc_library_get_address(struct CallfuncLibrary * library,
     assert(name != NULL);
 
     #ifdef _WIN32
-    void * address = GetProcAddress(library->library, name);
+    void * address = GetProcAddress((HMODULE) library->library, name);
     #else
     void * address = dlsym(library->library, name);
     #endif
