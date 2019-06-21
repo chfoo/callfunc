@@ -290,7 +290,9 @@ CallfuncError callfunc_callback_bind(struct CallfuncCallback * callback,
         uint8_t * arg_buffer, CallfuncHaxeFunc haxe_function) {
     assert(callback != NULL);
     assert(arg_buffer != NULL);
-    assert(haxe_function != NULL);
+    #ifndef CALLFUNC_CPP
+        assert(haxe_function != NULL);
+    #endif
 
     callback->closure = (ffi_closure *) ffi_closure_alloc(
         sizeof(ffi_closure), &callback->code_location);
@@ -530,7 +532,9 @@ void _callfunc_closure_handler(ffi_cif * cif, void * return_value,
 
     assert(callback->definition != NULL);
     assert(callback->arg_buffer != NULL);
-    assert(callback->haxe_function != NULL);
+    #ifndef CALLFUNC_CPP
+        assert(haxe_function != NULL);
+    #endif
 
     int32_t num_args = (int32_t) callback->cif.nargs;
 
