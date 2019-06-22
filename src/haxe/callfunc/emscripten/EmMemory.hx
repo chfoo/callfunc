@@ -1,5 +1,6 @@
 package callfunc.emscripten;
 
+import haxe.io.ArrayBufferView;
 import haxe.io.Bytes;
 import haxe.Int64;
 
@@ -32,11 +33,9 @@ class EmMemory implements Memory {
         return new EmPointer(module, address.low);
     }
 
-    public function bytesToPointer(bytes:Bytes):Pointer {
-        throw "Not implemented";
-    }
-
-    public function pointerToBytes(pointer:Pointer, count:Int):Bytes {
-        throw "Not implemented";
+    public function pointerToDataView(pointer:Pointer,count:Int):DataView {
+        var nativePointer = cast(pointer, EmPointer).nativePointer;
+        var bytes = Bytes.ofData(module.HEAPU8.buffer);
+        return new BytesDataView(bytes, nativePointer, count);
     }
 }

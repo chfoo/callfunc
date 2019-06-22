@@ -1,9 +1,11 @@
 package callfunc.impl;
 
 import callfunc.impl.ExternDef.ExternBytesData;
-import haxe.io.BytesData;
 import haxe.Int64;
+import haxe.io.ArrayBufferView;
 import haxe.io.Bytes;
+import haxe.io.BytesData;
+
 using Safety;
 
 class MemoryImpl implements Memory {
@@ -104,5 +106,9 @@ class MemoryImpl implements Memory {
         #error
 
         #end
+    }
+
+    public function pointerToDataView(pointer:Pointer, count:Int):DataView {
+        return new BytesDataView(pointerToBytes(pointer, count));
     }
 }

@@ -1,5 +1,6 @@
 package callfunc;
 
+import haxe.io.ArrayBufferView;
 import haxe.io.Bytes;
 import haxe.Int64;
 
@@ -33,6 +34,7 @@ interface Memory {
      */
     public function getPointer(address:Int64):Pointer;
 
+    #if sys
     /**
      * Exposes a pointer to the underlying C array of a Haxe `Bytes`.
      *
@@ -44,7 +46,7 @@ interface Memory {
     public function bytesToPointer(bytes:Bytes):Pointer;
 
     /**
-     * Wraps pointer of a C array to Haxe `Bytes`.
+     * Wraps a pointer of a C array to Haxe `Bytes`.
      *
      * Care must be ensured that the pointer is not freed. The pointer is
      * not automatically freed when the bytes instance is garbage collected.
@@ -53,4 +55,16 @@ interface Memory {
      * @param count Array length in bytes
      */
     public function pointerToBytes(pointer:Pointer, count:Int):Bytes;
+    #end
+
+    /**
+     * Wraps a pointer of C array to a data view.
+     *
+     * Care must be ensured that the pointer is not freed. The pointer is
+     * not automatically freed when the buffer's data is garbage collected.
+     *
+     * @param pointer
+     * @param count Array length in bytes
+     */
+    public function pointerToDataView(pointer:Pointer, count:Int):DataView;
 }

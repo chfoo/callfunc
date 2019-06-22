@@ -9,6 +9,10 @@ Supported targets:
 * CPP
 * HashLink
 
+Supported interfaces:
+
+* JS + Emscripten
+
 ## Quick start
 
 Callfunc requires:
@@ -132,7 +136,7 @@ var value = p.arrayGet(DataType.SInt32, index); // => 456
 
 ### Interpreting pointers as Bytes
 
-Callfunc has methods for converting between `Bytes` and `Pointer`. The `Bytes` instance can be operated on directly which bypasses the `Pointer` class wrapper. Allocating `Bytes` to use a `Pointer` can also take advantage of the Haxe garbage collection.
+Callfunc has methods for converting between `Bytes` and `Pointer` for targets that support it. The `Bytes` instance can be operated on directly which bypasses the `Pointer` class wrapper. Allocating `Bytes` to use a `Pointer` can also take advantage of the Haxe garbage collection.
 
 To convert to `Bytes`:
 
@@ -143,6 +147,12 @@ var bytes = callfunc.memory.pointerToBytes(pointer);
 To convert from `Bytes`:
 ```haxe
 var pointer = callfunc.memory.bytesToPointer(bytes);
+```
+
+However, for better portability between targets, the `DataView` interface (and `BytesDataView` implementation) is provided:
+
+```haxe
+var view = callfunc.memory.pointerToDataView(pointer);
 ```
 
 ## Structures
@@ -200,6 +210,17 @@ var f = library.newFunction("do_something", [DataType.Pointer]);
 
 f.call([callbackPointer]);
 ```
+
+## Emscripten
+
+To use Callfunc's interface to Emscripten, you must create a context with the module object:
+
+```haxe
+var context = new EmContext(Reflect.field(js.Browser.window, "Module"));
+Callfunc.setInstance(context);
+```
+
+To use exported functions, simply use the empty string `""` as the library name. Opening other libraries is not supported at this time.
 
 ## Documentation
 
