@@ -46,8 +46,8 @@ interface Memory {
     /**
      * Wraps pointer of a C array to Haxe `Bytes`.
      *
-     * Care must be ensured that the pointer is not freed and the lifecycle
-     * of the pointer is transferred to the `Bytes` instance.
+     * Care must be ensured that the pointer is not freed. The pointer is
+     * not automatically freed when the bytes instance is garbage collected.
      *
      * @param pointer
      * @param count Array length in bytes

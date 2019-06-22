@@ -89,7 +89,10 @@ class MemoryImpl implements Memory {
         #if cpp
         var bytesData = new BytesData();
         var pointerImpl = cast(pointer, PointerImpl);
-        cpp.NativeArray.setData(bytesData, cast cpp.Pointer.fromRaw(pointerImpl.nativePointer), count);
+        cpp.NativeArray.setUnmanagedData(
+            bytesData,
+            cast cpp.Pointer.fromRaw(pointerImpl.nativePointer),
+            count);
         return Bytes.ofData(bytesData);
 
         #elseif hl
