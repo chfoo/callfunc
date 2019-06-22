@@ -5,6 +5,9 @@ import utest.Test;
 
 class TestExamplelib extends Test {
     function getLibName() {
+        #if js
+        return "";
+        #else
         switch Sys.systemName() {
             case "Windows":
                 return "examplelib.dll";
@@ -13,6 +16,7 @@ class TestExamplelib extends Test {
             default:
                 return "examplelib.so";
         }
+        #end
     }
 
     public function testf1() {
@@ -67,5 +71,21 @@ class TestExamplelib extends Test {
         f.dispose();
         library.dispose();
         callbackWrapper.dispose();
+    }
+
+    public function testStructType() {
+        var callfunc = Callfunc.instance();
+
+        if (callfunc.memory.sizeOf(DataType.SInt) != 4) {
+            Assert.warn("Skipping test because it doesn't seem to be x86");
+            return;
+        }
+
+        var structType = callfunc.newStructType(
+            [DataType.SChar, DataType.SInt]
+        );
+
+        Assert.equals(8, structType.size);
+        Assert.same([0, 4], structType.offsets);
     }
 }

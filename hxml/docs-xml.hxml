@@ -4,6 +4,17 @@ libs.hxml
 --macro include('callfunc')
 --no-output
 
--xml out/xml/sys.xml
+--each
+
+-xml out/xml/hl.xml
 -hl out/dummy.hl
 
+--next
+
+-xml out/xml/cpp.xml
+-cpp out/cpp/
+
+--next
+
+-xml out/xml/js.xml
+-js out/dummy.js

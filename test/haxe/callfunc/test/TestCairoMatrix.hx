@@ -3,19 +3,24 @@ package callfunc.test;
 import utest.Assert;
 
 class TestCairoMatrix extends utest.Test {
-    public function testMatrixScale() {
-        var callfunc = Callfunc.instance();
-        var libName;
-
+    public static function getLibName() {
+        #if js
+        return "";
+        #else
         switch Sys.systemName() {
             case "Windows":
-                libName = "cairo.dll";
+                return "cairo.dll";
             case "Mac":
-                libName = "libcairo.dylib";
+                return "libcairo.dylib";
             default:
-                libName = "libcairo.so";
+                return "libcairo.so";
         }
-        var library = callfunc.newLibrary(libName);
+        #end
+    }
+
+    public function testMatrixScale() {
+        var callfunc = Callfunc.instance();
+        var library = callfunc.newLibrary(getLibName());
 
         var initIdentityFunc = library.newFunction(
             "cairo_matrix_init_identity",

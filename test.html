@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+        <script>
+            var loadCallback;
+            var loaded = false;
+
+            Module = {};
+            Module["onRuntimeInitialized"] = function() {
+                if (loadCallback) {
+                    loadCallback();
+                }
+
+                loaded = true;
+            };
+
+            function waitForLoad(callback) {
+                if (loaded) {
+                    callback();
+                } else {
+                    loadCallback = callback;
+                }
+            }
+        </script>
+        <script src="out/js/test.js"></script>
+        <script src="out/js/em.js"></script>
+    </body>
+</html>
