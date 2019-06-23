@@ -16,8 +16,8 @@ class TestPointer extends utest.Test {
         pointer.set(11111, DataType.UInt16);
         Assert.equals(11111, pointer.get(DataType.UInt16, 0));
 
-        pointer.set(-11111, DataType.SInt16);
-        Assert.equals(-11111, pointer.get(DataType.SInt16));
+        pointer.set(-32111, DataType.SInt16);
+        Assert.equals(-32111, pointer.get(DataType.SInt16));
 
         pointer.set(-11111111, DataType.SInt32);
         Assert.equals(-11111111, pointer.get(DataType.SInt32));
