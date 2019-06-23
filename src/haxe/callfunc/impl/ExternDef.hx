@@ -73,6 +73,10 @@ typedef ExternInt8 = Int;
     #end
 #end
 extern class ExternDef {
+    #if cpp @:native("callfunc_api_version") #end
+    #if hl @:hlNative("callfunc", "callfunc_api_version") #end
+    public static function apiVersion():Int;
+
     #if cpp @:native("callfunc_get_error_message") #end
     #if hl @:hlNative("callfunc", "callfunc_get_error_message") #end
     public static function getErrorMessage():ExternString;

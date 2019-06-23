@@ -1,11 +1,18 @@
 package callfunc.impl;
 
 class ContextImpl implements  Context {
+    static final API_VERSION = 1;
     public var memory(get, never):Memory;
 
     final _memory:Memory;
 
     public function new() {
+        var version = ExternDef.apiVersion();
+
+        if (version != API_VERSION) {
+            throw 'API version mismatch. Haxe: $API_VERSION, Native: $version';
+        }
+
         _memory = newMemory();
     }
 

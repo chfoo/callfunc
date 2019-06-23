@@ -5,6 +5,10 @@
 
 static const char * _callfunc_error_message;
 
+int32_t callfunc_api_version() {
+    return CALLFUNC_API_VERSION;
+}
+
 const char * callfunc_get_error_message() {
     return _callfunc_error_message;
 }
@@ -609,6 +613,7 @@ void _callfunc_closure_impl(struct CallfuncCallback * callback) {
 #define HL_DEF(name,t,args) DEFINE_PRIM_WITH_NAME(t,name,args,name)
 #define HL_DEF2(name,impl_name,t,args) DEFINE_PRIM_WITH_NAME(t,impl_name,args,name)
 
+HL_DEF(callfunc_api_version, _I32, _NO_ARG)
 HL_DEF(callfunc_get_error_message, _BYTES, _NO_ARG)
 HL_DEF(callfunc_get_sizeof_table, _VOID, _BYTES)
 HL_DEF(callfunc_alloc, _ABSTRACT(void*), _I32 _BOOL)

@@ -18,6 +18,8 @@
     #define CALLFUNC_API
 #endif
 
+#define CALLFUNC_API_VERSION (0x01)
+
 #define CALLFUNC_SUCCESS (0)
 #define CALLFUNC_FAILURE (1)
 
@@ -85,6 +87,9 @@ struct CallfuncCallback {
     uint8_t * arg_buffer;
     CallfuncHaxeFunc haxe_function;
 };
+
+CALLFUNC_API
+int32_t callfunc_api_version();
 
 CALLFUNC_API
 const char * callfunc_get_error_message();
