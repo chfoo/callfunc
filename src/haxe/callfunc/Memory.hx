@@ -11,6 +11,11 @@ interface Memory {
     /**
      * Allocates memory on the heap.
      *
+     * This calls standard C `malloc()` or `calloc()`.
+     *
+     * If the allocation fails, the pointer will have an address of 0 (a
+     * null pointer).
+     *
      * @param size Number of bytes.
      * @param initZero Whether to initialize the array to 0.
      */
@@ -18,6 +23,10 @@ interface Memory {
 
     /**
      * Releases previously allocated memory.
+     *
+     * This should only be called for pointers that the caller has previously
+     * allocated or have lifecycle control. As well, it should not be called
+     * more than once for a pointer.
      */
     public function free(pointer:Pointer):Void;
 

@@ -6,6 +6,9 @@ package callfunc;
 interface Library extends Disposable {
     /**
      * Returns a pointer to a symbol.
+     *
+     * @throws String An error message if the symbol was not found or any
+     *     other error.
      */
     public function getSymbol(name:String):Pointer;
 
@@ -22,6 +25,9 @@ interface Library extends Disposable {
      *     method matching `enum ffi_abi` defined in `ffitarget.h`.
      * @param returnType Data type of the return value. If the function does
      *     not return a value. Specify `null` or `DataType.Void`.
+     *
+     * @throws String An error message if the function was not found, a
+     *     data type or ABI is invalid, or any other error.
      */
     public function newFunction(name:String, ?params:Array<DataType>,
         ?returnType:DataType, ?abi:Int):Function;

@@ -1,20 +1,23 @@
 -cp src/haxe
 libs.hxml
 -D doc-gen
---macro include('callfunc')
+--macro include('callfunc', false)
 --no-output
 
 --each
 
 -xml out/xml/hl.xml
 -hl out/dummy.hl
+--macro include('callfunc.impl')
 
 --next
 
 -xml out/xml/cpp.xml
 -cpp out/cpp/
+--macro include('callfunc.impl')
 
 --next
 
 -xml out/xml/js.xml
 -js out/dummy.js
+--macro include('callfunc.emscripten')

@@ -4,7 +4,7 @@
 
 * Added: `Pointer.arrayGet()` and `Pointer.arraySet()`.
 * Added: `Callfunc.newCallback()`.
-* Added: JS+Emscripten support.
+* Added: JS+Emscripten interface support.
 * Added: `DataView` and `Memory.pointerToDataView()`.
 * Changed `Memory.pointerToBytes()` to never free the pointer.
 

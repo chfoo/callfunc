@@ -9,7 +9,7 @@ Supported targets:
 * CPP
 * HashLink
 
-Supported interfaces:
+Callfunc can also be used as a interface for calling foreign functions in other targets:
 
 * JS + Emscripten
 
@@ -222,6 +222,12 @@ Callfunc.setInstance(context);
 
 To use exported functions, simply use the empty string `""` as the library name. Opening other libraries is not supported at this time.
 
+## Safety
+
+Callfunc does not provide any automatic protection against memory-unsafe conditions such as dangling pointers or out-of-bounds read/writes.
+
+For targets that use libffi, the creation of `Function` or `StructType` instances is not thread safe.
+
 ## Documentation
 
 API docs: https://chfoo.github.io/callfunc/api/
@@ -309,6 +315,10 @@ For example:
 * To add the dynamic library link path `-L` flag, add `<flag value="-L/usr/local/lib"/>` to the `<linker>` section.
 
 Adjust the paths or create new sections for your platform/compiler as needed.
+
+## Javascript
+
+There are no C libraries needed to be compiled for the Javascript target.
 
 ## Tests
 

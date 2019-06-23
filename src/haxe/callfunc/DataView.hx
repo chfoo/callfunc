@@ -13,6 +13,9 @@ using callfunc.BytesTools;
  * The get and set integer methods use signed/unsigned N-bit values.
  * Float and double numbers are 32- and 64-bit values respectively.
  * The position is defined as the offset from the start of the view.
+ *
+ * Protection against out-of-bounds is not guaranteed and is not mandatory
+ * for implementations.
  */
 interface DataView {
     /**
@@ -34,12 +37,12 @@ interface DataView {
     // TODO: endian support
 
     /**
-     * @see `getUInt8()`
+     * @see `DataView.getUInt8()`
      */
     public function get(position:Int):Int;
 
     /**
-     * @see `setUInt8()`
+     * @see `DataView.setUInt8()`
      */
     public function set(position:Int, value:Int):Void;
 
@@ -95,7 +98,7 @@ interface DataView {
     /**
      * Copies data from Bytes to this view.
      *
-     * @see `blit()`.
+     * @see `DataView.blit()`.
      */
     public function blitBytes(position:Int, source:Bytes, sourcePosition:Int = 0,
             ?sourceLength:Int):Void;

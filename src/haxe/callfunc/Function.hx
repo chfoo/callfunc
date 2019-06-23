@@ -34,6 +34,9 @@ interface Function extends Disposable {
      *     Integer data types that fit within 32 bits will be
      *     promoted to `Int` while wider integers will be promoted
      *     to `haxe.io.Int64`.
+     *
+     * @throws String An error message if the argument list is invalid (such
+     *     as wrong size or wrong type.
      */
     public function call(?args:Array<Any>):Any;
 }

@@ -49,7 +49,7 @@ interface Pointer {
      *
      * @param dataType Data type of the array.
      * @param index Element index of the array.
-     * @see `get()` for return types.
+     * @see `Pointer.get` for return types.
      */
     public function arrayGet(dataType:DataType, index:Int):Any;
 
@@ -58,7 +58,7 @@ interface Pointer {
      * @param value Element value.
      * @param dataType Data type of the array.
      * @param index Element index.
-     * @see `set()` for parameter types.
+     * @see `Pointer.set` for parameter types.
      */
     public function arraySet(value:Any, dataType:DataType, index:Int):Void;
 }
