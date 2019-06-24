@@ -27,6 +27,6 @@ script:
   - make && make examplelib
   - cd ../
   - haxe hxml/test.cpp.hxml -D callfunc_unit_test
-  - haxe hxml/test.hl.hxml -D callfunc_unit_test
+  - haxe hxml/test.hl.hxml -D callfunc_unit_test -D hl_ver=1.9.0
   - source script/export_ld_path.sh && ./out/cpp/TestAll-debug
   - source script/export_ld_path.sh && hl out/hl/test.hl
