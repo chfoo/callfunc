@@ -19,4 +19,10 @@ class EmLibrary implements Library {
             ?returnType:DataType, ?abi:Int):Function {
         return new EmFunction(module, name, params, returnType);
     }
+
+    public function newVariadicFunction(name:String, params:Array<DataType>,
+            fixedParamCount:Int,
+            ?returnType:DataType, ?abi:Int):Function {
+        throw "Not supported. emscripten-core/emscripten #5563 #5684";
+    }
 }

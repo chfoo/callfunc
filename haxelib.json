@@ -6,7 +6,7 @@
     "description": "Foreign function interface library using libffi",
     "version": "0.2.0",
     "classPath": "src/haxe",
-    "releasenote": "Callback and better array support",
+    "releasenote": "Support callbacks, variadic function, more data types. (See changelog)",
     "contributors": ["chfoo"],
     "dependencies": {
         "safety": ""

@@ -9,6 +9,7 @@
 * Added: JS+Emscripten interface support.
 * Added: `DataView` and `Memory.pointerToDataView()`.
 * Added: More data types.
+* Added: `Library.newVariadicFunction()`.
 
 ## 0.1.0 (2019-06-19)
 

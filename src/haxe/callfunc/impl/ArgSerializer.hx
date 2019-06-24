@@ -9,8 +9,10 @@ class ArgSerializer extends DataValueSerializer {
     static final NUM_PARAM_VALUE_SIZE = 4;
     static final RETURN_VALUE_SIZE = 8;
 
-    public function serializeParams(params:Array<DataType>, ?returnType:DataType, ?buffer:Bytes):Bytes {
-        var bufferSize = NUM_PARAM_VALUE_SIZE + 1 + params.length;
+    public function serializeParams(params:Array<DataType>,
+            fixedParamCount:Int = -1, ?returnType:DataType,
+            ?buffer:Bytes):Bytes {
+        var bufferSize = NUM_PARAM_VALUE_SIZE * 2 + 1 + params.length;
 
         if (buffer == null) {
             buffer = Bytes.alloc(bufferSize);
@@ -20,19 +22,32 @@ class ArgSerializer extends DataValueSerializer {
             throw "Buffer too small";
         }
 
-        buffer.setInt32(0, params.length);
+        if (fixedParamCount == 0) {
+            throw "fixedParamCount can't be 0";
+        }
+
+        var bufferIndex = 0;
+
+        buffer.setInt32(bufferIndex, params.length);
+        bufferIndex += NUM_PARAM_VALUE_SIZE;
+
+        buffer.setInt32(bufferIndex, fixedParamCount);
+        bufferIndex += NUM_PARAM_VALUE_SIZE;
+
         buffer.set(
-            NUM_PARAM_VALUE_SIZE,
+            bufferIndex,
             returnType != null ?
                 memory.toCoreDataType(returnType).toInt() :
                 CoreDataType.Void.toInt());
+        bufferIndex += 1;
 
         for (paramIndex in 0...params.length) {
             if (params[paramIndex] == DataType.Void) {
                 throw "Void can only be used to indicate no return type";
             }
 
-            serializeDataType(buffer, NUM_PARAM_VALUE_SIZE + 1 + paramIndex, params[paramIndex]);
+            serializeDataType(buffer, bufferIndex, params[paramIndex]);
+            bufferIndex += 1;
         }
 
         return buffer;

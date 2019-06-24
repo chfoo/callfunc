@@ -20,7 +20,8 @@ class FunctionImpl implements Function {
     var buffer:Null<Bytes>;
 
     public function new(library:LibraryImpl, name:String,
-            ?params:Array<DataType>, ?returnType:DataType, ?abi:Int) {
+            ?params:Array<DataType>, fixedParamCount:Int = -1,
+            ?returnType:DataType, ?abi:Int) {
         params = params != null ? params : [];
         returnType = returnType != null ? returnType : DataType.Void;
         abi = abi != null ? abi : DEFAULT_ABI;
@@ -37,7 +38,8 @@ class FunctionImpl implements Function {
             throw "Failed to allocate function struct.";
         }
 
-        var buffer = library.argSerializer.serializeParams(params, returnType);
+        var buffer = library.argSerializer.serializeParams(
+            params, fixedParamCount, returnType);
         var pointer = cast(library.getSymbol(name), PointerImpl);
 
         var error = ExternDef.functionDefine(nativePointer,

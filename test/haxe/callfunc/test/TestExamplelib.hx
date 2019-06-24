@@ -41,6 +41,27 @@ class TestExamplelib extends Test {
         library.dispose();
     }
 
+    #if js
+    @Ignored("emscripten-core/emscripten #5563 #5684")
+    #end
+    public function testvf1() {
+        var callfunc = Callfunc.instance();
+        var library = callfunc.newLibrary(getLibName());
+
+        var f = library.newVariadicFunction(
+            "examplelib_vf1",
+            [DataType.UInt, DataType.SInt32, DataType.SInt32],
+            1,
+            DataType.SInt32
+        );
+
+        var result = f.call([2, 123, 456]);
+
+        Assert.equals(579, result);
+        f.dispose();
+        library.dispose();
+    }
+
     public function testCallback() {
         var callfunc = Callfunc.instance();
         var library = callfunc.newLibrary(getLibName());

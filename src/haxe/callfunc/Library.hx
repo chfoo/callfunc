@@ -15,8 +15,6 @@ interface Library extends Disposable {
     /**
      * Create a handle to a function.
      *
-     * This method does not support variadic functions.
-     *
      * @param name Symbol name.
      * @param params Data types corresponding to the function parameters.
      *     If the function does not accept arguments, specify `null` or empty
@@ -28,7 +26,24 @@ interface Library extends Disposable {
      *
      * @throws String An error message if the function was not found, a
      *     data type or ABI is invalid, or any other error.
+     *
+     * @see `Library.newVariadicFunction` for C variadic functions.
      */
     public function newFunction(name:String, ?params:Array<DataType>,
         ?returnType:DataType, ?abi:Int):Function;
+
+    /**
+     * Create a handle to a variadic function.
+     *
+     * @param name Symbol name.
+     * @param params Data types corresponding to the parameters.
+     * @param fixedParamCount Number of parameters that are fixed at the
+     *     start of the parameters.
+     * @param returnType Data type of the return value.
+     * @param abi ABI calling method.
+     * @throws String
+     * @see `Library.newFunction`
+     */
+    public function newVariadicFunction(name:String, params:Array<DataType>,
+        fixedParamCount:Int, ?returnType:DataType, ?abi:Int):Function;
 }

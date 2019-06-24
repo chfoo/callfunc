@@ -18,7 +18,7 @@
     #define CALLFUNC_API
 #endif
 
-#define CALLFUNC_API_VERSION (0x01)
+#define CALLFUNC_API_VERSION (0x02)
 
 #define CALLFUNC_SUCCESS (0)
 #define CALLFUNC_FAILURE (1)
@@ -194,7 +194,8 @@ ffi_type * _callfunc_constant_to_ffi_type(int constant);
 CallfuncError _check_ffi_status(ffi_status status);
 
 void _callfunc_parse_parameter_definition(uint8_t * definition,
-    int32_t * num_params, ffi_type *** parameter_types,
+    int32_t * num_params, int32_t * num_fixed_params,
+    ffi_type *** parameter_types,
     ffi_type ** return_type);
 
 void _callfunc_parse_struct_definition(uint8_t * definition,
@@ -205,6 +206,10 @@ void * _callfunc_get_aligned_pointer(void * pointer, uint8_t data_type,
 
 void _callfunc_closure_handler(ffi_cif * cif, void * return_value,
     void ** args, void * user_data);
+
+int32_t _callfunc_array_get_int(uint8_t * buffer, size_t offset);
+
+void _callfunc_array_set_int(uint8_t * buffer, size_t offset, int32_t value);
 
 void _callfunc_closure_impl(struct CallfuncCallback * callback);
 

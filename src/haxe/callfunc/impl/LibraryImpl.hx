@@ -58,7 +58,12 @@ class LibraryImpl implements Library {
 
     public function newFunction(name:String, ?params:Array<DataType>,
             ?returnType:DataType, ?abi:Int):Function {
-        return new FunctionImpl(this, name, params, returnType, abi);
+        return new FunctionImpl(this, name, params, -1, returnType, abi);
+    }
+
+    public function newVariadicFunction(name:String, params:Array<DataType>,
+            fixedParamCount:Int, ?returnType:DataType, ?abi:Int):Function {
+        return new FunctionImpl(this, name, params, fixedParamCount, returnType, abi);
     }
 
     public function dispose() {
