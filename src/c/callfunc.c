@@ -4,10 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifndef __STDC_NO_COMPLEX__
-    #include <complex.h>
-#endif
-
 #include "callfunc.h"
 
 static const char * _callfunc_error_message;
@@ -45,15 +41,11 @@ void callfunc_get_sizeof_table(uint8_t * buffer) {
         buffer[19] = sizeof(long double);
     #endif
 
-    #ifndef __STDC_NO_COMPLEX__
-        buffer[20] = sizeof(_Complex float);
-        buffer[21] = sizeof(_Complex double);
-
-        #ifdef LDBL_MIN
-            buffer[22] = sizeof(_Complex long double);
-        #endif
-
-    #endif
+    // Complex numbers
+    // Too difficult to detect if C99 complex.h is implemented
+    buffer[20] = 0;
+    buffer[21] = 0;
+    buffer[22] = 0;
 
     #if defined(_SIZE_T) || defined(_SIZE_T_) || defined(_SIZE_T_DEFINED) || defined(_SIZE_T_DEFINED_)
         buffer[23] = sizeof(size_t);
