@@ -5,11 +5,11 @@ class EmDataType {
         switch dataType {
             case Pointer:
                 return "*";
-            case UInt8 | SInt8 | UChar | SChar:
+            case UInt8 | SInt8 | UChar | SChar | WChar:
                 return "i8";
             case UInt16 | SInt16 | UShort | SShort:
                 return "i16";
-            case UInt32 | SInt32 | SInt | UInt:
+            case UInt32 | SInt32 | SInt | UInt | Size | PtrDiff:
                 return "i32";
             case UInt64 | SInt64 | SLong | ULong:
                 return "i64";
@@ -19,6 +19,8 @@ class EmDataType {
                 return "double";
             case Void:
                 throw "Void is not a real type";
+            case LongDouble | ComplexFloat | ComplexDouble | ComplexLongDouble:
+                throw 'Not supported data type $dataType';
         }
     }
 
@@ -34,11 +36,11 @@ class EmDataType {
         switch dataType {
             case Pointer:
                 return 4;
-            case UInt8 | SInt8 | UChar | SChar:
+            case UInt8 | SInt8 | UChar | SChar | WChar:
                 return 1;
             case UInt16 | SInt16 | UShort | SShort:
                 return 2;
-            case UInt32 | SInt32 | SInt | UInt:
+            case UInt32 | SInt32 | SInt | UInt | Size | PtrDiff:
                 return 4;
             case UInt64 | SInt64 | SLong | ULong:
                 return 8;
@@ -48,6 +50,8 @@ class EmDataType {
                 return 8;
             case Void:
                 throw "Void is not a real type";
+            case LongDouble | ComplexFloat | ComplexDouble | ComplexLongDouble:
+                return 0;
         }
     }
 
@@ -65,7 +69,8 @@ class EmDataType {
                 return "i";
             case UInt8 | SInt8 | UChar | SChar |
                     UInt16 | SInt16 | UShort | SShort |
-                    UInt32 | SInt32 | SInt | UInt:
+                    UInt32 | SInt32 | SInt | UInt |
+                    WChar | Size | PtrDiff:
                 return "i";
             case UInt64 | SInt64 | SLong | ULong:
                 return "j";
@@ -75,6 +80,8 @@ class EmDataType {
                 return "d";
             case Void:
                 return "v";
+            case LongDouble | ComplexFloat | ComplexDouble | ComplexLongDouble:
+                throw 'Not supported data type $dataType';
         }
     }
 }

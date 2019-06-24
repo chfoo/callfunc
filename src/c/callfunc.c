@@ -1,6 +1,13 @@
-#include <stdlib.h>
 #include <assert.h>
+#include <float.h>
+#include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
+
+#ifndef __STDC_NO_COMPLEX__
+    #include <complex.h>
+#endif
+
 #include "callfunc.h"
 
 static const char * _callfunc_error_message;
@@ -33,6 +40,32 @@ void callfunc_get_sizeof_table(uint8_t * buffer) {
     buffer[16] = sizeof(long);
     buffer[17] = sizeof(unsigned long);
     buffer[18] = sizeof(void *);
+
+    #ifdef LDBL_MIN
+        buffer[19] = sizeof(long double);
+    #endif
+
+    #ifndef __STDC_NO_COMPLEX__
+        buffer[20] = sizeof(_Complex float);
+        buffer[21] = sizeof(_Complex double);
+
+        #ifdef LDBL_MIN
+            buffer[22] = sizeof(_Complex long double);
+        #endif
+
+    #endif
+
+    #if defined(_SIZE_T) || defined(_SIZE_T_) || defined(_SIZE_T_DEFINED) || defined(_SIZE_T_DEFINED_)
+        buffer[23] = sizeof(size_t);
+    #endif
+
+    #if defined(_PTRDIFF_T) || defined(_PTRDIFF_T_) || defined(_PTRDIFF_T_DEFINED) || defined(_PTRDIFF_T_DEFINED_)
+        buffer[24] = sizeof(ptrdiff_t);
+    #endif
+
+    #if defined(_WCHAR_T) || defined(_WCHAR_T_) || defined(_WCHAR_T_DEFINED) || defined(_WCHAR_T_DEFINED_)
+        buffer[25] = sizeof(wchar_t);
+    #endif
 }
 
 void * callfunc_alloc(size_t size, bool zero) {

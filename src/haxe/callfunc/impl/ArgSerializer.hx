@@ -3,6 +3,8 @@ package callfunc.impl;
 import haxe.Int64;
 import haxe.io.Bytes;
 
+using callfunc.MemoryTools;
+
 class ArgSerializer extends DataValueSerializer {
     static final NUM_PARAM_VALUE_SIZE = 4;
     static final RETURN_VALUE_SIZE = 8;
@@ -19,7 +21,11 @@ class ArgSerializer extends DataValueSerializer {
         }
 
         buffer.setInt32(0, params.length);
-        buffer.set(NUM_PARAM_VALUE_SIZE, returnType != null ? returnType.toInt() : DataType.Void.toInt());
+        buffer.set(
+            NUM_PARAM_VALUE_SIZE,
+            returnType != null ?
+                memory.toCoreDataType(returnType).toInt() :
+                CoreDataType.Void.toInt());
 
         for (paramIndex in 0...params.length) {
             if (params[paramIndex] == DataType.Void) {

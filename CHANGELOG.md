@@ -8,6 +8,7 @@
 * Added: `Callfunc.newCallback()`.
 * Added: JS+Emscripten interface support.
 * Added: `DataView` and `Memory.pointerToDataView()`.
+* Added: More data types.
 
 ## 0.1.0 (2019-06-19)
 

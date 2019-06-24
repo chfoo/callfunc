@@ -4,6 +4,8 @@ import haxe.io.Bytes;
 import haxe.Int64;
 import utest.Assert;
 
+using callfunc.MemoryTools;
+
 class TestMemory extends utest.Test {
     public function testAllocFree() {
         var callfunc = Callfunc.instance();
@@ -22,7 +24,32 @@ class TestMemory extends utest.Test {
         var callfunc = Callfunc.instance();
         var memory = callfunc.memory;
 
-        Assert.equals(1, memory.sizeOf(DataType.SChar));
+        Assert.equals(1, memory.sizeOf(DataType.UInt8));
+        Assert.equals(1, memory.sizeOf(DataType.SInt8));
+        Assert.equals(2, memory.sizeOf(DataType.UInt16));
+        Assert.equals(2, memory.sizeOf(DataType.SInt16));
+        Assert.equals(4, memory.sizeOf(DataType.UInt32));
+        Assert.equals(4, memory.sizeOf(DataType.SInt32));
+        Assert.equals(8, memory.sizeOf(DataType.UInt64));
+        Assert.equals(8, memory.sizeOf(DataType.SInt64));
+        Assert.equals(4, memory.sizeOf(DataType.Float));
+        Assert.equals(8, memory.sizeOf(DataType.Double));
+        Assert.isTrue(memory.sizeOf(DataType.UChar) >= 1);
+        Assert.isTrue(memory.sizeOf(DataType.SChar) >= 1);
+        Assert.isTrue(memory.sizeOf(DataType.UShort) >= 2);
+        Assert.isTrue(memory.sizeOf(DataType.SShort) >= 2);
+        Assert.isTrue(memory.sizeOf(DataType.SInt) >= 2);
+        Assert.isTrue(memory.sizeOf(DataType.UInt) >= 2);
+        Assert.isTrue(memory.sizeOf(DataType.SLong) >= 4);
+        Assert.isTrue(memory.sizeOf(DataType.ULong) >= 4);
+        Assert.isTrue(memory.sizeOf(DataType.Pointer) >= 2);
+        Assert.isTrue(memory.sizeOf(DataType.LongDouble) >= 0);
+        Assert.isTrue(memory.sizeOf(DataType.ComplexFloat) >= 0);
+        Assert.isTrue(memory.sizeOf(DataType.ComplexDouble) >= 0);
+        Assert.isTrue(memory.sizeOf(DataType.ComplexLongDouble) >= 0);
+        Assert.isTrue(memory.sizeOf(DataType.Size) >= 0);
+        Assert.isTrue(memory.sizeOf(DataType.PtrDiff) >= 0);
+        Assert.isTrue(memory.sizeOf(DataType.WChar) >= 0);
     }
 
     public function testGetPointer() {
@@ -104,5 +131,25 @@ class TestMemory extends utest.Test {
         Assert.equals(2222, view.getInt32(4));
 
         memory.free(pointer);
+    }
+
+    public function testToCoreDataType() {
+        var callfunc = Callfunc.instance();
+        var memory = callfunc.memory;
+
+        Assert.same(CoreDataType.SInt8, memory.toCoreDataType(DataType.SInt8));
+        Assert.same(CoreDataType.Double, memory.toCoreDataType(DataType.Double));
+        Assert.same(CoreDataType.Void, memory.toCoreDataType(DataType.Void));
+
+        Assert.notEquals(CoreDataType.UChar, memory.toCoreDataType(DataType.UChar, true));
+        Assert.notEquals(CoreDataType.SChar, memory.toCoreDataType(DataType.SChar, true));
+        Assert.notEquals(CoreDataType.SInt, memory.toCoreDataType(DataType.SInt, true));
+        Assert.notEquals(CoreDataType.UInt, memory.toCoreDataType(DataType.UInt, true));
+        Assert.notEquals(CoreDataType.SLong, memory.toCoreDataType(DataType.SLong, true));
+        Assert.notEquals(CoreDataType.ULong, memory.toCoreDataType(DataType.ULong, true));
+
+        memory.toCoreDataType(DataType.Size);
+        memory.toCoreDataType(DataType.PtrDiff);
+        memory.toCoreDataType(DataType.WChar);
     }
 }

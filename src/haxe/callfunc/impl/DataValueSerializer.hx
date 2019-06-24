@@ -4,6 +4,7 @@ import haxe.io.Bytes;
 import haxe.Int64;
 
 using callfunc.BytesTools;
+using callfunc.MemoryTools;
 
 class DataValueSerializer {
     final memory:Memory;
@@ -32,31 +33,39 @@ class DataValueSerializer {
             DataType.UInt => buffer.get(15),
             DataType.SLong => buffer.get(16),
             DataType.ULong => buffer.get(17),
-            DataType.Pointer => buffer.get(18)
+            DataType.Pointer => buffer.get(18),
+
+            DataType.LongDouble => buffer.get(19),
+            DataType.ComplexFloat => buffer.get(20),
+            DataType.ComplexDouble => buffer.get(21),
+            DataType.ComplexLongDouble => buffer.get(22),
+            DataType.Size => buffer.get(23),
+            DataType.PtrDiff => buffer.get(24),
+            DataType.WChar => buffer.get(25)
         ];
     }
 
     public function serializeDataType(buffer:Bytes, bufferIndex:Int, dataType:DataType) {
-        buffer.set(bufferIndex, dataType.toInt());
+        buffer.set(bufferIndex, memory.toCoreDataType(dataType).toInt());
     }
 
     public function serializeValue(buffer:Bytes, bufferIndex:Int, dataType:DataType, value:Any):Int {
         var valueSize = memory.sizeOf(dataType);
 
-        switch DataTypeAlias.normalize(memory, dataType) {
-            case DataType.SInt8 | DataType.UInt8:
+        switch memory.toCoreDataType(dataType, true) {
+            case SInt8 | UInt8:
                 buffer.set(bufferIndex, toInt(value));
-            case DataType.SInt16 | DataType.UInt16:
+            case SInt16 | UInt16:
                 buffer.setUInt16(bufferIndex, toInt(value));
-            case DataType.SInt32 | DataType.UInt32:
+            case SInt32 | UInt32:
                 buffer.setInt32(bufferIndex, toInt(value));
-            case DataType.SInt64 | DataType.UInt64:
+            case SInt64 | UInt64:
                 buffer.setInt64(bufferIndex, toInt64(value));
-            case DataType.Float:
+            case Float:
                 buffer.setFloat(bufferIndex, value);
-            case DataType.Double:
+            case Double:
                 buffer.setDouble(bufferIndex, value);
-            case DataType.Pointer:
+            case Pointer:
                 serializePointer(buffer, bufferIndex, value);
             default:
                 throw "Shouldn't reach here";
@@ -103,29 +112,29 @@ class DataValueSerializer {
     }
 
     public function deserializeValue(buffer:Bytes, bufferIndex:Int, dataType:DataType):Any {
-        switch DataTypeAlias.normalize(memory, dataType) {
-            case DataType.UInt8:
+        switch memory.toCoreDataType(dataType, true) {
+            case UInt8:
                 return buffer.get(bufferIndex);
-            case DataType.SInt8:
+            case SInt8:
                 return buffer.getSInt8(bufferIndex);
-            case DataType.UInt16:
+            case UInt16:
                 return buffer.getUInt16(bufferIndex);
-            case DataType.SInt16:
+            case SInt16:
                 return buffer.getSInt16(bufferIndex);
-            case DataType.SInt32:
+            case SInt32:
                 return buffer.getInt32(bufferIndex);
-            case DataType.UInt32:
+            case UInt32:
                 return (buffer.getInt32(bufferIndex):UInt);
-            case DataType.SInt64 | DataType.UInt64:
+            case SInt64 | UInt64:
                 return buffer.getInt64(bufferIndex);
-            case DataType.Double:
+            case Double:
                 return buffer.getDouble(bufferIndex);
-            case DataType.Float:
+            case Float:
                 return buffer.getFloat(bufferIndex);
-            case DataType.Pointer:
+            case Pointer:
                 return deserializePointer(buffer, bufferIndex);
-            case DataType.Void:
-                return "Void type";
+            case Void:
+                throw "Void type";
             default:
                 throw "Shouldn't reach here";
         }

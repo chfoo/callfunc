@@ -41,7 +41,7 @@ class MemoryImpl implements Memory {
     }
 
     function getSizeOfTable():Map<DataType,Int> {
-        var buffer = Bytes.alloc(19);
+        var buffer = Bytes.alloc(27);
 
         ExternDef.getSizeOfTable(bytesToBytesData(buffer));
 
