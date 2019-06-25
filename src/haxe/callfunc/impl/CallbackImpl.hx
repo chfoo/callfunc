@@ -5,16 +5,16 @@ import haxe.io.Bytes;
 
 class CallbackImpl implements Callback {
     final nativePointer:ExternCallback;
-    final memory:Memory;
+    final context:ContextImpl;
     final argSerializer:ArgSerializer;
     final argBuffer:Bytes;
     final haxeFunction:Array<Any>->Any;
     final params:Array<DataType>;
     final returnType:DataType;
 
-    public function new(memory:Memory, haxeFunction:Array<Any>->Any,
+    public function new(context:ContextImpl, haxeFunction:Array<Any>->Any,
             ?params:Array<DataType>, ?returnType:DataType) {
-        this.memory = memory;
+        this.context = context;
         this.haxeFunction = haxeFunction;
 
         params = params != null ? params : [];
@@ -23,7 +23,7 @@ class CallbackImpl implements Callback {
         this.params = params;
         this.returnType = returnType;
 
-        argSerializer = new ArgSerializer(memory);
+        argSerializer = new ArgSerializer(context.memory);
         argBuffer = Bytes.alloc(argSerializer.getArgBufferLength(params));
 
         nativePointer = ExternDef.newCallback();
@@ -57,7 +57,7 @@ class CallbackImpl implements Callback {
             #else
             nativeCallbackPointer
             #end
-            , memory);
+            , context);
     }
 
     public function dispose() {

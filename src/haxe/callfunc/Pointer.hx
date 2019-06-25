@@ -13,6 +13,11 @@ interface Pointer {
     public var address(get, never):Int64;
 
     /**
+     * Memory instance of which this pointer belongs to.
+     */
+    public var memory(get, never):Memory;
+
+    /**
      * Returns whether the address does not point to anywhere.
      */
     public function isNull():Bool;

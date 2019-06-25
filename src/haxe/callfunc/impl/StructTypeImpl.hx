@@ -14,9 +14,9 @@ class StructTypeImpl implements StructType {
     final _offsets:Array<Int>;
     final serializer:StructTypeSerializer;
 
-    public function new(dataTypes:Array<DataType>, memory:Memory) {
+    public function new(dataTypes:Array<DataType>, context:ContextImpl) {
         _dataTypes = dataTypes;
-        serializer = new StructTypeSerializer(memory);
+        serializer = new StructTypeSerializer(context.memory);
 
         nativePointer = ExternDef.newStructType();
 

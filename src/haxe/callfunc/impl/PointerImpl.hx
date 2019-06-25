@@ -8,11 +8,12 @@ using callfunc.MemoryTools;
 
 class PointerImpl implements Pointer {
     public var address(get, never):Int64;
+    public var memory(get, never):Memory;
 
     final _address:Int64;
     public final nativePointer:ExternVoidStar;
     final buffer:Bytes;
-    final memory:Memory;
+    final context:ContextImpl;
     final serializer:DataValueSerializer;
 
     public function new(
@@ -21,7 +22,7 @@ class PointerImpl implements Pointer {
             #else
             nativePointer:ExternVoidStar
             #end,
-            memory:Memory) {
+            context:ContextImpl) {
 
         #if cpp
         nativePointer = haxePointer.raw;
@@ -31,12 +32,16 @@ class PointerImpl implements Pointer {
 
         _address = ExternDef.pointerToInt64(nativePointer);
         buffer = Bytes.alloc(8);
-        this.memory = memory;
-        serializer = new DataValueSerializer(memory);
+        this.context = context;
+        serializer = new DataValueSerializer(context.memory);
     }
 
     function get_address():Int64 {
         return _address;
+    }
+
+    function get_memory():Memory {
+        return context.memory;
     }
 
     public function isNull():Bool {
@@ -45,7 +50,7 @@ class PointerImpl implements Pointer {
 
     public function get(dataType:DataType, offset:Int = 0):Any {
         ExternDef.pointerGet(nativePointer,
-            memory.toCoreDataType(dataType).toInt(),
+            context.memory.toCoreDataType(dataType).toInt(),
             MemoryImpl.bytesToBytesData(buffer), offset);
 
         return serializer.deserializeValue(buffer, 0, dataType);
@@ -55,13 +60,13 @@ class PointerImpl implements Pointer {
         serializer.serializeValue(buffer, 0, dataType, value);
 
         ExternDef.pointerSet(nativePointer,
-            memory.toCoreDataType(dataType).toInt(),
+            context.memory.toCoreDataType(dataType).toInt(),
             MemoryImpl.bytesToBytesData(buffer), offset);
     }
 
     public function arrayGet(dataType:DataType, index:Int):Any {
         ExternDef.pointerArrayGet(nativePointer,
-            memory.toCoreDataType(dataType).toInt(),
+            context.memory.toCoreDataType(dataType).toInt(),
             MemoryImpl.bytesToBytesData(buffer), index);
 
         return serializer.deserializeValue(buffer, 0, dataType);
@@ -71,7 +76,7 @@ class PointerImpl implements Pointer {
         serializer.serializeValue(buffer, 0, dataType, value);
 
         ExternDef.pointerArraySet(nativePointer,
-            memory.toCoreDataType(dataType).toInt(),
+            context.memory.toCoreDataType(dataType).toInt(),
             MemoryImpl.bytesToBytesData(buffer), index);
     }
 }

@@ -1,10 +1,10 @@
 package callfunc.emscripten;
 
 class EmLibrary implements Library {
-    final module:EmscriptenModule;
+    final context:EmContext;
 
-    public function new(module:EmscriptenModule) {
-        this.module = module;
+    public function new(context:EmContext) {
+        this.context = context;
     }
 
     public function dispose() {
@@ -17,7 +17,7 @@ class EmLibrary implements Library {
 
     public function newFunction(name:String, ?params:Array<DataType>,
             ?returnType:DataType, ?abi:Int):Function {
-        return new EmFunction(module, name, params, returnType);
+        return new EmFunction(context, this, name, params, returnType);
     }
 
     public function newVariadicFunction(name:String, params:Array<DataType>,

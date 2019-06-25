@@ -5,14 +5,14 @@ import callfunc.impl.ExternDef;
 
 class LibraryImpl implements Library {
     public final nativePointer:ExternLibrary;
-    public final memory:Memory;
+    public final context:ContextImpl;
     public final argSerializer:ArgSerializer;
 
-    public function new(name:String, memory:Memory) {
+    public function new(name:String, context:ContextImpl) {
         nativePointer = ExternDef.newLibrary();
-        this.memory = memory;
+        this.context = context;
 
-        argSerializer = new ArgSerializer(memory);
+        argSerializer = new ArgSerializer(context.memory);
 
         if (nativePointer == null) {
             throw "Failed to allocate library struct.";
@@ -49,9 +49,9 @@ class LibraryImpl implements Library {
         }
 
         #if cpp
-        return new PointerImpl(cpp.Pointer.fromRaw(targetPointer), memory);
+        return new PointerImpl(cpp.Pointer.fromRaw(targetPointer), context);
         #else
-        return new PointerImpl(targetPointer, memory);
+        return new PointerImpl(targetPointer, context);
         #end
     }
 

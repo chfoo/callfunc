@@ -10,8 +10,10 @@ using Safety;
 
 class MemoryImpl implements Memory {
     final sizeOfTable:Map<DataType,Int>;
+    final context:ContextImpl;
 
-    public function new() {
+    public function new(context:ContextImpl) {
+        this.context = context;
         sizeOfTable = getSizeOfTable();
     }
 
@@ -28,7 +30,7 @@ class MemoryImpl implements Memory {
             #else
             nativePointer
             #end
-            , this);
+            , context);
     }
 
     public function free(pointer:Pointer) {
@@ -70,13 +72,13 @@ class MemoryImpl implements Memory {
             #else
             nativePointer
             #end
-            , this);
+            , context);
     }
 
     public function bytesToPointer(bytes:Bytes):Pointer {
         #if cpp
         var managedPointer = bytesToBytesData(bytes);
-        return new PointerImpl(cast managedPointer.raw, this);
+        return new PointerImpl(cast managedPointer.raw, context);
 
         #elseif hl
         return getPointer(bytesToBytesData(bytes).address());

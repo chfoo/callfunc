@@ -1,22 +1,25 @@
 package callfunc.emscripten;
 
 class EmFunction implements Function {
+    public var library(get, never):Library;
     public var name(get, never):String;
     public var params(get, never):Array<DataType>;
     public var returnType(get, never):DataType;
 
-    final module:EmscriptenModule;
+    final context:EmContext;
+    final _library:Library;
     final _name:String;
     final _params:Array<DataType>;
     final _returnType:DataType;
     final jsFunc:haxe.Constraints.Function;
 
-    public function new(module:EmscriptenModule, name:String,
+    public function new(context:EmContext, library:Library, name:String,
             ?params:Array<DataType>, ?returnType:DataType) {
         params = params != null ? params : [];
         returnType = returnType != null ? returnType : DataType.Void;
 
-        this.module = module;
+        this.context = context;
+        _library = library;
         _name = name;
         _params = params;
         _returnType = returnType;
@@ -24,7 +27,11 @@ class EmFunction implements Function {
         var ccallParams = _params.map(EmDataType.toCCallType);
         var ccallReturnType = EmDataType.toCCallReturnType(_returnType);
 
-        jsFunc = module.cwrap(name, ccallReturnType, ccallParams);
+        jsFunc = context.module.cwrap(name, ccallReturnType, ccallParams);
+    }
+
+    function get_library():Library {
+        return _library;
     }
 
     function get_name():String {
@@ -52,6 +59,15 @@ class EmFunction implements Function {
             }
         }
 
-        return @:nullSafety(Off) Reflect.callMethod(null, jsFunc, args);
+        var result = @:nullSafety(Off) Reflect.callMethod(null, jsFunc, args);
+
+        switch _returnType {
+            case Pointer:
+                return new EmPointer(context, result);
+            default:
+                // pass
+        }
+
+        return result;
     }
 }

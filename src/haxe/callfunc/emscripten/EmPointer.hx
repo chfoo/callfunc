@@ -6,19 +6,24 @@ using callfunc.emscripten.ModuleTools;
 
 class EmPointer implements Pointer {
     public var address(get, never):Int64;
+    public var memory(get, never):Memory;
 
     final _address:Int64;
     public final nativePointer:Int;
-    final module:EmscriptenModule;
+    final context:EmContext;
 
-    public function new(module:EmscriptenModule, nativePointer:Int) {
-        this.module = module;
+    public function new(context:EmContext, nativePointer:Int) {
+        this.context = context;
         this.nativePointer = nativePointer;
         _address = Int64.fromFloat(nativePointer);
     }
 
     function get_address():Int64 {
         return _address;
+    }
+
+    function get_memory():Memory {
+        return context.memory;
     }
 
     public function isNull():Bool {
@@ -30,17 +35,17 @@ class EmPointer implements Pointer {
             case DataType.SInt64 | DataType.UInt64 |
                     DataType.SLong | DataType.ULong:
                 return Int64.make(
-                    module.getValue(
+                    context.module.getValue(
                         nativePointer + offset + 4,
                         EmDataType.toLLVMType(DataType.SInt32)
                     ),
-                    module.getValue(
+                    context.module.getValue(
                         nativePointer + offset,
                         EmDataType.toLLVMType(DataType.SInt32)
                     )
                 );
             default:
-                return module.getValue(
+                return context.module.getValue(
                     nativePointer + offset,
                     EmDataType.toLLVMType(dataType)
                 );
@@ -50,18 +55,18 @@ class EmPointer implements Pointer {
     public function set(value:Any, dataType:DataType, offset:Int = 0) {
         if (Int64.is(value)) {
             var int64:Int64 = value;
-            module.setValue(
+            context.module.setValue(
                 nativePointer + offset,
                 int64.low,
                 EmDataType.toLLVMType(DataType.SInt32)
             );
-            module.setValue(
+            context.module.setValue(
                 nativePointer + offset + 4,
                 int64.high,
                 EmDataType.toLLVMType(DataType.SInt32)
             );
         } else {
-            module.setValue(
+            context.module.setValue(
                 nativePointer + offset,
                 value,
                 EmDataType.toLLVMType(dataType)

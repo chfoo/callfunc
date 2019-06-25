@@ -22,7 +22,7 @@ class ContextImpl implements  Context {
 
     function newMemory():Memory {
         #if (cpp || hl)
-        return new callfunc.impl.MemoryImpl();
+        return new callfunc.impl.MemoryImpl(this);
         #else
         throw "Not supported";
         #end
@@ -30,7 +30,7 @@ class ContextImpl implements  Context {
 
     public function newLibrary(name:String):Library {
         #if (cpp || hl)
-        return new callfunc.impl.LibraryImpl(name, memory);
+        return new callfunc.impl.LibraryImpl(name, this);
         #else
         throw "Not supported";
         #end
@@ -38,7 +38,7 @@ class ContextImpl implements  Context {
 
     public function newStructType(dataTypes:Array<DataType>):StructType {
         #if (cpp || hl)
-        return new callfunc.impl.StructTypeImpl(dataTypes, memory);
+        return new callfunc.impl.StructTypeImpl(dataTypes, this);
         #else
         throw "Not supported";
         #end
@@ -48,7 +48,7 @@ class ContextImpl implements  Context {
             ?params:Array<DataType>,
             ?returnType:DataType):Callback {
         #if (cpp || hl)
-        return new callfunc.impl.CallbackImpl(memory, haxeFunction, params,
+        return new callfunc.impl.CallbackImpl(this, haxeFunction, params,
             returnType);
         #else
         throw "Not supported";

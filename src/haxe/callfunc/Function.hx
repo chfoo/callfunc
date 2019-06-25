@@ -5,6 +5,11 @@ package callfunc;
  */
 interface Function extends Disposable {
     /**
+     * Library of which this function belongs to.
+     */
+    public var library(get, never):Library;
+
+    /**
      * Symbol name of the function.
      */
     public var name(get, never):String;
