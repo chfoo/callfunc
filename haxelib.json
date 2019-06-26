@@ -9,6 +9,7 @@
     "releasenote": "Support callbacks, variadic function, more data types. (See changelog)",
     "contributors": ["chfoo"],
     "dependencies": {
-        "safety": ""
+        "safety": "",
+        "unifill": ""
     }
 }
