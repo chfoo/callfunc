@@ -6,12 +6,12 @@ As described in the libffi readme, there will be some costs to performance. As w
 
 Supported targets:
 
-* CPP
-* HashLink
+* CPP (little-endian only)
+* HashLink (little-endian only)
 
 Callfunc can also be used as a interface for calling foreign functions in other targets:
 
-* JS + Emscripten
+* JS + Emscripten (32-bit WASM, little-endian only)
 
 ## Quick start
 
@@ -32,11 +32,15 @@ Obtain libffi.{so,dylib,dll} (and callfunc.hdll for Hashlink) from the zip relea
 
 ## Types
 
-The `DataType` enum contains the same data types as described in libffi.
+The `CoreDataType` enum contains the same data types as described in libffi. The `DataType` enum contains additional data types that are automatically aliased to core data types.
 
-* Integer C data types that fit within 32 bits, such as `int16_t`, are converted to Haxe `Int`. C integers that are 64 bits wide are converted to Haxe `Int64`. As a consequence, `long int` can be either `Int` or `Int64` depending on the ABI.
-* `float` and `double` are converted to Haxe `Float`.
-* `void *` and alike are represented by the `Pointer` class.
+Integer C data types that fit within 32 bits, such as `int16_t`, are converted to Haxe `Int`. C integers that are 64 bits wide are converted to Haxe `Int64`. As a consequence, `long int` can be either `Int` or `Int64` depending on the ABI.
+
+Likewise, **when converting to C data types, Haxe `Int` and `Int64` will be truncated (possible loss of data) when the data type is too small**. Otherwise, it there is no loss of data (either it fits or promoted).
+
+`float` and `double` are converted to Haxe `Float`.
+
+`void *` and alike are represented by the `Pointer` class.
 
 ## Loading a library
 
@@ -157,7 +161,7 @@ var view = callfunc.memory.pointerToDataView(pointer);
 
 ## Structures
 
-Unlike C arrays, the fields in C structures aren't necessaily next to each other. The way structs are packed depends on the ABI. To obtain the size and field offsets, build a `StructType`.
+Unlike C arrays, the fields in C structures aren't necessarily next to each other. The way structs are packed depends on the ABI. To obtain the size and field offsets, build a `StructType`.
 
 To build this C struct:
 
@@ -211,6 +215,52 @@ var f = library.newFunction("do_something", [DataType.Pointer]);
 f.call([callbackPointer]);
 ```
 
+## Convenience functions
+
+Callfunc provides static method extensions to help call functions easier. You can enable them by adding:
+
+```haxe
+using callfunc.FunctionTools;
+using callfunc.PointerTools;
+```
+
+Using variable argument version of `call()`:
+
+```haxe
+var functionInfo = library.newFunction("do_something", [DataType.SInt32, DataType.SInt32])
+functionInfo.callVA(123, 456);
+```
+
+Getting a variable argument function version of `call()` . `callVA()` is implemented as a macro, so it is not a real function.
+
+```haxe
+var doSomething:(Int->Int)->Void = functionInfo.getCallable();
+```
+
+Passing a callback function where the callback arguments array will be unpacked to a variadic argument function:
+
+```haxe
+function addCallback(a:Int, b:Int) {
+    // [...]
+}
+
+callfunc.newCallbackVA(addCallback, [DataType.SInt32, DataType.SInt32]);
+```
+
+Passing and reading strings:
+```haxe
+
+var inputPointer = callfunc.memory.allocString("Hello world!");
+var outputPointer:Pointer = f.callVA(inputStringPointer);
+var outputString = outputPointer.getString();
+```
+
+## 32/64-bit integers
+
+Callfunc provides `AutoInt64` that is an abstract of `Int64` which automatically promotes `Int` to `Int64`. Likewise, `AutoInt` is an abstract of `Int` which truncates `Int64` to `Int`.
+
+`AutoInt64` can be useful with working on C data types such as `size_t` which don't have a fixed width.
+
 ## Emscripten
 
 To use Callfunc's interface to Emscripten, you must create a context with the module object:
@@ -229,6 +279,8 @@ Callfunc does not provide any automatic protection against memory-unsafe conditi
 For targets that use libffi, the creation of `Function` or `StructType` instances is not thread safe.
 
 ## Documentation
+
+A libcurl example is in the "example" directory.
 
 API docs: https://chfoo.github.io/callfunc/api/
 

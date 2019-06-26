@@ -1,12 +1,28 @@
 #include "examplelib.h"
 #include <stdarg.h>
+#include <stdlib.h>
+#include <string.h>
 
-int32_t examplelib_f1(int32_t a, int32_t b, int32_t * c) {
+int32_t examplelib_ints(int32_t a, int32_t b, int32_t * c) {
     *c = a + b;
     return 0xcafe;
 }
 
-int32_t examplelib_vf1(unsigned int count, ...) {
+const char * examplelib_string(const char * text) {
+    char * new_string = (char *) malloc(strlen(text) + 1);
+
+    for (size_t index = 0; index < strlen(text) + 1; index++) {
+        if ('a' <= text[index] && text[index] <= 'z') {
+            new_string[index] = text[index] ^ 0x20;
+        } else {
+            new_string[index] = text[index];
+        }
+    }
+
+    return new_string;
+}
+
+int32_t examplelib_variadic(unsigned int count, ...) {
     int32_t sum = 0;
 
     va_list p;

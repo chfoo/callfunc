@@ -30,7 +30,8 @@ interface Context {
      *
      * Availability depends on the libffi platform support for closures.
      *
-     * @param haxeFunction Callback function to be wrapped.
+     * @param haxeFunction Callback function to be wrapped that accepts an
+     *     array of arguments or an empty array.
      * @param params Data types corresponding to the function parameters
      *     exposed to the C code.
      * @param returnType Data type of the return value of the exposed function.

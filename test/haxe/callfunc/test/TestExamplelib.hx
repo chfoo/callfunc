@@ -3,6 +3,9 @@ package callfunc.test;
 import utest.Assert;
 import utest.Test;
 
+using callfunc.FunctionTools;
+using callfunc.PointerTools;
+
 class TestExamplelib extends Test {
     function getLibName() {
         #if js
@@ -19,43 +22,64 @@ class TestExamplelib extends Test {
         #end
     }
 
-    public function testf1() {
+    public function testInts() {
         var callfunc = Callfunc.instance();
         var library = callfunc.newLibrary(getLibName());
 
         var f1 = library.newFunction(
-            "examplelib_f1",
+            "examplelib_ints",
             [DataType.SInt32, DataType.SInt32, DataType.Pointer],
             DataType.SInt32
         );
 
         var outputPointer = callfunc.memory.alloc(4);
 
-        var result = f1.call([123, 456, outputPointer]);
+        var result = f1.callVA(123, 456, outputPointer);
 
         Assert.equals(0xcafe, result);
         Assert.equals(579, outputPointer.get(DataType.SInt32));
 
-        callfunc.memory.free(outputPointer);
+        outputPointer.free();
         f1.dispose();
+        library.dispose();
+    }
+
+    public function testString() {
+        var callfunc = Callfunc.instance();
+        var library = callfunc.newLibrary(getLibName());
+
+        var f = library.newFunction(
+            "examplelib_string",
+            [DataType.Pointer],
+            DataType.Pointer
+        );
+
+        var inputStringPointer = callfunc.memory.allocString("Hello world!");
+        var result:Pointer = f.callVA(inputStringPointer);
+        var resultString = result.getString();
+
+        Assert.equals("HELLO WORLD!", resultString);
+
+        inputStringPointer.free();
+        f.dispose();
         library.dispose();
     }
 
     #if js
     @Ignored("emscripten-core/emscripten #5563 #5684")
     #end
-    public function testvf1() {
+    public function testVariadic() {
         var callfunc = Callfunc.instance();
         var library = callfunc.newLibrary(getLibName());
 
         var f = library.newVariadicFunction(
-            "examplelib_vf1",
+            "examplelib_variadic",
             [DataType.UInt, DataType.SInt32, DataType.SInt32],
             1,
             DataType.SInt32
         );
 
-        var result = f.call([2, 123, 456]);
+        var result = f.callVA(2, 123, 456);
 
         Assert.equals(579, result);
         f.dispose();
@@ -72,26 +96,23 @@ class TestExamplelib extends Test {
             DataType.SInt32
         );
 
-        function callback(args:Array<Any>):Any {
-            var a:Int = args[0];
-            var b:Int = args[1];
-
+        function callback(a:Int, b:Int):Int {
             return a + b;
         }
 
-        var callbackWrapper = callfunc.newCallback(
+        var callbackHandle = callfunc.newCallbackVA(
             callback,
             [DataType.SInt32, DataType.SInt32],
             DataType.SInt32);
-        var callbackPointer = callbackWrapper.getPointer();
+        var callbackPointer = callbackHandle.getPointer();
 
-        var result = f.call([callbackPointer]);
+        var result = f.callVA(callbackPointer);
 
         Assert.equals(123 + 456, result);
 
         f.dispose();
         library.dispose();
-        callbackWrapper.dispose();
+        callbackHandle.dispose();
     }
 
     public function testStructType() {

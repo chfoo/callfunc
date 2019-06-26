@@ -31,7 +31,8 @@ interface Function extends Disposable {
      *
      * @param args Arguments that correspond the parameter data types.
      *     Arguments can be `Int`, `haxe.io.Int64`, `Float`, or `Pointer`.
-     *     Numeric types will be promoted and casted appropriately.
+     *     Numeric types will be promoted and casted
+     *     (with possible truncation or loss of precision) appropriately.
      * @return If `returnType` is not `DataType.Void`, the return value
      *     will be converted to either `Int`, `haxe.io.Int64`, `Float`, or
      *     `Pointer`.

@@ -1,0 +1,4 @@
+libs.hxml
+-cp src/haxe/
+-cp example/
+-main curlexample.CurlExample

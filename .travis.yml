@@ -30,3 +30,5 @@ script:
   - haxe hxml/test.hl.hxml -D callfunc_unit_test -D hl_ver=1.9.0
   - source script/export_ld_path.sh && ./out/cpp/TestAll-debug
   - source script/export_ld_path.sh && hl out/hl/test.hl
+  - haxe hxml/example_curl.cpp.hxml
+  - haxe hxml/example_curl.hl.hxml -D hl_ver=1.9.0
