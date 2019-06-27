@@ -11,6 +11,7 @@
 #endif
 
 #ifdef CALLFUNC_HL
+    // we've already prefixed our names
     #define HL_NAME(n) n
     #include <hl.h>
     #define CALLFUNC_API HL_PRIM

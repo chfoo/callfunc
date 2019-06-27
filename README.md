@@ -7,7 +7,7 @@ As described in the libffi readme, there will be some costs to performance. As w
 Supported targets:
 
 * CPP (little-endian only)
-* HashLink (little-endian only)
+* HashLink and HL/C (little-endian only)
 
 Callfunc can also be used as a interface for calling foreign functions in other targets:
 

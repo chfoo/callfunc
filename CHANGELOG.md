@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* Fixed: Support for HL/C
+
 ## 0.2.0 (2019-06-26)
 
 * Fixed: Signed int8 and int16 conversion from int32 or unsigned int8.

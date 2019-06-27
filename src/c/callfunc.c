@@ -633,6 +633,12 @@ void _callfunc_array_set_int(uint8_t * buffer, size_t offset, int32_t value) {
 #elif CALLFUNC_HL
 #include <hl.h>
 
+typedef struct CallfuncLibrary _hl_CallfuncLibrary;
+typedef struct CallfuncFunction _hl_CallfuncFunction;
+typedef struct CallfuncStructType _hl_CallfuncStructType;
+typedef struct CallfuncCallback _hl_CallfuncCallback;
+typedef void* _hl_CallfuncVoidStar;
+
 // It would be nice if I could find in the source code how this structure
 // format is generated from the Int64 wrapper. Note that this is not the native
 // representation of int64_t.
@@ -642,7 +648,8 @@ struct hl_int64 {
     int32_t low;
 };
 
-vdynamic * hl_callfunc_pointer_to_int64(void * pointer) {
+CALLFUNC_API
+vdynamic * callfunc_pointer_to_int64_hl(void * pointer) {
     int64_t result = callfunc_pointer_to_int64(pointer);
 
     vdynamic * obj = hl_alloc_dynamic(&hlt_dyn);
@@ -654,7 +661,8 @@ vdynamic * hl_callfunc_pointer_to_int64(void * pointer) {
     return obj;
 }
 
-void * hl_callfunc_int64_to_pointer(vdynamic * obj) {
+CALLFUNC_API
+void * callfunc_int64_to_pointer_hl(vdynamic * obj) {
     struct hl_int64 * wrapper = (struct hl_int64 *) obj;
 
     uint64_t val = (uint64_t) wrapper->high << 32;
@@ -667,37 +675,37 @@ void _callfunc_closure_impl(struct CallfuncCallback * callback) {
     hl_dyn_call(callback->haxe_function, NULL, 0);
 }
 
-#define HL_DEF(name,t,args) DEFINE_PRIM_WITH_NAME(t,name,args,name)
+#define HL_DEF(name,t,args) DEFINE_PRIM_WITH_NAME(t,callfunc_##name,args,name)
 #define HL_DEF2(name,impl_name,t,args) DEFINE_PRIM_WITH_NAME(t,impl_name,args,name)
 
-HL_DEF(callfunc_api_version, _I32, _NO_ARG)
-HL_DEF(callfunc_get_error_message, _BYTES, _NO_ARG)
-HL_DEF(callfunc_get_sizeof_table, _VOID, _BYTES)
-HL_DEF(callfunc_alloc, _ABSTRACT(void*), _I32 _BOOL)
-HL_DEF(callfunc_free, _VOID, _ABSTRACT(void*))
-HL_DEF(callfunc_new_library, _ABSTRACT(struct CallfuncLibrary), _NO_ARG)
-HL_DEF(callfunc_del_library, _VOID, _ABSTRACT(struct CallfuncLibrary))
-HL_DEF(callfunc_library_open, _I32, _ABSTRACT(struct CallfuncLibrary) _BYTES)
-HL_DEF(callfunc_library_close, _VOID, _ABSTRACT(struct CallfuncLibrary))
-HL_DEF(callfunc_library_get_address, _I32, _ABSTRACT(struct CallfuncLibrary) _BYTES _REF(_ABSTRACT(void*)))
-HL_DEF(callfunc_new_function, _ABSTRACT(struct CallfuncFunction), _ABSTRACT(struct CallfuncLibrary))
-HL_DEF(callfunc_del_function, _VOID, _ABSTRACT(struct CallfuncFunction))
-HL_DEF(callfunc_function_define, _I32, _ABSTRACT(struct CallfuncFunction) _ABSTRACT(void*) _I32 _BYTES)
-HL_DEF(callfunc_function_call, _VOID, _ABSTRACT(struct CallfuncFunction) _BYTES)
-HL_DEF(callfunc_new_struct_type, _ABSTRACT(struct CallfuncStructType), _NO_ARG)
-HL_DEF(callfunc_del_struct_type, _VOID, _ABSTRACT(struct CallfuncStructType))
-HL_DEF(callfunc_struct_type_define, _I32, _ABSTRACT(struct CallfuncStructType) _BYTES _BYTES)
-HL_DEF(callfunc_new_callback, _ABSTRACT(struct CallfuncCallback), _NO_ARG)
-HL_DEF(callfunc_del_callback, _VOID, _ABSTRACT(struct CallfuncCallback))
-HL_DEF(callfunc_callback_define, _I32, _ABSTRACT(struct CallfuncCallback) _BYTES)
-HL_DEF(callfunc_callback_bind, _I32, _ABSTRACT(struct CallfuncCallback) _BYTES _FUN(_VOID, _NO_ARG))
-HL_DEF(callfunc_callback_get_pointer, _ABSTRACT(void*), _ABSTRACT(struct CallfuncCallback))
-HL_DEF2(callfunc_pointer_to_int64, hl_callfunc_pointer_to_int64, _OBJ(_I32 _I32), _ABSTRACT(void*))
-HL_DEF2(callfunc_int64_to_pointer, hl_callfunc_int64_to_pointer, _ABSTRACT(void*), _OBJ(_I32 _I32))
-HL_DEF(callfunc_pointer_get, _VOID, _ABSTRACT(void*) _I8 _BYTES _I32)
-HL_DEF(callfunc_pointer_set, _VOID, _ABSTRACT(void*) _I8 _BYTES _I32)
-HL_DEF(callfunc_pointer_array_get, _VOID, _ABSTRACT(void*) _I8 _BYTES _I32)
-HL_DEF(callfunc_pointer_array_set, _VOID, _ABSTRACT(void*) _I8 _BYTES _I32)
+HL_DEF(api_version, _I32, _NO_ARG)
+HL_DEF(get_error_message, _BYTES, _NO_ARG)
+HL_DEF(get_sizeof_table, _VOID, _BYTES)
+HL_DEF(alloc, _ABSTRACT(_hl_CallfuncVoidStar), _I32 _BOOL)
+HL_DEF(free, _VOID, _ABSTRACT(_hl_CallfuncVoidStar))
+HL_DEF(new_library, _ABSTRACT(_hl_CallfuncLibrary), _NO_ARG)
+HL_DEF(del_library, _VOID, _ABSTRACT(_hl_CallfuncLibrary))
+HL_DEF(library_open, _I32, _ABSTRACT(_hl_CallfuncLibrary) _BYTES)
+HL_DEF(library_close, _VOID, _ABSTRACT(_hl_CallfuncLibrary))
+HL_DEF(library_get_address, _I32, _ABSTRACT(_hl_CallfuncLibrary) _BYTES _REF(_ABSTRACT(_hl_CallfuncVoidStar)))
+HL_DEF(new_function, _ABSTRACT(_hl_CallfuncFunction), _ABSTRACT(_hl_CallfuncLibrary))
+HL_DEF(del_function, _VOID, _ABSTRACT(_hl_CallfuncFunction))
+HL_DEF(function_define, _I32, _ABSTRACT(_hl_CallfuncFunction) _ABSTRACT(_hl_CallfuncVoidStar) _I32 _BYTES)
+HL_DEF(function_call, _VOID, _ABSTRACT(_hl_CallfuncFunction) _BYTES)
+HL_DEF(new_struct_type, _ABSTRACT(_hl_CallfuncStructType), _NO_ARG)
+HL_DEF(del_struct_type, _VOID, _ABSTRACT(_hl_CallfuncStructType))
+HL_DEF(struct_type_define, _I32, _ABSTRACT(_hl_CallfuncStructType) _BYTES _BYTES)
+HL_DEF(new_callback, _ABSTRACT(_hl_CallfuncCallback), _NO_ARG)
+HL_DEF(del_callback, _VOID, _ABSTRACT(_hl_CallfuncCallback))
+HL_DEF(callback_define, _I32, _ABSTRACT(_hl_CallfuncCallback) _BYTES)
+HL_DEF(callback_bind, _I32, _ABSTRACT(_hl_CallfuncCallback) _BYTES _FUN(_VOID, _NO_ARG))
+HL_DEF(callback_get_pointer, _ABSTRACT(_hl_CallfuncVoidStar), _ABSTRACT(_hl_CallfuncCallback))
+HL_DEF(pointer_to_int64_hl, _OBJ(_I32 _I32), _ABSTRACT(_hl_CallfuncVoidStar))
+HL_DEF(int64_to_pointer_hl, _ABSTRACT(_hl_CallfuncVoidStar), _OBJ(_I32 _I32))
+HL_DEF(pointer_get, _VOID, _ABSTRACT(_hl_CallfuncVoidStar) _I8 _BYTES _I32)
+HL_DEF(pointer_set, _VOID, _ABSTRACT(_hl_CallfuncVoidStar) _I8 _BYTES _I32)
+HL_DEF(pointer_array_get, _VOID, _ABSTRACT(_hl_CallfuncVoidStar) _I8 _BYTES _I32)
+HL_DEF(pointer_array_set, _VOID, _ABSTRACT(_hl_CallfuncVoidStar) _I8 _BYTES _I32)
 
 #else
 
