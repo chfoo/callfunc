@@ -20,6 +20,7 @@ before_install:
 
 install:
   - yes | haxelib install hxcpp
+  - yes | haxelib install hashlink
   - yes | haxelib install test.hxml
 
 script:
