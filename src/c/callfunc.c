@@ -115,6 +115,7 @@ void callfunc_library_close(struct CallfuncLibrary * library) {
         #else
         dlclose(library->library);
         #endif
+        library->library = NULL;
     }
 }
 
@@ -157,6 +158,7 @@ void callfunc_del_function(struct CallfuncFunction * function) {
 
     if (function->cif.arg_types != NULL) {
         free(function->cif.arg_types);
+        function->cif.arg_types = NULL;
     }
 
     free(function);
@@ -242,6 +244,7 @@ void callfunc_del_struct_type(struct CallfuncStructType * struct_type) {
 
     if (struct_type->type.elements != NULL) {
         free(struct_type->type.elements);
+        struct_type->type.elements = NULL;
     }
 
     free(struct_type);
@@ -291,14 +294,17 @@ void callfunc_del_callback(struct CallfuncCallback * callback) {
 
     if (callback->cif.arg_types != NULL) {
         free(callback->cif.arg_types);
+        callback->cif.arg_types = NULL;
     }
 
     if (callback->closure != NULL) {
         ffi_closure_free(callback->closure);
+        callback->closure = NULL;
     }
 
     if (callback->definition != NULL) {
         free(callback->definition);
+        callback->definition = NULL;
     }
 
     free(callback);

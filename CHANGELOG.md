@@ -3,6 +3,7 @@
 ## Unreleased
 
 * Fixed: Support for HL/C
+* Fixed: Double free when closing library and memory leak when error thrown opening library/function.
 
 ## 0.2.0 (2019-06-26)
 

@@ -79,12 +79,6 @@ class TestCairoSurface extends Test {
         destroyFunc.call([context]);
         surfaceDestroyFunc.call([surface]);
         imageSurfaceCreateFunc.dispose();
-        imageSurfaceCreateFunc = library.newFunction(
-            "cairo_image_surface_create",
-            [DataType.SInt32, DataType.SInt, DataType.SInt],
-            DataType.Pointer
-        );
-
         imageSurfaceGetDataFunc.dispose();
         surfaceStatusFunc.dispose();
         surfaceFlushFunc.dispose();

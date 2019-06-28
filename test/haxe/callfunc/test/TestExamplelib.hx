@@ -22,6 +22,21 @@ class TestExamplelib extends Test {
         #end
     }
 
+    public function testNonexistentLibrary() {
+        var callfunc = Callfunc.instance();
+        Assert.raises(callfunc.newLibrary.bind("nonexistent-library-1234"));
+    }
+
+    public function testNonexistentFunction() {
+        var callfunc = Callfunc.instance();
+        var library = callfunc.newLibrary(getLibName());
+
+        Assert.raises(library.newFunction.bind("nonexistent_function"));
+        Assert.raises(library.newVariadicFunction.bind("nonexistent_function", [DataType.SInt], 1));
+
+        library.dispose();
+    }
+
     public function testInts() {
         var callfunc = Callfunc.instance();
         var library = callfunc.newLibrary(getLibName());
@@ -60,6 +75,7 @@ class TestExamplelib extends Test {
 
         Assert.equals("HELLO WORLD!", resultString);
 
+        result.free();
         inputStringPointer.free();
         f.dispose();
         library.dispose();

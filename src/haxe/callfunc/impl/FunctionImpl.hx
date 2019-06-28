@@ -47,6 +47,7 @@ class FunctionImpl implements Function {
             pointer.nativePointer, abi, MemoryImpl.bytesToBytesData(buffer));
 
         if (error != 0) {
+            dispose();
             throw NativeUtil.fromNativeString(ExternDef.getErrorMessage());
         }
     }

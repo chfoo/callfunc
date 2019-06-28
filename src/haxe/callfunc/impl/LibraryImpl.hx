@@ -24,6 +24,7 @@ class LibraryImpl implements Library {
             );
 
         if (error != 0) {
+            dispose();
             throw NativeUtil.fromNativeString(ExternDef.getErrorMessage());
         }
     }

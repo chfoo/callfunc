@@ -50,5 +50,7 @@ class TestPointer extends utest.Test {
         Assert.equals(2, pointer.arrayGet(DataType.SInt32, 1));
         Assert.equals(3, pointer.arrayGet(DataType.SInt32, 2));
         Assert.equals(4, pointer.arrayGet(DataType.SInt32, 3));
+
+        memory.free(pointer);
     }
 }
