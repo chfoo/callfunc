@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.1 (2019-07-03)
 
 * Fixed: Support for HL/C
 * Fixed: Double free when closing library and memory leak when error thrown opening library/function.
