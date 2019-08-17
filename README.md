@@ -187,6 +187,15 @@ var a = structPointer.get(DataType.SInt, structType.offsets[0]);
 var b = structPointer.get(DataType.Pointer, structType.offsets[1]);
 ```
 
+Structs can also be accessed using a helper class `StructAccess`:
+
+```haxe
+var struct = new StructAccess(structPointer, structType, ["a", "b"]);
+
+struct["a"] = 123;
+trace(struct["a"]);
+```
+
 ## Callback functions
 
 C code calling Haxe code is supported.

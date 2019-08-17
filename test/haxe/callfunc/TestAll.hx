@@ -32,6 +32,7 @@ class TestAll {
         runner.addCase(new callfunc.test.TestExamplelib());
         runner.addCase(new callfunc.test.TestMemory());
         runner.addCase(new callfunc.test.TestPointer());
+        runner.addCase(new callfunc.test.TestStructAccess());
         Report.create(runner);
         runner.run();
     }
