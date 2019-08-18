@@ -54,13 +54,13 @@ class DataValueSerializer {
 
         switch memory.toCoreDataType(dataType, true) {
             case SInt8 | UInt8:
-                buffer.set(bufferIndex, toInt(value));
+                buffer.set(bufferIndex, NumberUtil.toInt(value));
             case SInt16 | UInt16:
-                buffer.setUInt16(bufferIndex, toInt(value));
+                buffer.setUInt16(bufferIndex, NumberUtil.toInt(value));
             case SInt32 | UInt32:
-                buffer.setInt32(bufferIndex, toInt(value));
+                buffer.setInt32(bufferIndex, NumberUtil.toInt(value));
             case SInt64 | UInt64:
-                buffer.setInt64(bufferIndex, toInt64(value));
+                buffer.setInt64(bufferIndex, NumberUtil.toInt64(value));
             case Float:
                 buffer.setFloat(bufferIndex, value);
             case Double:
@@ -84,30 +84,6 @@ class DataValueSerializer {
                 buffer.setInt32(bufferIndex, pointer.address.low);
             default:
                 throw 'Unsupported pointer width $valueSize';
-        }
-    }
-
-    function toInt(value:Any):Int {
-        if (Std.is(value, Int)) {
-            return value;
-        } else if (Int64.is(value)) {
-            return (value:Int64).low;
-        } else if (Std.is(value, Float)) {
-            return Std.int(value);
-        } else {
-            throw "Cannot convert value to Int";
-        }
-    }
-
-    function toInt64(value:Any):Int64 {
-        if (Int64.is(value)) {
-            return value;
-        } else if (Std.is(value, Int)) {
-            return Int64.make(0, value);
-        } else if (Std.is(value, Float)) {
-            return Int64.fromFloat(value);
-        } else {
-            throw "Cannot convert value to Int64";
         }
     }
 

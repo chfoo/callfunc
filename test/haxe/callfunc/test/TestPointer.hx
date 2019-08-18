@@ -13,14 +13,23 @@ class TestPointer extends utest.Test {
         pointer.set(-1, DataType.SInt8);
         Assert.equals(-1, pointer.get(DataType.SInt8));
 
+        pointer.set(200, DataType.UInt8);
+        Assert.equals(200, pointer.get(DataType.UInt8));
+
         pointer.set(11111, DataType.UInt16);
         Assert.equals(11111, pointer.get(DataType.UInt16, 0));
+
+        pointer.set(50000, DataType.UInt16);
+        Assert.equals(50000, pointer.get(DataType.UInt16, 0));
 
         pointer.set(-32111, DataType.SInt16);
         Assert.equals(-32111, pointer.get(DataType.SInt16));
 
         pointer.set(-11111111, DataType.SInt32);
         Assert.equals(-11111111, pointer.get(DataType.SInt32));
+
+        pointer.set(0xffaabbcc, DataType.UInt32);
+        Assert.equals(0xffaabbcc, pointer.get(DataType.UInt32));
 
         pointer.set(Int64.make(0x12345678, 0xc001cafe), DataType.SInt64);
         // Assert.equals(Int64.make(0x12345678, 0xc001cafe), pointer.get(DataType.SInt64));

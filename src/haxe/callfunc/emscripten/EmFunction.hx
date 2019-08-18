@@ -1,5 +1,7 @@
 package callfunc.emscripten;
 
+using callfunc.emscripten.ModuleTools;
+
 class EmFunction implements Function {
     public var library(get, never):Library;
     public var name(get, never):String;
@@ -23,6 +25,9 @@ class EmFunction implements Function {
         _name = name;
         _params = params;
         _returnType = returnType;
+
+        // Check for existence
+        context.module.getSymbol(name);
 
         var ccallParams = _params.map(EmDataType.toCCallType);
         var ccallReturnType = EmDataType.toCCallReturnType(_returnType);

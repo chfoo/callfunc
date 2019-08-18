@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* Fixed: Emscripten pointer get() for unsigned int data types returning signed values.
 * Added: StructAccess
 
 ## 0.2.1 (2019-07-03)
