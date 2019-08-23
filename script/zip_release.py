@@ -45,7 +45,7 @@ def add_bin(zip_filename: str, project_dir: str):
 
     filenames = (
         'bin/libffi.txt',
-        'bin/macos/callfunc-0.2.1_84c2bbf/callfunc.hdll',
+        'bin/macos/callfunc-0.3.0_2f42754/callfunc.hdll',
         'bin/macos/libffi-3.3-rc0_80d0710/ffi.h',
         'bin/macos/libffi-3.3-rc0_80d0710/ffitarget.h',
         'bin/macos/libffi-3.3-rc0_80d0710/libffi.7.dylib',
@@ -54,9 +54,9 @@ def add_bin(zip_filename: str, project_dir: str):
         'bin/windows-x86-64/libffi-3.3-rc0-1_20f4c8a/libffi.dll',
         'bin/windows-x86-64/libffi-3.3-rc0-1_20f4c8a/libffi.lib',
         'bin/windows-x86-64/libffi-3.3-rc0-1_20f4c8a/libffi.pdb',
-        'bin/windows-x86/callfunc-0.2.1_84c2bbf/callfunc.exp',
-        'bin/windows-x86/callfunc-0.2.1_84c2bbf/callfunc.hdll',
-        'bin/windows-x86/callfunc-0.2.1_84c2bbf/callfunc.lib',
+        'bin/windows-x86/callfunc-0.3.0_2f42754/callfunc.exp',
+        'bin/windows-x86/callfunc-0.3.0_2f42754/callfunc.hdll',
+        'bin/windows-x86/callfunc-0.3.0_2f42754/callfunc.lib',
         'bin/windows-x86/libffi-3.3-rc0-1_20f4c8a/ffi.h',
         'bin/windows-x86/libffi-3.3-rc0-1_20f4c8a/ffitarget.h',
         'bin/windows-x86/libffi-3.3-rc0-1_20f4c8a/libffi.dll',
