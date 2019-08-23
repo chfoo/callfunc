@@ -40,4 +40,5 @@ enum DataType {
     Size;
     PtrDiff;
     WChar;
+    Struct(fields:Array<DataType>);
 }

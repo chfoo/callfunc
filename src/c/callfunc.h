@@ -19,7 +19,7 @@
     #define CALLFUNC_API
 #endif
 
-#define CALLFUNC_API_VERSION (0x02)
+#define CALLFUNC_API_VERSION (0x03)
 
 #define CALLFUNC_SUCCESS (0)
 #define CALLFUNC_FAILURE (1)
@@ -46,6 +46,7 @@
 #define CALLFUNC_SLONG (17)
 #define CALLFUNC_ULONG (18)
 #define CALLFUNC_POINTER (19)
+#define CALLFUNC_STRUCT (20)
 
 #define CALLFUNC_DEFAULT_ABI (-999)
 
@@ -84,7 +85,6 @@ struct CallfuncCallback {
     ffi_cif cif;
     ffi_closure * closure;
     void * code_location;
-    uint8_t * definition;
     uint8_t * arg_buffer;
     CallfuncHaxeFunc haxe_function;
 };
@@ -195,12 +195,20 @@ ffi_type * _callfunc_constant_to_ffi_type(int constant);
 CallfuncError _check_ffi_status(ffi_status status);
 
 void _callfunc_parse_parameter_definition(uint8_t * definition,
-    int32_t * num_params, int32_t * num_fixed_params,
+    size_t * num_params, int32_t * num_fixed_params,
     ffi_type *** parameter_types,
     ffi_type ** return_type);
 
 void _callfunc_parse_struct_definition(uint8_t * definition,
-    int32_t * num_fields, ffi_type *** field_types) ;
+    size_t * num_fields, ffi_type *** field_types);
+
+ffi_type * _callfunc_parse_type(uint8_t * buffer, size_t offset,
+    size_t * bytes_read);
+
+void * _callfunc_get_buffer_struct_copy(uint8_t * buffer, size_t offset,
+    size_t struct_size);
+
+void _callfunc_rescursive_free_types(ffi_type ** types, size_t length);
 
 void * _callfunc_get_aligned_pointer(void * pointer, uint8_t data_type,
     int32_t index);

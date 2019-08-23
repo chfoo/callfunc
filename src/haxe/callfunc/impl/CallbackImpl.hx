@@ -25,6 +25,7 @@ class CallbackImpl implements Callback {
 
         argSerializer = new ArgSerializer(context.memory);
         argBuffer = Bytes.alloc(argSerializer.getArgBufferLength(params));
+        argBuffer.setInt32(0, argBuffer.length);
 
         nativePointer = ExternDef.newCallback();
 

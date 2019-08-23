@@ -40,3 +40,13 @@ int32_t examplelib_variadic(unsigned int count, ...) {
 int32_t examplelib_callback(int32_t (*callback)(int32_t a, int32_t b)) {
     return callback(123, 456);
 }
+
+struct examplelib_struct1 examplelib_struct_value(struct examplelib_struct1 value) {
+    struct examplelib_struct1 return_value;
+
+    return_value.a = value.a ^ 0x20;
+    return_value.b = value.b ^ 0x20;
+    return_value.c = value.c * 2;
+
+    return return_value;
+}

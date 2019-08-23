@@ -145,5 +145,37 @@ class TestExamplelib extends Test {
 
         Assert.equals(8, structType.size);
         Assert.same([0, 4], structType.offsets);
+
+        structType.dispose();
+    }
+
+    public function testStructPassByValue() {
+        var callfunc = Callfunc.instance();
+        var library = callfunc.newLibrary(getLibName());
+        var structDataTypes = [DataType.UChar, DataType.SInt32, DataType.Double];
+        var structType = callfunc.newStructType(structDataTypes);
+
+        var f = library.newFunction(
+            "examplelib_struct_value",
+            [DataType.Struct(structDataTypes)],
+            DataType.Struct(structDataTypes)
+        );
+
+        var inputStructPointer = callfunc.memory.alloc(structType.size);
+        inputStructPointer.set(0x65, DataType.UChar, structType.offsets[0]);
+        inputStructPointer.set(0x65, DataType.SInt32, structType.offsets[1]);
+        inputStructPointer.set(123.456, DataType.Double, structType.offsets[2]);
+
+        var result:Pointer = f.call([inputStructPointer]);
+
+        Assert.equals(0x45, result.get(DataType.UChar, structType.offsets[0]));
+        Assert.equals(0x45, result.get(DataType.SInt32, structType.offsets[1]));
+        Assert.equals(246.912, result.get(DataType.Double, structType.offsets[2]));
+
+        structType.dispose();
+        f.dispose();
+        library.dispose();
+        inputStructPointer.free();
+        result.free();
     }
 }

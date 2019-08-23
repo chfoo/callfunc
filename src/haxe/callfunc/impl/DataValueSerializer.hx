@@ -45,13 +45,50 @@ class DataValueSerializer {
         ];
     }
 
-    public function serializeDataType(buffer:Bytes, bufferIndex:Int, dataType:DataType) {
+    public function serializeDataType(buffer:Bytes, bufferIndex:Int, dataType:DataType):Int {
         buffer.set(bufferIndex, memory.toCoreDataType(dataType).toInt());
+
+        switch dataType {
+            case Struct(fields):
+                var size = 1;
+
+                buffer.setInt32(bufferIndex + size, fields.length);
+                size += 4;
+
+                for (field in fields) {
+                    size += serializeDataType(buffer, bufferIndex + size, field);
+                }
+
+                return size;
+            default:
+                return 1;
+        }
+    }
+
+    public function getSerializedDataTypeSize(dataType:DataType):Int {
+        switch dataType {
+            case Struct(fields):
+                var size = 1 + 4;
+
+                for (field in fields) {
+                    size += getSerializedDataTypeSize(field);
+                }
+
+                return size;
+            default:
+                return 1;
+        }
+    }
+
+    public function getSerializedValueSize(dataType:DataType):Int {
+        if (dataType.match(DataType.Struct(_))) {
+            dataType = DataType.Pointer;
+        }
+
+        return memory.sizeOf(dataType);
     }
 
     public function serializeValue(buffer:Bytes, bufferIndex:Int, dataType:DataType, value:Any):Int {
-        var valueSize = memory.sizeOf(dataType);
-
         switch memory.toCoreDataType(dataType, true) {
             case SInt8 | UInt8:
                 buffer.set(bufferIndex, NumberUtil.toInt(value));
@@ -65,12 +102,14 @@ class DataValueSerializer {
                 buffer.setFloat(bufferIndex, value);
             case Double:
                 buffer.setDouble(bufferIndex, value);
-            case Pointer:
+            case Pointer | Struct:
                 serializePointer(buffer, bufferIndex, value);
+                dataType = DataType.Pointer;
             default:
                 throw "Shouldn't reach here";
         }
 
+        var valueSize = memory.sizeOf(dataType);
         return valueSize;
     }
 
@@ -107,7 +146,7 @@ class DataValueSerializer {
                 return buffer.getDouble(bufferIndex);
             case Float:
                 return buffer.getFloat(bufferIndex);
-            case Pointer:
+            case Pointer | Struct:
                 return deserializePointer(buffer, bufferIndex);
             case Void:
                 throw "Void type";

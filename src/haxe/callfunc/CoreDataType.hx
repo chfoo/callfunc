@@ -29,6 +29,7 @@ abstract CoreDataType(Int) {
     var SLong = 17;
     var ULong = 18;
     var Pointer = 19;
+    var Struct = 20;
 
     inline public function toInt():Int {
         return this;
@@ -56,6 +57,7 @@ abstract CoreDataType(Int) {
             case DataType.Double: return Double;
             case DataType.Pointer: return Pointer;
             case DataType.Void: return Void;
+            case DataType.Struct(_): return Struct;
             default: return null;
         }
     }

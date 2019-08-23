@@ -196,6 +196,12 @@ struct["a"] = 123;
 trace(struct["a"]);
 ```
 
+### Passing structs by value
+
+Structs are usually passed by reference using pointers, but passing structs by value is also supported. This is done by specifying the `Struct` data type to the function definition and pass `Pointer` arguments to populated structs. Copies of the structs will be made from the pointers during the function call.
+
+For functions that return structs by value, a `Pointer` to a copied struct will be returned. This pointer should be freed by the caller.
+
 ## Callback functions
 
 C code calling Haxe code is supported.

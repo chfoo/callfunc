@@ -1,7 +1,7 @@
 package callfunc.impl;
 
 class ContextImpl implements  Context {
-    static final API_VERSION = 2;
+    static final API_VERSION = 3;
     public var memory(get, never):Memory;
 
     final _memory:Memory;

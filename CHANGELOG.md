@@ -4,6 +4,7 @@
 
 * Fixed: Emscripten pointer get() for unsigned int data types returning signed values.
 * Added: StructAccess
+* Added: Support for pass by value structs
 
 ## 0.2.1 (2019-07-03)
 

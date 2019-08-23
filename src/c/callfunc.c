@@ -157,7 +157,8 @@ void callfunc_del_function(struct CallfuncFunction * function) {
     assert(function != NULL);
 
     if (function->cif.arg_types != NULL) {
-        free(function->cif.arg_types);
+        _callfunc_rescursive_free_types(function->cif.arg_types,
+            function->cif.nargs);
         function->cif.arg_types = NULL;
     }
 
@@ -172,7 +173,7 @@ CallfuncError callfunc_function_define(
 
     function->function = (void(*)(void)) target_function;
 
-    int32_t num_params;
+    size_t num_params;
     int32_t num_fixed_params;
     ffi_type ** parameter_types;
     ffi_type * return_type;
@@ -203,27 +204,63 @@ void callfunc_function_call(struct CallfuncFunction * function,
     assert(function->function != NULL);
     assert(sizeof(ffi_arg) <= 8);
 
-    int32_t num_args = _callfunc_array_get_int(argument_buffer, 0);
+    unsigned int num_args = function->cif.nargs;
     ffi_arg return_value;
-    size_t buffer_index = 4 + CALLFUNC_MAX_RETURN_SIZE;
+    size_t buffer_index = 0;
+    size_t buffer_length = _callfunc_array_get_int(argument_buffer, buffer_index);
+    buffer_index += 4;
+    buffer_index += CALLFUNC_MAX_RETURN_SIZE;
 
     void ** arg_pointers = (void **) malloc(num_args * sizeof(void *));
+    bool * arg_pointer_allocated = (bool *) malloc(num_args * sizeof(bool *));
     _CALLFUNC_ABORT_NULL(arg_pointers);
+    _CALLFUNC_ABORT_NULL(arg_pointer_allocated);
 
-    for (int32_t arg_index = 0; arg_index < num_args; arg_index++) {
-        size_t arg_size = argument_buffer[buffer_index];
-        buffer_index += 1;
+    for (size_t index = 0; index < num_args; index++) {
+        assert(buffer_index < buffer_length);
+        ffi_type * arg_type = function->cif.arg_types[index];
+        size_t arg_size;
 
-        arg_pointers[arg_index] = &argument_buffer[buffer_index];
+        if (arg_type->type == FFI_TYPE_STRUCT) {
+            void * copied_struct = _callfunc_get_buffer_struct_copy(
+                    argument_buffer, buffer_index, arg_type->size);
+
+            arg_size = sizeof(void *);
+            arg_pointers[index] = copied_struct;
+            arg_pointer_allocated[index] = true;
+        } else {
+            arg_size = arg_type->size;
+            arg_pointers[index] = &argument_buffer[buffer_index];
+            arg_pointer_allocated[index] = false;
+        }
 
         buffer_index += arg_size;
     }
 
-    ffi_call(&function->cif, function->function,
-        &return_value, arg_pointers);
+    assert(buffer_index == buffer_length);
 
-    memcpy(&argument_buffer[4], &return_value, sizeof(ffi_arg));
+    if (function->cif.rtype->type == FFI_TYPE_STRUCT) {
+        void * return_buffer = malloc(function->cif.rtype->size);
+
+        ffi_call(&function->cif, function->function,
+            return_buffer, arg_pointers);
+
+        memcpy(&argument_buffer[4], &return_buffer, sizeof(void *));
+    } else {
+        ffi_call(&function->cif, function->function,
+            &return_value, arg_pointers);
+
+        memcpy(&argument_buffer[4], &return_value, sizeof(ffi_arg));
+    }
+
+    for (size_t index = 0; index < num_args; index++) {
+        if (arg_pointer_allocated[index]) {
+            free(arg_pointers[index]);
+        }
+    }
+
     free(arg_pointers);
+    free(arg_pointer_allocated);
 }
 
 struct CallfuncStructType * callfunc_new_struct_type() {
@@ -243,7 +280,7 @@ void callfunc_del_struct_type(struct CallfuncStructType * struct_type) {
     assert(struct_type != NULL);
 
     if (struct_type->type.elements != NULL) {
-        free(struct_type->type.elements);
+        _callfunc_rescursive_free_types(struct_type->type.elements, SIZE_MAX);
         struct_type->type.elements = NULL;
     }
 
@@ -257,7 +294,7 @@ CallfuncError callfunc_struct_type_define(
     assert(definition != NULL);
     assert(resultInfo != NULL);
 
-    int32_t num_fields;
+    size_t num_fields;
     ffi_type ** field_types;
 
     _callfunc_parse_struct_definition(definition, &num_fields, &field_types);
@@ -272,7 +309,7 @@ CallfuncError callfunc_struct_type_define(
 
     _callfunc_array_set_int(resultInfo, 0, struct_type->type.size);
 
-    for (int32_t field_index = 0; field_index < num_fields; field_index++) {
+    for (size_t field_index = 0; field_index < num_fields; field_index++) {
         _callfunc_array_set_int(
             resultInfo,
             (1 + field_index) * 4,
@@ -293,18 +330,14 @@ void callfunc_del_callback(struct CallfuncCallback * callback) {
     assert(callback != NULL);
 
     if (callback->cif.arg_types != NULL) {
-        free(callback->cif.arg_types);
+        _callfunc_rescursive_free_types(callback->cif.arg_types,
+            callback->cif.nargs);
         callback->cif.arg_types = NULL;
     }
 
     if (callback->closure != NULL) {
         ffi_closure_free(callback->closure);
         callback->closure = NULL;
-    }
-
-    if (callback->definition != NULL) {
-        free(callback->definition);
-        callback->definition = NULL;
     }
 
     free(callback);
@@ -315,7 +348,7 @@ CallfuncError callfunc_callback_define(struct CallfuncCallback * callback,
     assert(callback != NULL);
     assert(definition != NULL);
 
-    int32_t num_params;
+    size_t num_params;
     int32_t num_fixed_params;
     ffi_type ** parameter_types;
     ffi_type * return_type;
@@ -325,10 +358,6 @@ CallfuncError callfunc_callback_define(struct CallfuncCallback * callback,
         &parameter_types, &return_type);
 
     assert(num_fixed_params < 0);
-
-    callback->definition = (uint8_t *) malloc(4 + 4 + 1 + num_params);
-    _CALLFUNC_ABORT_NULL(callback->definition);
-    memcpy(callback->definition, definition, 4 + 4 + 1 + num_params);
 
     ffi_status status = ffi_prep_cif(&callback->cif, FFI_DEFAULT_ABI,
         num_params, return_type, parameter_types);
@@ -511,40 +540,151 @@ CallfuncError _check_ffi_status(ffi_status status) {
 }
 
 void _callfunc_parse_parameter_definition(uint8_t * definition,
-        int32_t * num_params, int32_t * num_fixed_params,
+        size_t * num_params, int32_t * num_fixed_params,
         ffi_type *** parameter_types, ffi_type ** return_type) {
+    assert(definition != NULL);
+    assert(num_params != NULL);
+    assert(num_fixed_params != NULL);
+    assert(parameter_types != NULL);
+    assert(return_type != NULL);
 
-    int32_t num_params_ = _callfunc_array_get_int(definition, 0);
-    int32_t num_fixed_params_ = _callfunc_array_get_int(definition, 4);
+    size_t offset = 0;
+    size_t buffer_length = _callfunc_array_get_int(definition, offset);
+    offset += 4;
+    *num_params = _callfunc_array_get_int(definition, offset);
+    offset += 4;
+    *num_fixed_params = _callfunc_array_get_int(definition, offset);
+    offset += 4;
 
-    *num_params = num_params_;
-    *num_fixed_params = num_fixed_params_;
-    *parameter_types = (ffi_type **) malloc(sizeof(ffi_type *) * num_params_);
-    *return_type = (ffi_type *) _callfunc_constant_to_ffi_type(definition[4 + 4]);
+    *parameter_types = (ffi_type **) malloc(sizeof(ffi_type *) * *num_params);
+
+    size_t bytes_read_child;
+    *return_type = _callfunc_parse_type(definition, offset, &bytes_read_child);
+    offset += bytes_read_child;
 
     _CALLFUNC_ABORT_NULL(*parameter_types);
 
-    for (int32_t param_index = 0; param_index < num_params_; param_index++) {
-        (*parameter_types)[param_index] =
-            _callfunc_constant_to_ffi_type(definition[4 + 4 + 1 + param_index]);
+    for (size_t index = 0; index < *num_params; index++) {
+        assert(offset < buffer_length);
+        size_t bytes_read_child;
+
+        (*parameter_types)[index] =
+            _callfunc_parse_type(definition, offset, &bytes_read_child);
+
+        offset += bytes_read_child;
     }
+
+    assert(offset == buffer_length);
 }
 
 void _callfunc_parse_struct_definition(uint8_t * definition,
-        int32_t * num_fields, ffi_type *** field_types) {
+        size_t * num_fields, ffi_type *** field_types) {
+    assert(definition != NULL);
+    assert(num_fields != NULL);
+    assert(field_types != NULL);
 
-    int32_t num_fields_ = _callfunc_array_get_int(definition, 0);
-    *num_fields = num_fields_;
-    *field_types = (ffi_type **) malloc(sizeof(ffi_type *) * (num_fields_ + 1));
+    size_t offset = 0;
+    size_t buffer_length = _callfunc_array_get_int(definition, offset);
+    offset += 4;
 
+    *num_fields = _callfunc_array_get_int(definition, offset);
+    *field_types = (ffi_type **) malloc(sizeof(ffi_type *) * (*num_fields + 1));
     _CALLFUNC_ABORT_NULL(*field_types);
+    offset += 4;
 
-    for (int32_t field_index = 0; field_index < num_fields_; field_index++) {
-        (*field_types)[field_index] =
-            _callfunc_constant_to_ffi_type(definition[4 + field_index]);
+    for (size_t index = 0; index < *num_fields; index++) {
+        assert(offset < buffer_length);
+        size_t bytes_read_child;
+
+        (*field_types)[index] =
+            _callfunc_parse_type(definition, offset, &bytes_read_child);
+
+        offset += bytes_read_child;
     }
 
-    (*field_types)[num_fields_] = NULL;
+    (*field_types)[*num_fields] = NULL;
+    assert(offset == buffer_length);
+}
+
+ffi_type * _callfunc_parse_type(uint8_t * buffer, size_t offset,
+        size_t * bytes_read) {
+    assert(buffer != NULL);
+    assert(bytes_read != NULL);
+
+    size_t bytes_read_local = 0;
+    int type_constant = buffer[offset];
+    bytes_read_local += 1;
+    offset += 1;
+
+    if (type_constant == CALLFUNC_STRUCT) {
+        ffi_type * type = (ffi_type *) malloc(sizeof(ffi_type));
+
+        _CALLFUNC_ABORT_NULL(type);
+
+        type->type = FFI_TYPE_STRUCT;
+        type->size = 0;
+        type->alignment = 0;
+
+        size_t num_fields = _callfunc_array_get_int(buffer, offset);
+        type->elements = (ffi_type **) malloc(sizeof(ffi_type *) * (num_fields + 1));
+
+        _CALLFUNC_ABORT_NULL(type->elements);
+
+        bytes_read_local += 4;
+        offset += 4;
+
+        for (size_t index = 0; index < num_fields; index++) {
+            size_t bytes_read_child;
+
+            type->elements[index] =
+                _callfunc_parse_type(buffer, offset, &bytes_read_child);
+
+            bytes_read_local += bytes_read_child;
+            offset += bytes_read_child;
+        }
+
+        type->elements[num_fields] = NULL;
+
+        *bytes_read = bytes_read_local;
+        return type;
+
+    } else {
+        *bytes_read = bytes_read_local;
+        return _callfunc_constant_to_ffi_type(type_constant);
+    }
+}
+
+void * _callfunc_get_buffer_struct_copy(uint8_t * buffer, size_t offset,
+        size_t struct_size) {
+    void * original_struct;
+    memcpy(&original_struct, &buffer[offset], sizeof(void *));
+    void * copied_struct = malloc(struct_size);
+
+    _CALLFUNC_ABORT_NULL(copied_struct);
+
+    memcpy(copied_struct, original_struct, struct_size);
+
+    return copied_struct;
+}
+
+void _callfunc_rescursive_free_types(ffi_type ** types, size_t length) {
+    for (size_t index = 0; index < length; index++) {
+        ffi_type * type = types[index];
+
+        if (type == NULL) {
+            break;
+        } else if (type->type != FFI_TYPE_STRUCT) {
+            continue;
+        }
+
+        if (type->elements != NULL) {
+            _callfunc_rescursive_free_types(type->elements, SIZE_MAX);
+        }
+
+        free(type);
+    }
+
+    free(types);
 }
 
 #define _CALLFUNC_ALIGN_HELPER(ctype) (&((ctype *) pointer)[index])
@@ -583,25 +723,30 @@ void _callfunc_closure_handler(ffi_cif * cif, void * return_value,
 
     struct CallfuncCallback * callback = (struct CallfuncCallback *) user_data;
 
-    assert(callback->definition != NULL);
     assert(callback->arg_buffer != NULL);
     #ifndef CALLFUNC_CPP
         assert(callback->haxe_function != NULL);
     #endif
 
     int32_t num_args = (int32_t) callback->cif.nargs;
+    size_t buffer_index = 0;
+    size_t buffer_size = _callfunc_array_get_int(callback->arg_buffer, buffer_index);
+    buffer_index += 4;
 
-    _callfunc_array_set_int(callback->arg_buffer, 0, num_args);
+    buffer_index += CALLFUNC_MAX_RETURN_SIZE;
 
-    size_t buffer_index = 4 + CALLFUNC_MAX_RETURN_SIZE;
+    for (int32_t index = 0; index < num_args; index++) {
+        assert(buffer_index < buffer_size);
+        size_t value_size;
+        ffi_type * arg_type = callback->cif.arg_types[index];
 
-    for (int32_t arg_index = 0; arg_index < num_args; arg_index++) {
-        uint8_t data_type = callback->definition[4 + 4 + 1 + arg_index];
-        size_t value_size = _callfunc_data_type_size(data_type);
-        void * arg = args[arg_index];
+        if (arg_type->type == FFI_TYPE_STRUCT) {
+            value_size = sizeof(void *);
+        } else {
+            value_size = arg_type->size;
+        }
 
-        callback->arg_buffer[buffer_index] = value_size;
-        buffer_index += 1;
+        void * arg = args[index];
 
         memcpy(&callback->arg_buffer[buffer_index], arg, value_size);
 
@@ -610,9 +755,7 @@ void _callfunc_closure_handler(ffi_cif * cif, void * return_value,
 
     _callfunc_closure_impl(callback);
 
-    uint8_t return_data_type = callback->definition[4 + 4];
-
-    if (return_data_type != CALLFUNC_VOID) {
+    if (callback->cif.rtype->type != FFI_TYPE_VOID) {
         memcpy(return_value, &callback->arg_buffer[4], sizeof(ffi_arg));
     }
 }
