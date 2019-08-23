@@ -1,7 +1,7 @@
 package callfunc;
 
 /**
- * C structure packing information.
+ * C structure (composite data type) packing information.
  */
 interface StructType extends Disposable {
     /**

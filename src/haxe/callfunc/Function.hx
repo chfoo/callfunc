@@ -41,6 +41,9 @@ interface Function extends Disposable {
      *     promoted to `Int` while wider integers will be promoted
      *     to `haxe.io.Int64`.
      *
+     *     If `returnType` is `DataType.Struct`, the return value will be
+     *     a `Pointer` which the caller should free.
+     *
      * @throws String An error message if the argument list is invalid (such
      *     as wrong size or wrong type.
      */

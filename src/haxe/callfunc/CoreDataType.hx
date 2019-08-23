@@ -5,6 +5,9 @@ import haxe.ds.Option;
 /**
  * Represents primitive C data types supported by libffi.
  *
+ * Note that `Struct` is not true primitive data type; it is an indicator
+ * for composite data types in the serialization process.
+ *
  * @see `DataType`
  */
 @:enum

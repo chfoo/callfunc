@@ -10,6 +10,16 @@ package callfunc;
  * - ComplexDouble
  * - ComplexLongDouble
  *
+ * The `Pointer` data type is a pointer to a data type (object pointer) or
+ * a function (function pointer). libffi and Callfunc assumes that the
+ * architecture treats object pointers and function pointers as the
+ * same thing. It is up to the user to dereference the pointer to the correct
+ * data type or function.
+ *
+ * Note that `Struct` is a composite of data types. It is intended to define
+ * pass-by-value struct C function signatures and nested struct definitions.
+ * Not to be confused with a `Pointer` which can point to a struct.
+ *
  * @see `CoreDataType`
  */
 enum DataType {
