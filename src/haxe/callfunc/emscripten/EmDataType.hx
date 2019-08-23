@@ -19,7 +19,7 @@ class EmDataType {
                 return "double";
             case Void:
                 throw "Void is not a real type";
-            case LongDouble | ComplexFloat | ComplexDouble | ComplexLongDouble:
+            case LongDouble | ComplexFloat | ComplexDouble | ComplexLongDouble | Struct(_):
                 throw 'Not supported data type $dataType';
         }
     }
@@ -50,7 +50,7 @@ class EmDataType {
                 return 8;
             case Void:
                 throw "Void is not a real type";
-            case LongDouble | ComplexFloat | ComplexDouble | ComplexLongDouble:
+            case LongDouble | ComplexFloat | ComplexDouble | ComplexLongDouble | Struct(_):
                 return 0;
         }
     }
@@ -80,7 +80,7 @@ class EmDataType {
                 return "d";
             case Void:
                 return "v";
-            case LongDouble | ComplexFloat | ComplexDouble | ComplexLongDouble:
+            case LongDouble | ComplexFloat | ComplexDouble | ComplexLongDouble | Struct(_):
                 throw 'Not supported data type $dataType';
         }
     }

@@ -149,6 +149,9 @@ class TestExamplelib extends Test {
         structType.dispose();
     }
 
+    #if js
+    @Ignored("not supported")
+    #end
     public function testStructPassByValue() {
         var callfunc = Callfunc.instance();
         var library = callfunc.newLibrary(getLibName());
