@@ -4,9 +4,9 @@
     "license": "MIT",
     "tags": ["native"],
     "description": "Foreign function interface library using libffi",
-    "version": "0.2.1",
+    "version": "0.3.0",
     "classPath": "src/haxe",
-    "releasenote": "Support callbacks, variadic function, more data types. (See changelog)",
+    "releasenote": "Support pass by value structs. (See changelog)",
     "contributors": ["chfoo"],
     "dependencies": {
         "safety": "",

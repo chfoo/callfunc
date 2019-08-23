@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.3.0 (2019-08-23)
 
 * Fixed: Emscripten pointer get() for unsigned int data types returning signed values.
 * Added: StructAccess
