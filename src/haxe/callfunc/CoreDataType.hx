@@ -38,7 +38,7 @@ abstract CoreDataType(Int) {
         return this;
     }
 
-    public static function fromDataType(dataType:DataType):Null<CoreDataType> {
+    public static function fromDataType(dataType:DataType):CoreDataType {
         switch dataType {
             case DataType.UChar: return UChar;
             case DataType.UShort: return UShort;
@@ -61,7 +61,7 @@ abstract CoreDataType(Int) {
             case DataType.Pointer: return Pointer;
             case DataType.Void: return Void;
             case DataType.Struct(_): return Struct;
-            default: return null;
+            default: throw 'Invalid type $dataType';
         }
     }
 

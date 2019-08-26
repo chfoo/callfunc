@@ -15,20 +15,15 @@ class MemoryTools {
             dataType = toFixedWidth(memory, dataType);
         }
 
-        var coreDataType = CoreDataType.fromDataType(dataType);
-
-        if (coreDataType != null) {
-            return coreDataType;
+        try {
+            return CoreDataType.fromDataType(dataType);
+        } catch (exception:String) {
+            // continue
         }
 
         dataType = toFixedWidth(memory, dataType);
-        coreDataType = CoreDataType.fromDataType(dataType);
 
-        if (coreDataType != null) {
-            return coreDataType;
-        }
-
-        throw 'Unsupported type $dataType';
+        return CoreDataType.fromDataType(dataType);
     }
 
     static function toFixedWidth(memory:Memory, dataType:DataType):DataType {

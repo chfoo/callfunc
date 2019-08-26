@@ -10,6 +10,13 @@ import callfunc.emscripten.EmContext;
 
 class TestAll {
     public static function main() {
+        #if sys
+        if (Sys.args().indexOf("--test-performance") >= 0) {
+            trace("PerformanceTest");
+            PerformanceTest.run();
+        }
+        #end
+
         #if js
         var context = new EmContext(Reflect.field(js.Browser.window, "Module"));
         Callfunc.setInstance(context);

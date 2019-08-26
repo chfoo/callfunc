@@ -7,7 +7,7 @@ using callfunc.FunctionTools;
 using callfunc.PointerTools;
 
 class TestExamplelib extends Test {
-    function getLibName() {
+    public static function getLibName() {
         #if js
         return "";
         #else

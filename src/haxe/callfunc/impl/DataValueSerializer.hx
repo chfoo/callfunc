@@ -13,38 +13,6 @@ class DataValueSerializer {
         this.memory = memory;
     }
 
-    public static function deserializeSizeOfTable(buffer:Bytes):Map<DataType,Int> {
-        return [
-            DataType.UInt8 => buffer.get(0),
-            DataType.SInt8 => buffer.get(1),
-            DataType.UInt16 => buffer.get(2),
-            DataType.SInt16 => buffer.get(3),
-            DataType.UInt32 => buffer.get(4),
-            DataType.SInt32 => buffer.get(5),
-            DataType.UInt64 => buffer.get(6),
-            DataType.SInt64 => buffer.get(7),
-            DataType.Float => buffer.get(8),
-            DataType.Double => buffer.get(9),
-            DataType.UChar => buffer.get(10),
-            DataType.SChar => buffer.get(11),
-            DataType.UShort => buffer.get(12),
-            DataType.SShort => buffer.get(13),
-            DataType.SInt => buffer.get(14),
-            DataType.UInt => buffer.get(15),
-            DataType.SLong => buffer.get(16),
-            DataType.ULong => buffer.get(17),
-            DataType.Pointer => buffer.get(18),
-
-            DataType.LongDouble => buffer.get(19),
-            DataType.ComplexFloat => buffer.get(20),
-            DataType.ComplexDouble => buffer.get(21),
-            DataType.ComplexLongDouble => buffer.get(22),
-            DataType.Size => buffer.get(23),
-            DataType.PtrDiff => buffer.get(24),
-            DataType.WChar => buffer.get(25)
-        ];
-    }
-
     public function serializeDataType(buffer:Bytes, bufferIndex:Int, dataType:DataType):Int {
         buffer.set(bufferIndex, memory.toCoreDataType(dataType).toInt());
 
