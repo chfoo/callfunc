@@ -39,7 +39,7 @@ class CurlExample {
         // We could use AutoInt to work on 32-bit integers, but it's legal
         // (but probably impossible) on 64-bit platform that libcurl can give
         // us a data chunk larger 2 GB. So instead truncating "count",
-        // we XOR the Int64 to properly compute how much we want to process.
+        // we AND the Int64 to properly compute how much we want to process.
 
         var receiveBuffer = new BytesBuffer();
 
@@ -47,7 +47,7 @@ class CurlExample {
                 count:AutoInt64):AutoInt64 {
 
             // size is guaranteed to be 1 byte from libcurl.
-            // We choose an XOR value that is guaranteed to not be negative
+            // We choose an AND value that is guaranteed to not be negative
             // and won't lose data in 32/64-bit truncation and promotion.
             // 16 MB is more than enough as kernel receive sizes are near 4 KB.
             var processedCount = (size.toInt() * ((count:Int64) & 0xffffff)).toInt();
