@@ -268,7 +268,9 @@ Passing a callback function where the callback arguments array will be unpacked 
 
 ```haxe
 // ❌ Instead of:
-function uglyAddCallback([a:Int, b:Int]) {
+function uglyAddCallback(args:Array<Any>) {
+    var a:Int = args[0];
+    var b:Int = args[1];
     // [...]
 }
 
@@ -344,7 +346,7 @@ Likewise, `Pointer` objects hold C pointers which must be treated with care as u
 
 ## Safety
 
-Callfunc does not provide any automatic protection against memory-unsafe conditions such as dangling pointers or out-of-bounds read/writes.
+Callfunc does not provide any automatic protection against memory-unsafe conditions such as dangling pointers, out-of-bounds read/writes, type confusion, or integer overflows/underflows.
 
 For targets that use libffi, the creation of `Function` or `StructType` instances is not thread safe.
 
