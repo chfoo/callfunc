@@ -10,14 +10,18 @@ using callfunc.MemoryTools;
 class EmPointer implements Pointer {
     public var address(get, never):Int64;
     public var memory(get, never):Memory;
+    public var dataType(get, set):DataType;
 
     final _address:Int64;
     public final nativePointer:Int;
     final context:EmContext;
 
+    var _dataType:DataType;
+
     public function new(context:EmContext, nativePointer:Int) {
         this.context = context;
         this.nativePointer = nativePointer;
+        _dataType = DataType.SInt;
         _address = Int64.fromFloat(nativePointer);
     }
 
@@ -29,11 +33,20 @@ class EmPointer implements Pointer {
         return context.memory;
     }
 
+    function get_dataType():DataType {
+        return _dataType;
+    }
+
+    function set_dataType(value:DataType):DataType {
+        return _dataType = value;
+    }
+
     public function isNull():Bool {
         return nativePointer == 0;
     }
 
-    public function get(dataType:DataType, offset:Int = 0):Any {
+    public function get(?dataType:DataType, offset:Int = 0):Any {
+        dataType = Safety.or(dataType, _dataType);
         final coreDataType = context.memory.toCoreDataType(dataType, true);
 
         switch coreDataType {
@@ -70,7 +83,9 @@ class EmPointer implements Pointer {
         );
     }
 
-    public function set(value:Any, dataType:DataType, offset:Int = 0) {
+    public function set(value:Any, ?dataType:DataType, offset:Int = 0) {
+        dataType = Safety.or(dataType, _dataType);
+
         switch context.memory.toCoreDataType(dataType, true) {
             case SInt64 | UInt64:
                 setInt64(NumberUtil.toInt64(value), offset);
@@ -96,11 +111,13 @@ class EmPointer implements Pointer {
         );
     }
 
-    public function arrayGet(dataType:DataType, index:Int):Any {
+    public function arrayGet(index:Int, ?dataType:DataType):Any {
+        dataType = Safety.or(dataType, _dataType);
         return get(dataType, index * EmDataType.getSize(dataType));
     }
 
-    public function arraySet(value:Any, dataType:DataType, index:Int) {
+    public function arraySet(index:Int, value:Any, ?dataType:DataType) {
+        dataType = Safety.or(dataType, _dataType);
         set(value, dataType, index * EmDataType.getSize(dataType));
     }
 }

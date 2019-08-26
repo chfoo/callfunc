@@ -50,15 +50,50 @@ class TestPointer extends utest.Test {
 
         var pointer = memory.alloc(16);
 
-        pointer.arraySet(1, DataType.SInt32, 0);
-        pointer.arraySet(2, DataType.SInt32, 1);
-        pointer.arraySet(3, DataType.SInt32, 2);
-        pointer.arraySet(4, DataType.SInt32, 3);
+        pointer.arraySet(0, 1, DataType.SInt32);
+        pointer.arraySet(1, 2, DataType.SInt32);
+        pointer.arraySet(2, 3, DataType.SInt32);
+        pointer.arraySet(3, 4, DataType.SInt32);
 
-        Assert.equals(1, pointer.arrayGet(DataType.SInt32, 0));
-        Assert.equals(2, pointer.arrayGet(DataType.SInt32, 1));
-        Assert.equals(3, pointer.arrayGet(DataType.SInt32, 2));
-        Assert.equals(4, pointer.arrayGet(DataType.SInt32, 3));
+        Assert.equals(1, pointer.arrayGet(0, DataType.SInt32));
+        Assert.equals(2, pointer.arrayGet(1, DataType.SInt32));
+        Assert.equals(3, pointer.arrayGet(2, DataType.SInt32));
+        Assert.equals(4, pointer.arrayGet(3, DataType.SInt32));
+
+        memory.free(pointer);
+    }
+
+    public function testDefaultDataType() {
+        var callfunc = Callfunc.instance();
+        var memory = callfunc.memory;
+
+        var pointer = memory.alloc(8);
+        pointer.dataType = DataType.SInt16;
+
+        function clear () {
+            for (index in 0...8) {
+                pointer.set(0, DataType.SInt8, index);
+            }
+        }
+
+        // These tests assume little endian
+        clear();
+        pointer.set(-1);
+        Assert.equals(-1, pointer.get());
+        Assert.equals(0xffff, pointer.get(DataType.SInt32));
+
+        clear();
+        pointer.set(0xc001cafe, DataType.SInt32);
+        Assert.equals(-13570, pointer.get());
+
+        clear();
+        pointer.arraySet(0, -1);
+        Assert.equals(-1, pointer.arrayGet(0));
+        Assert.equals(0xffff, pointer.arrayGet(0, DataType.SInt32));
+
+        clear();
+        pointer.arraySet(0, 0xc001cafe, DataType.SInt32);
+        Assert.equals(-13570, pointer.arrayGet(0));
 
         memory.free(pointer);
     }

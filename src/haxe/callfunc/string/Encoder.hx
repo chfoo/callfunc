@@ -18,7 +18,7 @@ class Encoder {
         var length = 0;
 
         while (true) {
-            if (pointer.arrayGet(dataType, length) == 0) {
+            if (pointer.arrayGet(length, dataType) == 0) {
                 break;
             }
 

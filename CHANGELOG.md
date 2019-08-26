@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+* Changed: [Backwards incompatible] `Pointer`: The parameters in `arrayGet()` and `arraySet()` were reordered to be closer with standard array or map methods.
+* Added: `dataType` field to `Pointer` for default data type.
+
 ## 0.3.0 (2019-08-23)
 
 * Fixed: Emscripten pointer get() for unsigned int data types returning signed values.

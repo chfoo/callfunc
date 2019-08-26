@@ -18,6 +18,11 @@ interface Pointer {
     public var memory(get, never):Memory;
 
     /**
+     * Default data type if not specified in get or set methods.
+     */
+    public var dataType(get, set):DataType;
+
+    /**
      * Returns whether the address does not point to anywhere.
      */
     public function isNull():Bool;
@@ -35,7 +40,7 @@ interface Pointer {
      *     promoted to `Int` while wider integers will be promoted
      *     to `haxe.io.Int64`.
      */
-    public function get(dataType:DataType, offset:Int = 0):Any;
+    public function get(?dataType:DataType, offset:Int = 0):Any;
 
     /**
      * Sets the value at the address memory location.
@@ -47,23 +52,23 @@ interface Pointer {
      * @param offset Value in bytes used to offset the address. This is used to
      *     access fields in a struct.
      */
-    public function set(value:Any, dataType:DataType, offset:Int = 0):Void;
+    public function set(value:Any, ?dataType:DataType, offset:Int = 0):Void;
 
     /**
      * Returns the element value at the addressed C array location.
      *
-     * @param dataType Data type of the array.
      * @param index Element index of the array.
+     * @param dataType Data type of the array.
      * @see `Pointer.get` for return types.
      */
-    public function arrayGet(dataType:DataType, index:Int):Any;
+    public function arrayGet(index:Int, ?dataType:DataType):Any;
 
     /**
      * Sets the element value at the address C array location.
+     * @param index Element index.
      * @param value Element value.
      * @param dataType Data type of the array.
-     * @param index Element index.
      * @see `Pointer.set` for parameter types.
      */
-    public function arraySet(value:Any, dataType:DataType, index:Int):Void;
+    public function arraySet(index:Int, value:Any, ?dataType:DataType):Void;
 }
