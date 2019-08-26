@@ -108,7 +108,7 @@ trace(result); // Int on x86/x86-64
 
 ## Pointers
 
-C pointers are represented by the `Pointer` class. They have two main methods which are `get()` and `set()` that accept `DataType` and an optional offset.
+C pointers are represented by the `Pointer` class. They have two main methods which are `get()` and `set()`.
 
 C:
 
@@ -123,9 +123,11 @@ var f = library.newFunction("do_something", [DataType.Pointer]);
 var size = callfunc.memory.sizeOf(DataType.SInt32);
 var p = callfunc.memory.alloc(size);
 
-p.set(123, DataType.SInt32);
+p.dataType = DataType.SInt32;
+
+p.set(123);
 f.call([p]);
-var result = p.get(DataType.SInt32);
+var result = p.get();
 ```
 
 ### Arrays
@@ -134,8 +136,8 @@ To access array elements, use the array version of get/set:
 
 ```haxe
 var index = 10;
-p.arraySet(456, DataType.SInt32,index);
-var value = p.arrayGet(DataType.SInt32, index); // => 456
+p.arraySet(index, 456);
+var value = p.arrayGet(index); // => 456
 ```
 
 ### Interpreting pointers as Bytes
@@ -239,22 +241,41 @@ using callfunc.FunctionTools;
 using callfunc.PointerTools;
 ```
 
+### Calling functions cleaner
+
 Using variable argument version of `call()`:
 
 ```haxe
 var functionInfo = library.newFunction("do_something", [DataType.SInt32, DataType.SInt32])
+
+// ❌ Instead of:
+functionInfo.call([123, 456]);
+
+// ✔️ Use this:
 functionInfo.callVA(123, 456);
 ```
 
-Getting a variable argument function version of `call()` . `callVA()` is implemented as a macro, so it is not a real function.
+`callVA()` is implemented as a macro, so it is not a real function. However, you can get a variable argument function version of `call()`:
 
 ```haxe
+// ✔️ Safest way with typing:
 var doSomething:(Int->Int)->Void = functionInfo.getCallable();
+
+doSomething(123, 456);
 ```
 
 Passing a callback function where the callback arguments array will be unpacked to a variadic argument function:
 
 ```haxe
+// ❌ Instead of:
+function uglyAddCallback([a:Int, b:Int]) {
+    // [...]
+}
+
+callfunc.newCallback(addCallback, [DataType.SInt32, DataType.SInt32]);
+
+
+// ✔️ Use this:
 function addCallback(a:Int, b:Int) {
     // [...]
 }
@@ -262,12 +283,40 @@ function addCallback(a:Int, b:Int) {
 callfunc.newCallbackVA(addCallback, [DataType.SInt32, DataType.SInt32]);
 ```
 
-Passing and reading strings:
-```haxe
+### Object-oriented Pointer syntax
 
-var inputPointer = callfunc.memory.allocString("Hello world!");
-var outputPointer:Pointer = f.callVA(inputStringPointer);
-var outputString = outputPointer.getString();
+```haxe
+// ❌ Instead of this component aspect API:
+memory.pointerToBytes(pointer);
+memory.pointerToDataView(pointer);
+memory.free(pointer);
+
+// ✔️ Use this this pointer object API:
+pointer.getBytes();
+pointer.getDataView();
+pointer.free();
+```
+
+### Passing and reading strings
+
+To quickly allocate a string:
+
+```haxe
+var pointer = callfunc.memory.allocString("Hello world!");
+
+// or
+
+var pointer = callfunc.memory.allocString("Hello world!", Encoding.UTF16);
+```
+
+Likewise, to decode a string:
+
+```haxe
+var string = pointer.getString();
+
+// or
+
+var string = pointer.getString(Encoding.UTF16);
 ```
 
 ## 32/64-bit integers
@@ -287,6 +336,12 @@ Callfunc.setInstance(context);
 
 To use exported functions, simply use the empty string `""` as the library name. Opening other libraries is not supported at this time.
 
+## Garbage collection
+
+Any object with a `dispose()` method contains resources that cannot be automatically garbage collected. It is up to the user to call this method at the appropriate times.
+
+Likewise, `Pointer` objects hold C pointers which must be treated with care as usual in C.
+
 ## Safety
 
 Callfunc does not provide any automatic protection against memory-unsafe conditions such as dangling pointers or out-of-bounds read/writes.
@@ -300,6 +355,8 @@ A libcurl example is in the "example" directory.
 API docs: https://chfoo.github.io/callfunc/api/
 
 ## Compiling the libraries
+
+Pre-compiled libraries are included in the releases, but if you need to compile them yourself, see below.
 
 ### libffi
 
