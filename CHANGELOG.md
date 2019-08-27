@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.4.0 (2019-08-27)
 
 * Changed: [Backwards incompatible] `Pointer`: The parameters in `arrayGet()` and `arraySet()` were reordered to be closer with standard array or map methods.
 * Added: `dataType` field to `Pointer` for default data type.
