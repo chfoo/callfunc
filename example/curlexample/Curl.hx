@@ -4,13 +4,9 @@ import callfunc.Function;
 import callfunc.AutoInt64;
 import callfunc.Callback;
 import callfunc.Callfunc;
-import callfunc.Context;
 import callfunc.DataType;
 import callfunc.Library;
 import callfunc.Pointer;
-
-using callfunc.FunctionTools;
-using callfunc.PointerTools;
 
 // This class provides a few methods to the libcurl C functions.
 // It demonstrates how to convert Dynamic functions into typed functions.
@@ -36,42 +32,44 @@ class Curl {
     public final easySetOptLong:(Pointer, Int, Int)->Int;
     public final easyPerform:Pointer->Int;
 
-    final context:Context;
+    final callfunc:Callfunc;
     final library:Library;
-    final functionHandles:Array<Function>;
 
     public function new() {
-        context = Callfunc.instance();
-        library = context.newLibrary(getLibraryName());
-        functionHandles = [];
+        callfunc = Callfunc.instance();
+        library = callfunc.openLibrary(getLibraryName());
 
-        globalInit = newFunction(
+        globalInit = cast library.define(
             "curl_global_init",
             [DataType.SInt]
-        );
-        globalCleanup = newFunction(
+        ).call;
+        globalCleanup = cast library.define(
             "curl_global_cleanup"
-        );
-        easyInit = newFunction(
+        ).call;
+        easyInit = cast library.define(
             "curl_easy_init",
             [],
             DataType.Pointer
-        );
-        easySetOptPointer = newFunction(
+        ).call;
+        easySetOptPointer = cast library.defineVariadic(
             "curl_easy_setopt",
             [DataType.Pointer, DataType.SInt, DataType.Pointer],
-            DataType.SInt
-        );
-        easySetOptLong = newFunction(
+            2,
+            DataType.SInt,
+            "curl_easy_setopt:pointer"
+        ).call;
+        easySetOptLong = cast library.defineVariadic(
             "curl_easy_setopt",
             [DataType.Pointer, DataType.SInt, DataType.SLong],
-            DataType.SInt
-        );
-        easyPerform = newFunction(
+            2,
+            DataType.SInt,
+            "curl_easy_setopt:long"
+        ).call;
+        easyPerform = cast library.define(
             "curl_easy_perform",
             [DataType.Pointer],
             DataType.SInt
-        );
+        ).call;
     }
 
     function getLibraryName():String {
@@ -85,16 +83,8 @@ class Curl {
         }
     }
 
-    // A convenience function for reducing clutter above
-    function newFunction(name, ?params, ?returnType):Dynamic {
-        var functionHandle = library.newFunction(name, params, returnType);
-        functionHandles.push(functionHandle);
-
-        return functionHandle.getCallable();
-    }
-
     public function newWriteFunction(callback:CurlWriteFunction):Callback {
-        var handle = context.newCallbackVA(
+        var handle = callfunc.wrapCallback(
             callback,
             [DataType.Pointer, DataType.Size, DataType.Size, DataType.Pointer],
             DataType.Size
@@ -104,9 +94,6 @@ class Curl {
     }
 
     public function dispose() {
-        for (handle in functionHandles) {
-            handle.dispose();
-        }
         library.dispose();
     }
 }

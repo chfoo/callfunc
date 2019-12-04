@@ -96,10 +96,22 @@ class TestExamplelib extends Test {
             1,
             DataType.SInt32
         );
+        library.defineVariadic(
+            "examplelib_variadic",
+            [DataType.UInt, DataType.SInt32, DataType.SInt32, DataType.SInt32],
+            1,
+            DataType.SInt32,
+            "examplelib_variadic__2"
+        );
 
         var result = library.s.examplelib_variadic.call(2, 123, 456);
 
         Assert.equals(579, result);
+
+        result = library.s.examplelib_variadic__2.call(3, 123, 456, 789);
+
+        Assert.equals(1368, result);
+
         library.dispose();
     }
 

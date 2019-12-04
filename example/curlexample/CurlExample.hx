@@ -6,16 +6,13 @@ import callfunc.Callfunc;
 import callfunc.Pointer;
 import haxe.io.Bytes;
 
-using callfunc.FunctionTools;
-using callfunc.PointerTools;
-
 using haxe.Int64;
 
 // This example shows how to interact with libcurl to download a web page.
 // We have a Curl class that helps define types for some type safety.
 class CurlExample {
     public static function main() {
-        var context = Callfunc.instance();
+        var callfunc = Callfunc.instance();
         var curl = new Curl();
 
         curl.globalInit(Curl.GLOBAL_ALL);
@@ -25,7 +22,7 @@ class CurlExample {
 
         // Allocate a ASCII/UTF8 string on the heap, pass the pointer,
         // libcurl will copy the string, then we free it.
-        var url = context.memory.allocString("https://haxe.org/");
+        var url = callfunc.allocString("https://haxe.org/");
         curl.easySetOptPointer(handle, Curl.OPT_URL, url);
         url.free();
 
@@ -60,7 +57,7 @@ class CurlExample {
 
         var writeCallbackInfo = curl.newWriteFunction(writeCallback);
         curl.easySetOptPointer(handle, Curl.OPT_WRITE_FUNCTION,
-            writeCallbackInfo.getPointer());
+            writeCallbackInfo.pointer);
 
         // Make libcurl do things
         var error = curl.easyPerform(handle);

@@ -58,14 +58,16 @@ class Library implements Disposable {
      *     array.
      * @param returnType Data type of the return value. If the function does
      *     not return a value. Specify `null` or `DataType.Void`.
+     * @param alias Name used to access this function. If not provided, it
+     *     defaults to the function's name.
      * @param abi If supported by the platform and target, an ABI calling
      *     method matching `enum ffi_abi` defined in `ffitarget.h`.
      *
      * @see `Library.defineVariadic` for C variadic functions.
      */
     public function define(name:String, ?params:Array<DataType>,
-            ?returnType:DataType, ?abi:Int):Function {
-        return addNewFunction(name, params, returnType, abi);
+            ?returnType:DataType, ?alias:String, ?abi:Int):Function {
+        return addNewFunction(name, params, returnType, alias, abi);
     }
 
     /**
@@ -74,25 +76,31 @@ class Library implements Disposable {
      * When calling variadic functions, the number of arguments must match
      * the number of parameters in the definition. As such, a separate
      * definition must be made for the same function if the number of arguments
-     * is different.
+     * is different. Use `alias` to give each definition a different name.
      *
      * @param name Function's symbol name.
      * @param params Data types corresponding to the function parameters.
      * @param fixedParamCount Number of parameters that are fixed (not variadic)
      *     at the start of the parameters list.
      * @param returnType Data type of the return value.
+     * @param alias Name used to access this function. If not provided, it
+     *     defaults to the function's name.
      * @param abi ABI calling method.
      *
      * @see `Library.define` for full parameter documentation.
      */
     public function defineVariadic(name:String, params:Array<DataType>,
-            fixedParamCount:Int, ?returnType:DataType, ?abi:Int):Function {
-        return addNewFunction(name, params, fixedParamCount, returnType, abi);
+            fixedParamCount:Int, ?returnType:DataType,
+            ?alias:String, ?abi:Int):Function {
+        return addNewFunction(name, params, fixedParamCount, returnType, alias, abi);
     }
 
     function addNewFunction(name:String, ?params:Array<DataType>,
-            ?fixedParamCount:Int, ?returnType:DataType, ?abi:Int):Function {
-        if (functions.exists(name)) {
+            ?fixedParamCount:Int, ?returnType:DataType,
+            ?alias:String, ?abi:Int):Function {
+        final key = alias != null ? alias : name;
+
+        if (functions.exists(key)) {
             throw "Function is already defined";
         }
 
@@ -118,7 +126,7 @@ class Library implements Disposable {
             func.abi = Some(abi);
         }
 
-        functions.set(name, func);
+        functions.set(key, func);
 
         return func;
     }
@@ -126,7 +134,7 @@ class Library implements Disposable {
     /**
      * Returns a function from the given name.
      *
-     * @param name Function symbol name
+     * @param name Function symbol name or alias name.
      * @return If the function has been previously defined with `Library.define`,
      *      it will return the previously function. Otherwise, a new `Function`
      *      will be created.
@@ -144,7 +152,7 @@ class Library implements Disposable {
     /**
      * Removes a previously defined function, disposing it if necessary.
      *
-     * @param name Function symbol name.
+     * @param name Function symbol name or alias name.
      */
     public function undefine(name:String) {
         final func = functions.get(name);
