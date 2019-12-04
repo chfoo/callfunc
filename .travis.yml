@@ -3,7 +3,7 @@ dist: xenial
 language: haxe
 
 haxe:
-  - "4.0.0-rc.3"
+  - "4.0.2"
 
 before_install:
   # Cmake 1.13 minimum
@@ -30,10 +30,9 @@ script:
   - haxe hxml/test.cpp.hxml -D callfunc_unit_test
   - haxe hxml/test.hl.hxml -D callfunc_unit_test
   - haxe hxml/test.hl.c.hxml -D callfunc_unit_test
-  # wait until newer Haxe release (haxe #8430)
-  # - gcc -g -o out/hl/test/test out/hl/test/test.c -I out/hl/test/ -std=c11 -lhl -lm out/out/callfunc/callfunc.hdll
+  - gcc -g -o out/hl/test/test out/hl/test/test.c -I out/hl/test/ -std=c11 -lhl -lm out/out/callfunc/callfunc.hdll
   - source script/export_ld_path.sh && ./out/cpp/TestAll-debug
   - source script/export_ld_path.sh && hl out/hl/test.hl
-  # - source script/export_ld_path.sh && out/hl/test/test
+  - source script/export_ld_path.sh && out/hl/test/test
   - haxe hxml/example_curl.cpp.hxml -D callfunc_unit_test
   - haxe hxml/example_curl.hl.hxml -D callfunc_unit_test
