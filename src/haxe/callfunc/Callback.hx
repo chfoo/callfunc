@@ -1,11 +1,25 @@
 package callfunc;
 
+import callfunc.core.Context;
+import callfunc.core.CallbackHandle;
+
 /**
  * Allows C code to call Haxe functions.
  */
-interface Callback extends Disposable {
+class Callback implements Disposable {
+    final callbackHandle:CallbackHandle;
+
     /**
-     * Returns a function pointer which can be called by C code.
+     * A function pointer which can be called by C code.
      */
-    public function getPointer():Pointer;
+    public final pointer:Pointer;
+
+    public function new(context:Context, callbackHandle:CallbackHandle) {
+        this.callbackHandle = callbackHandle;
+        pointer = new Pointer(context, callbackHandle.getPointer());
+    }
+
+    public function dispose() {
+        callbackHandle.dispose();
+    }
 }

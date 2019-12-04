@@ -1,11 +1,13 @@
 package callfunc;
 
+import callfunc.core.StructTypeHandle;
+
 class StructAccessImpl {
     final pointer:Pointer;
-    final structType:StructType;
+    final structType:StructTypeHandle;
     final nameMap:Map<String,Int>;
 
-    public function new(pointer:Pointer, structType:StructType, names:Iterable<String>) {
+    public function new(pointer:Pointer, structType:StructTypeHandle, names:Iterable<String>) {
         this.pointer = pointer;
         this.structType = structType;
         this.nameMap = new Map();
@@ -45,7 +47,10 @@ class StructAccessImpl {
 }
 
 /**
- * Provides access to a struct pointer by names.
+ * Provides array and field access to a struct pointer by names.
+ *
+ * The struct can be accessed using array syntax `myStruct["fieldName"]`
+ * or by field access syntax `myStruct.fieldName`.
  */
 @:forward
 abstract StructAccess(StructAccessImpl) {
@@ -54,18 +59,18 @@ abstract StructAccess(StructAccessImpl) {
      * @param structType Structure definition.
      * @param names Names of the fields in the struct.
      */
-    public inline function new(pointer:Pointer, structType:StructType,
+    public inline function new(pointer:Pointer, structType:StructTypeHandle,
             names:Iterable<String>) {
         this = new StructAccessImpl(pointer, structType, names);
     }
 
-    @:arrayAccess
-    public inline function get(name:String):Any {
+    @:op([]) @:op(a.b)
+    inline function _get(name:String):Any {
         return this.get(name);
     }
 
-    @:arrayAccess
-    public inline function set<T>(name:String, value:T):T {
+    @:op([]) @:op(a.b)
+    inline function _set<T>(name:String, value:T):T {
         return this.set(name, value);
     }
 }

@@ -1,49 +1,176 @@
 package callfunc;
 
+import callfunc.core.Context;
+import callfunc.core.LibraryHandle;
+
+
 /**
- * Handle to a loaded dynamic library.
+ * Loaded dynamic library symbols and functions.
  */
-interface Library extends Disposable {
-    /**
-     * Returns a pointer to a symbol.
-     *
-     * @throws String An error message if the symbol was not found or any
-     *     other error.
-     */
-    public function getSymbol(name:String):Pointer;
+class Library implements Disposable {
+    final context:Context;
+    final libraryHandle:LibraryHandle;
+    final functions:Map<String,Function>;
 
     /**
-     * Create a handle to a function.
+     * Array or field access to functions and symbols.
      *
-     * @param name Symbol name.
+     * This object allows accessing functions and symbols using the array
+     * syntax or field access syntax.
+     *
+     * If the symbol name exists in the library, a `Function` will be created
+     * automatically. It defaults to functions that accept no arguments and a
+     * void return type. If previously defined using `define`, it will return
+     * the previously defined function.
+     *
+     * Example accessing functions:
+     *
+     * - Array syntax: `myLibrary.s["myFunction"].call()`
+     * - Field syntax: `myLibrary.s.myFunction.call()`
+     *
+     * Example getting a pointer:
+     *
+     * - Array syntax: `myLibrary.s["myFunction"].pointer()`
+     * - Field syntax: `myLibrary.s.myFunction.pointer()`
+     */
+    public final s:LibrarySymbolAccess;
+
+    public function new(context:Context, libraryHandle:LibraryHandle) {
+        this.context = context;
+        this.libraryHandle = libraryHandle;
+        functions = [];
+        s = this;
+    }
+
+    /**
+     * Returns whether the given symbol name is in the library's symbol table.
+     */
+    public function hasSymbol(name:String):Bool {
+        return libraryHandle.hasSymbol(name);
+    }
+
+    /**
+     * Defines a C function's signature.
+     *
+     * @param name Function's symbol name.
      * @param params Data types corresponding to the function parameters.
      *     If the function does not accept arguments, specify `null` or empty
      *     array.
-     * @param abi If supported by the platform and target, an ABI calling
-     *     method matching `enum ffi_abi` defined in `ffitarget.h`.
      * @param returnType Data type of the return value. If the function does
      *     not return a value. Specify `null` or `DataType.Void`.
+     * @param abi If supported by the platform and target, an ABI calling
+     *     method matching `enum ffi_abi` defined in `ffitarget.h`.
      *
-     * @throws String An error message if the function was not found, a
-     *     data type or ABI is invalid, or any other error.
-     *
-     * @see `Library.newVariadicFunction` for C variadic functions.
+     * @see `Library.defineVariadic` for C variadic functions.
      */
-    public function newFunction(name:String, ?params:Array<DataType>,
-        ?returnType:DataType, ?abi:Int):Function;
+    public function define(name:String, ?params:Array<DataType>,
+            ?returnType:DataType, ?abi:Int):Function {
+        return addNewFunction(name, params, returnType, abi);
+    }
 
     /**
-     * Create a handle to a variadic function.
+     * Defines a variadic C function.
      *
-     * @param name Symbol name.
-     * @param params Data types corresponding to the parameters.
-     * @param fixedParamCount Number of parameters that are fixed at the
-     *     start of the parameters.
+     * When calling variadic functions, the number of arguments must match
+     * the number of parameters in the definition. As such, a separate
+     * definition must be made for the same function if the number of arguments
+     * is different.
+     *
+     * @param name Function's symbol name.
+     * @param params Data types corresponding to the function parameters.
+     * @param fixedParamCount Number of parameters that are fixed (not variadic)
+     *     at the start of the parameters list.
      * @param returnType Data type of the return value.
      * @param abi ABI calling method.
-     * @throws String
-     * @see `Library.newFunction`
+     *
+     * @see `Library.define` for full parameter documentation.
      */
-    public function newVariadicFunction(name:String, params:Array<DataType>,
-        fixedParamCount:Int, ?returnType:DataType, ?abi:Int):Function;
+    public function defineVariadic(name:String, params:Array<DataType>,
+            fixedParamCount:Int, ?returnType:DataType, ?abi:Int):Function {
+        return addNewFunction(name, params, fixedParamCount, returnType, abi);
+    }
+
+    function addNewFunction(name:String, ?params:Array<DataType>,
+            ?fixedParamCount:Int, ?returnType:DataType, ?abi:Int):Function {
+        if (functions.exists(name)) {
+            throw "Function is already defined";
+        }
+
+        if (!hasSymbol(name)) {
+            throw "Symbol not in library";
+        }
+
+        final func = new Function(name, context, this, libraryHandle);
+
+        if (params != null) {
+            func.params = params;
+        }
+
+        if (returnType != null) {
+            func.returnType = returnType;
+        }
+
+        if (fixedParamCount != null) {
+            func.fixedParamCount = Some(fixedParamCount);
+        }
+
+        if (abi != null) {
+            func.abi = Some(abi);
+        }
+
+        functions.set(name, func);
+
+        return func;
+    }
+
+    /**
+     * Returns a function from the given name.
+     *
+     * @param name Function symbol name
+     * @return If the function has been previously defined with `Library.define`,
+     *      it will return the previously function. Otherwise, a new `Function`
+     *      will be created.
+     */
+    public function get(name:String):Function {
+        final func = functions.get(name);
+
+        if (func != null) {
+            return func;
+        } else {
+            return addNewFunction(name);
+        }
+    }
+
+    /**
+     * Removes a previously defined function, disposing it if necessary.
+     *
+     * @param name Function symbol name.
+     */
+    public function undefine(name:String) {
+        final func = functions.get(name);
+
+        if (func != null) {
+            func.dispose();
+            functions.remove(name);
+        }
+    }
+
+    /**
+     * Dispose all functions.
+     */
+    public function dispose() {
+        for (func in functions) {
+            func.dispose();
+        }
+
+        functions.clear();
+    }
+}
+
+
+abstract LibrarySymbolAccess(Library) from Library {
+    @:arrayAccess @:op(a.b)
+    inline function get(name:String) {
+        return this.get(name);
+    }
 }

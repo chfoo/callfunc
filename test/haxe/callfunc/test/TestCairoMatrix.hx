@@ -20,64 +20,61 @@ class TestCairoMatrix extends utest.Test {
 
     public function testMatrixScale() {
         var callfunc = Callfunc.instance();
-        var library = callfunc.newLibrary(getLibName());
+        var library = callfunc.openLibrary(getLibName());
 
-        var initIdentityFunc = library.newFunction(
+        library.define(
             "cairo_matrix_init_identity",
             [DataType.Pointer]
         );
 
-        var scaleFunc = library.newFunction(
+        library.define(
             "cairo_matrix_scale",
             [DataType.Pointer, DataType.Double, DataType.Double]
         );
 
-        var transformPointFunc = library.newFunction(
+        library.define(
             "cairo_matrix_transform_point",
             [DataType.Pointer, DataType.Pointer, DataType.Pointer]
         );
 
-        var matrixStructType = callfunc.newStructType(
+        var matrixStructDef = callfunc.defineStruct(
             [DataType.Double, DataType.Double, DataType.Double,
-            DataType.Double, DataType.Double, DataType.Double]
+            DataType.Double, DataType.Double, DataType.Double],
+            ["xx", "yx", "xy", "yy", "x0", "y0"]
         );
 
-        Assert.isTrue(matrixStructType.size >= 8 * 6);
+        Assert.isTrue(matrixStructDef.size >= 8 * 6);
 
-        var matrixPointer = callfunc.memory.alloc(matrixStructType.size);
+        var matrixPointer = callfunc.alloc(matrixStructDef.size);
+        var matrix = matrixStructDef.access(matrixPointer);
 
         var i = matrixPointer.address;
 
-        initIdentityFunc.call([matrixPointer]);
+        library.s.cairo_matrix_init_identity.call(matrixPointer);
 
-        Assert.equals(1.0, matrixPointer.get(DataType.Double, matrixStructType.offsets[0]));
-        Assert.equals(0.0, matrixPointer.get(DataType.Double, matrixStructType.offsets[1]));
-        Assert.equals(0.0, matrixPointer.get(DataType.Double, matrixStructType.offsets[2]));
-        Assert.equals(1.0, matrixPointer.get(DataType.Double, matrixStructType.offsets[3]));
-        Assert.equals(0.0, matrixPointer.get(DataType.Double, matrixStructType.offsets[4]));
-        Assert.equals(0.0, matrixPointer.get(DataType.Double, matrixStructType.offsets[5]));
+        Assert.equals(1.0, matrix.xx);
+        Assert.equals(0.0, matrix.yx);
+        Assert.equals(0.0, matrix.xy);
+        Assert.equals(1.0, matrix.yy);
+        Assert.equals(0.0, matrix.x0);
+        Assert.equals(0.0, matrix.y0);
 
-        scaleFunc.call([matrixPointer, 2.0, 1.0]);
+        library.s.cairo_matrix_scale.call(matrixPointer, 2.0, 1.0);
 
-        var xPointer = callfunc.memory.alloc(
-            callfunc.memory.sizeOf(DataType.Double));
-        var yPointer = callfunc.memory.alloc(
-            callfunc.memory.sizeOf(DataType.Double));
+        var xPointer = callfunc.alloc(callfunc.sizeOf(DataType.Double));
+        var yPointer = callfunc.alloc(callfunc.sizeOf(DataType.Double));
+        xPointer.dataType = yPointer.dataType = DataType.Double;
 
-        xPointer.set(10.0, DataType.Double);
-        yPointer.set(10.0, DataType.Double);
+        xPointer.set(10.0);
+        yPointer.set(10.0);
 
-        transformPointFunc.call([matrixPointer, xPointer, yPointer]);
+        library.s.cairo_matrix_transform_point.call(matrixPointer, xPointer, yPointer);
 
-        Assert.equals(20.0, xPointer.get(DataType.Double));
-        Assert.equals(10.0, yPointer.get(DataType.Double));
+        Assert.equals(20.0, xPointer.get());
+        Assert.equals(10.0, yPointer.get());
 
-        callfunc.memory.free(matrixPointer);
-        callfunc.memory.free(xPointer);
-        callfunc.memory.free(yPointer);
-        initIdentityFunc.dispose();
-        scaleFunc.dispose();
-        transformPointFunc.dispose();
+        matrixPointer.free();
+        matrixStructDef.dispose();
         library.dispose();
     }
 }

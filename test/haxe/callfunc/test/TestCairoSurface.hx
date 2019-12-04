@@ -6,87 +6,78 @@ import utest.Test;
 class TestCairoSurface extends Test {
     public function testSimpleDraw() {
         var callfunc = Callfunc.instance();
-        var library = callfunc.newLibrary(TestCairoMatrix.getLibName());
+        var library = callfunc.openLibrary(TestCairoMatrix.getLibName());
 
-        var imageSurfaceCreateFunc = library.newFunction(
+        library.define(
             "cairo_image_surface_create",
             [DataType.SInt32, DataType.SInt, DataType.SInt],
             DataType.Pointer
         );
 
-        var surfaceStatusFunc = library.newFunction(
+        library.define(
             "cairo_surface_status",
             [DataType.Pointer],
             DataType.SInt
         );
 
-        var imageSurfaceGetDataFunc = library.newFunction(
+        library.define(
             "cairo_image_surface_get_data",
             [DataType.Pointer],
             DataType.Pointer
         );
 
-        var surfaceFlushFunc = library.newFunction(
+        library.define(
             "cairo_surface_flush",
             [DataType.Pointer]
         );
 
-        var surfaceDestroyFunc = library.newFunction(
+        library.define(
             "cairo_surface_destroy",
             [DataType.Pointer]
         );
 
-        var createFunc = library.newFunction(
+        library.define(
             "cairo_create",
             [DataType.Pointer],
             DataType.Pointer
         );
 
-        var destroyFunc = library.newFunction(
+        library.define(
             "cairo_destroy",
             [DataType.Pointer]
         );
 
-        var rectangleFunc = library.newFunction(
+        library.define(
             "cairo_rectangle",
             [DataType.Pointer, DataType.Double, DataType.Double,
             DataType.Double, DataType.Double]
         );
 
-        var fillFunc = library.newFunction(
+        library.define(
             "cairo_fill",
             [DataType.Pointer]
         );
 
-        var surface = imageSurfaceCreateFunc.call([0, 100, 100]);
-        var status = surfaceStatusFunc.call([surface]);
+        var surface = library.s.cairo_image_surface_create.call(0, 100, 100);
+        var status = library.s.cairo_surface_status.call(surface);
 
         Assert.equals(0, status);
 
-        var context = createFunc.call([surface]);
+        var context = library.s.cairo_create.call(surface);
 
-        rectangleFunc.call([context, 1, 0, 20, 20]);
-        fillFunc.call([context]);
-        surfaceFlushFunc.call([surface]);
+        library.s.cairo_rectangle.call(context, 1, 0, 20, 20);
+        library.s.cairo_fill.call(context);
+        library.s.cairo_surface_flush.call(surface);
 
-        var data:Pointer = imageSurfaceGetDataFunc.call([surface]);
+        var data:Pointer = library.s.cairo_image_surface_get_data.call(surface);
 
         Assert.equals(0, data.get(DataType.UInt32));
         Assert.equals(0xff000000,
             data.get(DataType.UInt32,
-                1 * callfunc.memory.sizeOf(DataType.UInt32)));
+                1 * callfunc.sizeOf(DataType.UInt32)));
 
-        destroyFunc.call([context]);
-        surfaceDestroyFunc.call([surface]);
-        imageSurfaceCreateFunc.dispose();
-        imageSurfaceGetDataFunc.dispose();
-        surfaceStatusFunc.dispose();
-        surfaceFlushFunc.dispose();
-        surfaceDestroyFunc.dispose();
-        createFunc.dispose();
-        destroyFunc.dispose();
-        rectangleFunc.dispose();
-        fillFunc.dispose();
+        library.s.cairo_destroy.call(context);
+        library.s.cairo_surface_destroy.call(surface);
         library.dispose();
     }
 }

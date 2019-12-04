@@ -4,7 +4,7 @@ import utest.Runner;
 import utest.ui.Report;
 
 #if js
-import callfunc.emscripten.EmContext;
+import callfunc.core.emscripten.EmContext;
 #end
 
 
@@ -19,7 +19,7 @@ class TestAll {
 
         #if js
         var context = new EmContext(Reflect.field(js.Browser.window, "Module"));
-        Callfunc.setInstance(context);
+        Callfunc.setInstance(new Callfunc(context));
 
         js.Syntax.code("waitForLoad({0})", runTests);
         #else
@@ -37,7 +37,7 @@ class TestAll {
 
         runner.addCase(new callfunc.test.TestDataView());
         runner.addCase(new callfunc.test.TestExamplelib());
-        runner.addCase(new callfunc.test.TestMemory());
+        runner.addCase(new callfunc.test.TestCallfunc());
         runner.addCase(new callfunc.test.TestPointer());
         runner.addCase(new callfunc.test.TestStructAccess());
         Report.create(runner);

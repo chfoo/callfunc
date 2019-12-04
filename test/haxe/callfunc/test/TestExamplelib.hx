@@ -3,9 +3,6 @@ package callfunc.test;
 import utest.Assert;
 import utest.Test;
 
-using callfunc.FunctionTools;
-using callfunc.PointerTools;
-
 class TestExamplelib extends Test {
     public static function getLibName() {
         #if js
@@ -24,60 +21,65 @@ class TestExamplelib extends Test {
 
     public function testNonexistentLibrary() {
         var callfunc = Callfunc.instance();
-        Assert.raises(callfunc.newLibrary.bind("nonexistent-library-1234"));
+        Assert.raises(callfunc.openLibrary.bind("nonexistent-library-1234"));
     }
 
     public function testNonexistentFunction() {
         var callfunc = Callfunc.instance();
-        var library = callfunc.newLibrary(getLibName());
+        var library = callfunc.openLibrary(getLibName());
 
-        Assert.raises(library.newFunction.bind("nonexistent_function"));
-        Assert.raises(library.newVariadicFunction.bind("nonexistent_function", [DataType.SInt], 1));
+        Assert.raises(library.define.bind("nonexistent_function"));
+        Assert.raises(library.defineVariadic.bind("nonexistent_function", [DataType.SInt], 1));
 
         library.dispose();
     }
 
     public function testInts() {
         var callfunc = Callfunc.instance();
-        var library = callfunc.newLibrary(getLibName());
+        var library = callfunc.openLibrary(getLibName());
 
-        var f1 = library.newFunction(
+        library.define(
             "examplelib_ints",
             [DataType.SInt32, DataType.SInt32, DataType.Pointer],
             DataType.SInt32
         );
 
-        var outputPointer = callfunc.memory.alloc(4);
+        var outputPointer = callfunc.alloc(4);
+        outputPointer.dataType = DataType.SInt32;
 
-        var result = f1.callVA(123, 456, outputPointer);
+        var result = library.s.examplelib_ints.call(123, 456, outputPointer);
 
         Assert.equals(0xcafe, result);
-        Assert.equals(579, outputPointer.get(DataType.SInt32));
+        Assert.equals(579, outputPointer.get());
+
+        result = library.s["examplelib_ints"].call(10, 20, outputPointer);
+        Assert.equals(30, outputPointer.get());
 
         outputPointer.free();
-        f1.dispose();
         library.dispose();
     }
 
     public function testString() {
         var callfunc = Callfunc.instance();
-        var library = callfunc.newLibrary(getLibName());
+        var library = callfunc.openLibrary(getLibName());
 
-        var f = library.newFunction(
+        library.define(
             "examplelib_string",
             [DataType.Pointer],
             DataType.Pointer
         );
 
-        var inputStringPointer = callfunc.memory.allocString("Hello world!");
-        var result:Pointer = f.callVA(inputStringPointer);
+        var inputStringPointer = callfunc.allocString("Hello world!");
+        var result:Pointer = library.s.examplelib_string.call(inputStringPointer);
         var resultString = result.getString();
 
         Assert.equals("HELLO WORLD!", resultString);
 
+        result.setString("abc");
+        Assert.equals("abc", result.getString());
+
         result.free();
         inputStringPointer.free();
-        f.dispose();
         library.dispose();
     }
 
@@ -86,27 +88,26 @@ class TestExamplelib extends Test {
     #end
     public function testVariadic() {
         var callfunc = Callfunc.instance();
-        var library = callfunc.newLibrary(getLibName());
+        var library = callfunc.openLibrary(getLibName());
 
-        var f = library.newVariadicFunction(
+        library.defineVariadic(
             "examplelib_variadic",
             [DataType.UInt, DataType.SInt32, DataType.SInt32],
             1,
             DataType.SInt32
         );
 
-        var result = f.callVA(2, 123, 456);
+        var result = library.s.examplelib_variadic.call(2, 123, 456);
 
         Assert.equals(579, result);
-        f.dispose();
         library.dispose();
     }
 
     public function testCallback() {
         var callfunc = Callfunc.instance();
-        var library = callfunc.newLibrary(getLibName());
+        var library = callfunc.openLibrary(getLibName());
 
-        var f = library.newFunction(
+        library.define(
             "examplelib_callback",
             [DataType.Pointer],
             DataType.SInt32
@@ -116,17 +117,15 @@ class TestExamplelib extends Test {
             return a + b;
         }
 
-        var callbackHandle = callfunc.newCallbackVA(
+        var callbackHandle = callfunc.wrapCallback(
             callback,
             [DataType.SInt32, DataType.SInt32],
             DataType.SInt32);
-        var callbackPointer = callbackHandle.getPointer();
 
-        var result = f.callVA(callbackPointer);
+        var result = library.s.examplelib_callback.call(callbackHandle.pointer);
 
         Assert.equals(123 + 456, result);
 
-        f.dispose();
         library.dispose();
         callbackHandle.dispose();
     }
@@ -134,19 +133,20 @@ class TestExamplelib extends Test {
     public function testStructType() {
         var callfunc = Callfunc.instance();
 
-        if (callfunc.memory.sizeOf(DataType.SInt) != 4) {
+        if (callfunc.sizeOf(DataType.SInt) != 4) {
             Assert.warn("Skipping test because it doesn't seem to be x86");
             return;
         }
 
-        var structType = callfunc.newStructType(
-            [DataType.SChar, DataType.SInt]
+        var structDef = callfunc.defineStruct(
+            [DataType.SChar, DataType.SInt],
+            ["a", "b"]
         );
 
-        Assert.equals(8, structType.size);
-        Assert.same([0, 4], structType.offsets);
+        Assert.equals(8, structDef.size);
+        Assert.same([0, 4], structDef.offsets);
 
-        structType.dispose();
+        structDef.dispose();
     }
 
     #if js
@@ -154,29 +154,30 @@ class TestExamplelib extends Test {
     #end
     public function testStructPassByValue() {
         var callfunc = Callfunc.instance();
-        var library = callfunc.newLibrary(getLibName());
+        var library = callfunc.openLibrary(getLibName());
         var structDataTypes = [DataType.UChar, DataType.SInt32, DataType.Double];
-        var structType = callfunc.newStructType(structDataTypes);
+        var structDef = callfunc.defineStruct(structDataTypes, ["a", "b", "c"]);
 
-        var f = library.newFunction(
+        library.define(
             "examplelib_struct_value",
             [DataType.Struct(structDataTypes)],
             DataType.Struct(structDataTypes)
         );
 
-        var inputStructPointer = callfunc.memory.alloc(structType.size);
-        inputStructPointer.set(0x65, DataType.UChar, structType.offsets[0]);
-        inputStructPointer.set(0x65, DataType.SInt32, structType.offsets[1]);
-        inputStructPointer.set(123.456, DataType.Double, structType.offsets[2]);
+        var inputStructPointer = callfunc.alloc(structDef.size);
+        var inputStruct = structDef.access(inputStructPointer);
+        inputStruct.a = 0x65;
+        inputStruct.b = 0x65;
+        inputStruct.c = 123.456;
 
-        var result:Pointer = f.call([inputStructPointer]);
+        var result:Pointer = library.s.examplelib_struct_value.call(inputStructPointer);
+        var resultStruct = structDef.access(result);
 
-        Assert.equals(0x45, result.get(DataType.UChar, structType.offsets[0]));
-        Assert.equals(0x45, result.get(DataType.SInt32, structType.offsets[1]));
-        Assert.equals(246.912, result.get(DataType.Double, structType.offsets[2]));
+        Assert.equals(0x45, resultStruct.a);
+        Assert.equals(0x45, resultStruct.b);
+        Assert.equals(246.912, resultStruct.c);
 
-        structType.dispose();
-        f.dispose();
+        structDef.dispose();
         library.dispose();
         inputStructPointer.free();
         result.free();

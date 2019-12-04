@@ -48,14 +48,14 @@ To load a library, obtain a `Callfunc` instance and call the `newLibrary` method
 
 ```haxe
 var callfunc = Callfunc.instance();
-var library = callfunc.newLibrary("libexample.so");
+var library = callfunc.openLibrary("libexample.so");
 ```
 
 The name of the library is passed to `dlopen()` or `LoadLibrary()` on Windows.
 
 ## Calling functions
 
-Before you can call a function, you need to define the parameters. Then use the handle to the function to call the function as many times as you want.
+The library object has a `s` field which lets you access functions using array access or field access syntax.
 
 ### No parameters
 
@@ -68,11 +68,14 @@ void do_something();
 Haxe:
 
 ```haxe
-var f = library.newFunction("do_something");
-f.call();
+library.s["do_something"].call();
+// or
+library.s.do_something.call();
 ```
 
 ### Numeric parameters
+
+By default, functions are automatically defined to accept no parameters and return no value. To pass arguments, you need to define the parameters. Once you definea function, you can call it as many times as you want.
 
 C:
 
@@ -83,11 +86,11 @@ void do_something(int32_t a, int64_t b, double c);
 Haxe:
 
 ```haxe
-var f = library.newFunction(
+library.define(
     "do_something",
     [DataType.SInt32, DataType.SInt64, DataType.Double]
 );
-f.call([123, Int64.make(123, 456), 123.456]);
+library.s.do_something(123, Int64.make(123, 456), 123.456);
 ```
 
 ### Numeric return
@@ -101,14 +104,14 @@ int do_something();
 Haxe:
 
 ```haxe
-var f = library.newFunction("do_something", [], DataType.SInt);
-var result = f.call();
+library.define("do_something", [], DataType.SInt);
+var result = library.s.do_something.call();
 trace(result); // Int on x86/x86-64
 ```
 
 ## Pointers
 
-C pointers are represented by the `Pointer` class. They have two main methods which are `get()` and `set()`.
+C pointers are represented by the `Pointer` class. They have two main methods which are `get()` and `set()`. By default, they have a data type of `SInt32` but you can change it as needed.
 
 C:
 
@@ -119,15 +122,23 @@ void do_something(int32_t * a);
 Haxe:
 
 ```haxe
-var f = library.newFunction("do_something", [DataType.Pointer]);
-var size = callfunc.memory.sizeOf(DataType.SInt32);
-var p = callfunc.memory.alloc(size);
+library.s.define("do_something", [DataType.Pointer]);
+
+var size = callfunc.sizeOf(DataType.SInt32);
+var p = callfunc.alloc(size);
 
 p.dataType = DataType.SInt32;
 
 p.set(123);
-f.call([p]);
+library.s.do_something.call(p);
 var result = p.get();
+trace(result);
+```
+
+If you need to free the allocated memory, use:
+
+```haxe
+pointer.free();
 ```
 
 ### Arrays
@@ -144,26 +155,29 @@ var value = p.arrayGet(index); // => 456
 
 Callfunc has methods for converting between `Bytes` and `Pointer` for targets that support it. The `Bytes` instance can be operated on directly which bypasses the `Pointer` class wrapper. Allocating `Bytes` to use a `Pointer` can also take advantage of the Haxe garbage collection.
 
-To convert to `Bytes`:
+To convert to `Bytes` assuming an array of 10 bytes:
 
 ```haxe
-var bytes = callfunc.memory.pointerToBytes(pointer);
+var bytes = pointer.getBytes(10);
 ```
 
 To convert from `Bytes`:
 ```haxe
-var pointer = callfunc.memory.bytesToPointer(bytes);
+var pointer = callfunc.bytesToPointer(bytes);
 ```
 
 However, for better portability between targets, the `DataView` interface (and `BytesDataView` implementation) is provided:
 
 ```haxe
-var view = callfunc.memory.pointerToDataView(pointer);
+var view = pointer.getDataView(10);
+
+view.setUInt32(0, 123);
+trace(view.getUInt32(0))
 ```
 
 ## Structures
 
-Unlike C arrays, the fields in C structures aren't necessarily next to each other. The way structs are packed depends on the ABI. To obtain the size and field offsets, build a `StructType`.
+Unlike C arrays, the fields in C structures aren't necessarily next to each other. The way structs are packed depends on the ABI. To obtain the size and field offsets, build a `StructDef`.
 
 To build this C struct:
 
@@ -174,28 +188,34 @@ struct {
 };
 ```
 
-Call `callfunc.newStructType()`:
+Call `callfunc.defineStruct()`:
 
 ```haxe
-var structType = callfunc.newStructType([DataType.SInt, DataType.Pointer]);
+var structDef = callfunc.defineStruct(
+    [DataType.SInt, DataType.Pointer],
+    ["a", "b"]
+);
 ```
 
 Structs can be accessed using the struct information:
 
 ```haxe
-var structPointer = callfunc.memory.alloc(structType.size);
+var structPointer = callfunc.alloc(structType.size);
 
 var a = structPointer.get(DataType.SInt, structType.offsets[0]);
 var b = structPointer.get(DataType.Pointer, structType.offsets[1]);
 ```
 
-Structs can also be accessed using a helper class `StructAccess`:
+But in most cases, you will access structs using the helper class `StructAccess`:
 
 ```haxe
-var struct = new StructAccess(structPointer, structType, ["a", "b"]);
+var struct = structDef.access(structPointer);
 
 struct["a"] = 123;
 trace(struct["a"]);
+// or
+struct.a = 123;
+trace(struct.a);
 ```
 
 ### Passing structs by value
@@ -217,98 +237,32 @@ void do_something(int32_t (*callback)(int32_t a, int32_t b));
 In Haxe, define the function parameters and return type and obtain a pointer to be passed to the C function.
 
 ```haxe
-function myHaxeCallback(args:Array<Any>):Any {
-    var a:Int = args[0];
-    var b:Int = args[1];
-
+function myHaxeCallback(a:Int, b:Int):Int {
     return b - a;
 }
 
 var callfunc = Callfunc.instance();
-var callbackDef = callfunc.newCallback(myHaxeCallback, [DataType.SInt32, DataType.SInt32], DataType.SInt32);
-var callbackPointer = callbackDef.getPointer();
-var f = library.newFunction("do_something", [DataType.Pointer]);
+var callbackDef = callfunc.wrawCallback(
+    myHaxeCallback,
+    [DataType.SInt32, DataType.SInt32],
+    DataType.SInt32
+);
 
-f.call([callbackPointer]);
+library.define("do_something", [DataType.Pointer]);
+library.s.do_something.call(callbackDef.pointer);
 ```
 
-## Convenience functions
-
-Callfunc provides static method extensions to help call functions easier. You can enable them by adding:
-
-```haxe
-using callfunc.FunctionTools;
-using callfunc.PointerTools;
-```
-
-### Calling functions cleaner
-
-Using variable argument version of `call()`:
-
-```haxe
-var functionInfo = library.newFunction("do_something", [DataType.SInt32, DataType.SInt32])
-
-// ❌ Instead of:
-functionInfo.call([123, 456]);
-
-// ✔️ Use this:
-functionInfo.callVA(123, 456);
-```
-
-`callVA()` is implemented as a macro, so it is not a real function. However, you can get a variable argument function version of `call()`:
-
-```haxe
-// ✔️ Safest way with typing:
-var doSomething:(Int->Int)->Void = functionInfo.getCallable();
-
-doSomething(123, 456);
-```
-
-Passing a callback function where the callback arguments array will be unpacked to a variadic argument function:
-
-```haxe
-// ❌ Instead of:
-function uglyAddCallback(args:Array<Any>) {
-    var a:Int = args[0];
-    var b:Int = args[1];
-    // [...]
-}
-
-callfunc.newCallback(addCallback, [DataType.SInt32, DataType.SInt32]);
-
-
-// ✔️ Use this:
-function addCallback(a:Int, b:Int) {
-    // [...]
-}
-
-callfunc.newCallbackVA(addCallback, [DataType.SInt32, DataType.SInt32]);
-```
-
-### Object-oriented Pointer syntax
-
-```haxe
-// ❌ Instead of this component aspect API:
-memory.pointerToBytes(pointer);
-memory.pointerToDataView(pointer);
-memory.free(pointer);
-
-// ✔️ Use this this pointer object API:
-pointer.getBytes();
-pointer.getDataView();
-pointer.free();
-```
-
-### Passing and reading strings
+## Strings
 
 To quickly allocate a string:
 
 ```haxe
-var pointer = callfunc.memory.allocString("Hello world!");
+var pointer = callfunc.allocString("Hello world!");
 
-// or
+// By default, UTF-8 is used.
+// To use UTF-16 use:
 
-var pointer = callfunc.memory.allocString("Hello world!", Encoding.UTF16);
+var pointer = callfunc.allocString("Hello world!", Encoding.UTF16);
 ```
 
 Likewise, to decode a string:
@@ -333,7 +287,7 @@ To use Callfunc's interface to Emscripten, you must create a context with the mo
 
 ```haxe
 var context = new EmContext(Reflect.field(js.Browser.window, "Module"));
-Callfunc.setInstance(context);
+Callfunc.setInstance(new Callfunc(context));
 ```
 
 To use exported functions, simply use the empty string `""` as the library name. Opening other libraries is not supported at this time.
