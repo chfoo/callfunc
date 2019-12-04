@@ -75,7 +75,7 @@ library.s.do_something.call();
 
 ### Numeric parameters
 
-By default, functions are automatically defined to accept no parameters and return no value. To pass arguments, you need to define the parameters. Once you definea function, you can call it as many times as you want.
+By default, functions are automatically defined to accept no parameters and return no value. To pass arguments, you need to define the parameters. Once you define a function, you can call it as many times as you want.
 
 C:
 
@@ -107,6 +107,28 @@ Haxe:
 library.define("do_something", [], DataType.SInt);
 var result = library.s.do_something.call();
 trace(result); // Int on x86/x86-64
+```
+
+### Variadic functions
+
+For C variadic functions (varargs), use `library.defineVariadic`:
+
+C:
+
+```c
+void printf(char * a, ...);
+```
+
+Haxe:
+
+```haxe
+library.defineVariadic("printf", [DataType.Pointer, DataType.SInt], 1, "printf__int");
+library.defineVariadic("printf", [DataType.Pointer, DataType.Double], 1, "printf__double");
+library.defineVariadic("printf", [DataType.Pointer, DataType.SInt, DataType.Double], 1, "printf__int_double");
+
+library.s.printf__int.call(string, 123);
+library.s.printf__double.call(string, 123.456);
+library.s.printf__int_double.call(string, 123, 123.456);
 ```
 
 ## Pointers
@@ -242,7 +264,7 @@ function myHaxeCallback(a:Int, b:Int):Int {
 }
 
 var callfunc = Callfunc.instance();
-var callbackDef = callfunc.wrawCallback(
+var callbackDef = callfunc.wrapCallback(
     myHaxeCallback,
     [DataType.SInt32, DataType.SInt32],
     DataType.SInt32
