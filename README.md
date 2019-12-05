@@ -90,7 +90,7 @@ library.define(
     "do_something",
     [DataType.SInt32, DataType.SInt64, DataType.Double]
 );
-library.s.do_something(123, Int64.make(123, 456), 123.456);
+library.s.do_something.call(123, Int64.make(123, 456), 123.456);
 ```
 
 ### Numeric return
