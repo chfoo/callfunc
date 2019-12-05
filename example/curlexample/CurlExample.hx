@@ -1,10 +1,10 @@
 package curlexample;
 
-import haxe.io.BytesBuffer;
-import callfunc.AutoInt64;
+import callfunc.AnyInt;
 import callfunc.Callfunc;
 import callfunc.Pointer;
 import haxe.io.Bytes;
+import haxe.io.BytesBuffer;
 
 using haxe.Int64;
 
@@ -30,24 +30,20 @@ class CurlExample {
         //
         // Since size_t is dependent on the CPU, Callfunc will use either
         // Int or Int64. But we don't want to write two functions, so we
-        // accept the largest size which is Int64. Callfunc provides AutoInt64
-        // which automatically promotes an Int to Int64.
-        //
-        // We could use AutoInt to work on 32-bit integers, but it's legal
-        // (but probably impossible) on 64-bit platform that libcurl can give
-        // us a data chunk larger 2 GB. So instead truncating "count",
-        // we AND the Int64 to properly compute how much we want to process.
+        // accept Int64 but return Int. Callfunc provides AnyInt
+        // which is an abstract over the Dynamic type. It provides methods
+        // for checking the type at runtime and converting as needed.
 
         var receiveBuffer = new BytesBuffer();
 
-        function writeCallback(buffer:Pointer, size:AutoInt64,
-                count:AutoInt64):AutoInt64 {
+        function writeCallback(buffer:Pointer, size:AnyInt,
+                count:AnyInt):Int {
 
             // size is guaranteed to be 1 byte from libcurl.
             // We choose an AND value that is guaranteed to not be negative
             // and won't lose data in 32/64-bit truncation and promotion.
             // 16 MB is more than enough as kernel receive sizes are near 4 KB.
-            var processedCount = (size.toInt() * ((count:Int64) & 0xffffff)).toInt();
+            var processedCount = (size.toInt64() * (count.toInt64() & 0xffffff)).toInt();
             var view = buffer.getDataView(processedCount);
 
             receiveBuffer.addBytes(view.buffer, view.byteOffset, view.byteLength);

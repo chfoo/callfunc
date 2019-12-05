@@ -1,7 +1,7 @@
 package curlexample;
 
 import callfunc.Function;
-import callfunc.AutoInt64;
+import callfunc.AnyInt;
 import callfunc.Callback;
 import callfunc.Callfunc;
 import callfunc.DataType;
@@ -13,7 +13,7 @@ import callfunc.Pointer;
 // In a real libcurl binding, you would wrap most of libcurl functionality
 // into object oriented manner.
 
-typedef CurlWriteFunction = (buffer:Pointer, size:AutoInt64, count:AutoInt64)->AutoInt64;
+typedef CurlWriteFunction = (buffer:Pointer, size:AnyInt, count:AnyInt)->Int;
 
 class Curl {
     // Constants from libcurl header file

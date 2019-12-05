@@ -4,6 +4,13 @@ import haxe.Int64;
 
 /**
  * `Int` abstract with automatic truncation of `Int64`.
+ *
+ * `Int64` will be converted to `Int` with possible data loss.
+ *
+ * This abstract can be used for implicit casing between `Int64`
+ * as "syntactic sugar".
+ *
+ * @see `AnyInt` for a runtime version.
  */
 @:forward
 @:forwardStatics

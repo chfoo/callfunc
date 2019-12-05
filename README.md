@@ -299,9 +299,11 @@ var string = pointer.getString(Encoding.UTF16);
 
 ## 32/64-bit integers
 
-Callfunc provides `AutoInt64` that is an abstract of `Int64` which automatically promotes `Int` to `Int64`. Likewise, `AutoInt` is an abstract of `Int` which truncates `Int64` to `Int`.
+Some C data types such as `size_t` don't have a fixed width and may require the use of `Int64`. Because of the mix of `Int` and `Int64`, Callfunc provides some abstracts to make things easier.
 
-`AutoInt64` can be useful with working on C data types such as `size_t` which don't have a fixed width.
+`AnyInt` is an abstract over `Dynamic` which provides methods to convert values to `Int` or `Int64` at runtime. It encapsulates the if-else type checking. In function parameters, it can be used as a "either" type which accepts either `Int` or `Int64` integers.
+
+`AutoInt64` that is an abstract of `Int64` which automatically promotes `Int` to `Int64`. Likewise, `AutoInt` is an abstract of `Int` which truncates `Int64` to `Int`. These can be used for implicit casting between `Int64` if `Int64` methods are too verbose.
 
 ## Emscripten
 
@@ -348,7 +350,7 @@ If you are compiling to HashLink, note that the HashLink binary from the website
 
 1. Download and set up vcpkg
 2. Install the Visual Studio C++ workload SDK in Tools, Get Tool and Features.
-3. Add the fork: `git add remote driver1998 https://github.com/driver1998/vcpkg/`
+3. Add the fork: `git remote add driver1998 https://github.com/driver1998/vcpkg/`
 4. Update: `git fetch driver1998 libffi`
 5. Switch to a temporary branch: `git checkout driver1998/libffi`
 6. Run `./vcpkg install libffi:x64-windows libffi:x86-windows`
@@ -396,7 +398,7 @@ You will need CMake. The following commands assumes a Bash shell.
 
 To specify the include and linker paths add (adjust paths as needed):
 
-* For libffi: `-DLIBFFI_INCLUDE_PATH:PATH=/usr/local/include/ -DLIBFFI_LIB_PATH:PATH=/usr/local/lib/`. For vcpkg, please add the toolchain define as reported at the end of libffi install.
+* For libffi: `-DLIBFFI_INCLUDE_PATH:PATH=/usr/local/include/ -DLIBFFI_LIB_PATH:PATH=/usr/local/lib/`. For vcpkg, please add the toolchain define as reported at the end of libffi install. (Use `vcpkg integrate install` to get the path.)
 * For HashLink: `-DHLINCLUDE_PATH:PATH=/usr/local/include/ -DHL_LIB_PATH:PATH=/usr/local/lib/`.
 
 On Linux and MacOS, this will be a makefile which you can run `make`.

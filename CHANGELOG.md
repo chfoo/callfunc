@@ -12,6 +12,7 @@
     * Emscripten users still need to make `Callfunc` wrap `EmContext` and set that as the singleton.
   * Please review the readme to update your code to the new API.
 * Added: Support for calling variadic (varargs) functions in Emscripten
+* Added: `AnyInt` abstract for better handling of `Int` and `Int64` at runtime.
 
 ## 0.4.0 (2019-08-27)
 
