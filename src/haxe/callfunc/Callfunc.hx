@@ -113,7 +113,7 @@ class Callfunc {
      *     other error.
      */
     public function wrapCallback(
-            haxeFunction:haxe.Constraints.Function,
+            haxeFunction:Dynamic,
             ?params:Array<DataType>,
             ?returnType:DataType):Callback {
 
@@ -137,7 +137,25 @@ class Callfunc {
             ?params:Array<DataType>,
             ?returnType:DataType) {
 
-        final handle = context.newCallback(haxeFunction, params, returnType);
+        function argPointerWrapper(args:Array<Any>):Any {
+            if (params != null) {
+                for (index in 0...args.length) {
+                    if (params[index] == DataType.Pointer) {
+                        args[index] = new Pointer(context, args[index]);
+                    }
+                }
+            }
+
+            final result = haxeFunction(args);
+
+            if (returnType == DataType.Pointer) {
+                return Pointer.unwrap(returnType);
+            } else {
+                return result;
+            }
+        }
+
+        final handle = context.newCallback(argPointerWrapper, params, returnType);
         return new Callback(context, handle);
     }
 

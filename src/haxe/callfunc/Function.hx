@@ -61,7 +61,7 @@ class Function {
      *
      * @see `Function.arrayCall` for description of function behavior.
      */
-    public final call:haxe.Constraints.Function;
+    public final call:Dynamic;
 
     public function new(name:String, context:Context, library:Library, libraryHandle:LibraryHandle) {
         this.name = name;

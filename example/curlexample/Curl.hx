@@ -39,33 +39,33 @@ class Curl {
         callfunc = Callfunc.instance();
         library = callfunc.openLibrary(getLibraryName());
 
-        globalInit = cast library.define(
+        globalInit = library.define(
             "curl_global_init",
             [DataType.SInt]
         ).call;
-        globalCleanup = cast library.define(
+        globalCleanup = library.define(
             "curl_global_cleanup"
         ).call;
-        easyInit = cast library.define(
+        easyInit = library.define(
             "curl_easy_init",
             [],
             DataType.Pointer
         ).call;
-        easySetOptPointer = cast library.defineVariadic(
+        easySetOptPointer = library.defineVariadic(
             "curl_easy_setopt",
             [DataType.Pointer, DataType.SInt, DataType.Pointer],
             2,
             DataType.SInt,
             "curl_easy_setopt:pointer"
         ).call;
-        easySetOptLong = cast library.defineVariadic(
+        easySetOptLong = library.defineVariadic(
             "curl_easy_setopt",
             [DataType.Pointer, DataType.SInt, DataType.SLong],
             2,
             DataType.SInt,
             "curl_easy_setopt:long"
         ).call;
-        easyPerform = cast library.define(
+        easyPerform = library.define(
             "curl_easy_perform",
             [DataType.Pointer],
             DataType.SInt

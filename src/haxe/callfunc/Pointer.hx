@@ -191,7 +191,7 @@ class Pointer {
         }
     }
 
-    @:allow(callfunc.Function)
+    @:allow(callfunc)
     static function unwrap(value:Any):Any {
         if (Std.is(value, Pointer)) {
             return (value:Pointer).basicPointer;
