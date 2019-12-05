@@ -83,9 +83,6 @@ class TestExamplelib extends Test {
         library.dispose();
     }
 
-    #if js
-    @Ignored("emscripten-core/emscripten #5563 #5684")
-    #end
     public function testVariadic() {
         var callfunc = Callfunc.instance();
         var library = callfunc.openLibrary(getLibName());

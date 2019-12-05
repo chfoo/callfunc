@@ -35,6 +35,6 @@ class EmLibrary implements LibraryHandle {
     public function newVariadicFunction(name:String, params:Array<DataType>,
             fixedParamCount:Int,
             ?returnType:DataType, ?abi:Int):FunctionHandle {
-        throw "Not supported. emscripten-core/emscripten #5563 #5684";
+        return new EmFunction(context, name, params, returnType, fixedParamCount);
     }
 }

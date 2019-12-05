@@ -11,6 +11,7 @@
   * Class `Callfunc` no longer implements `Context`; `Callfunc` wraps `Context` now. For unsupported targets, `Callfunc` wraps `DummyContext`.
     * Emscripten users still need to make `Callfunc` wrap `EmContext` and set that as the singleton.
   * Please review the readme to update your code to the new API.
+* Added: Support for calling variadic (varargs) functions in Emscripten
 
 ## 0.4.0 (2019-08-27)
 

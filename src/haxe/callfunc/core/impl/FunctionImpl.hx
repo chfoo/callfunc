@@ -7,22 +7,22 @@ class FunctionImpl implements FunctionHandle {
     final MAX_RETURN_SIZE = 8;
     final DEFAULT_ABI = -999;
 
-    final _name:String;
-    final _params:Array<DataType>;
-    final _returnType:DataType;
-    final _abi:Int;
+    final name:String;
+    final params:Array<DataType>;
+    final returnType:DataType;
+    final abi:Int;
     final nativePointer:ExternFunction;
-    final _library:LibraryImpl;
+    final library:LibraryImpl;
     var buffer:Null<Bytes>;
 
     public function new(library:LibraryImpl, name:String,
             ?params:Array<DataType>, fixedParamCount:Int = -1,
             ?returnType:DataType, ?abi:Int) {
-        _library = library;
-        _name = name;
-        _params = params = params != null ? params : [];
-        _returnType = returnType = returnType != null ? returnType : DataType.Void;
-        _abi = abi = abi != null ? abi : DEFAULT_ABI;
+        this.library = library;
+        this.name = name;
+        this.params = params = params != null ? params : [];
+        this.returnType = returnType = returnType != null ? returnType : DataType.Void;
+        this.abi = abi = abi != null ? abi : DEFAULT_ABI;
 
         nativePointer = ExternDef.newFunction(library.nativePointer);
 
@@ -50,16 +50,16 @@ class FunctionImpl implements FunctionHandle {
     public function call(?args:Array<Any>):Null<Any> {
         args = args != null ? args : [];
 
-        if (args.length != _params.length) {
+        if (args.length != params.length) {
             throw "Function argument count mismatch";
         }
 
-        buffer = _library.argSerializer.serializeArgs(_params, args, buffer);
+        buffer = library.argSerializer.serializeArgs(params, args, buffer);
 
         ExternDef.functionCall(nativePointer, ContextImpl.bytesToBytesData(buffer));
 
-        if (_returnType != DataType.Void) {
-            return _library.argSerializer.getReturnValue(buffer, _returnType);
+        if (returnType != DataType.Void) {
+            return library.argSerializer.getReturnValue(buffer, returnType);
         } else {
             return null;
         }
