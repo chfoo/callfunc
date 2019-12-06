@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* Fixed: Strings not properly null-terminated when passing them to the Callfunc C library.
 * Changed: The API was overhauled.
   * A new high level API was written and the low level API was moved to the `core` package.
   * Defined library functions are now stored in the library object so you don't need to keep a reference to each one to dispose them later.

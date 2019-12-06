@@ -101,11 +101,11 @@ class Library implements Disposable {
         final key = alias != null ? alias : name;
 
         if (functions.exists(key)) {
-            throw "Function is already defined";
+            throw 'Function is already defined: $key';
         }
 
         if (!hasSymbol(name)) {
-            throw "Symbol not in library";
+            throw 'Symbol not in library: $name';
         }
 
         final func = new Function(name, context, this, libraryHandle);
