@@ -1,5 +1,6 @@
 package callfunc;
 
+import callfunc.string.Encoder;
 import haxe.Int64;
 import haxe.io.ArrayBufferView;
 import haxe.io.Bytes;
@@ -182,5 +183,16 @@ class BytesDataView implements DataView {
     public function setString(position:Int, string:String, ?encoding:Encoding) {
         var stringBytes = Bytes.ofString(string, encoding);
         blitBytes(position, stringBytes);
+    }
+
+    public function getStringFull(pos:Int, ?len:Int,
+            encoding:callfunc.string.Encoding = UTF8):String {
+        return Encoder.decodeFromBytes(_bytes, _byteOffset + pos, len, encoding);
+    }
+
+    public function setStringFull(pos:Int, text:String,
+            encoding:callfunc.string.Encoding = UTF8,
+            terminator:Bool = false) {
+        return Encoder.encodeToBytes(_bytes, _byteOffset + pos, text, encoding, terminator);
     }
 }

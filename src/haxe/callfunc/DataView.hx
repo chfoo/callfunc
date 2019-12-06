@@ -120,11 +120,43 @@ interface DataView {
 
     /**
      * Returns a decoded string.
+     *
+     * Depending on the target, null bytes may stop the decoder.
+     *
+     * @see DataView.getStringFull
      */
     public function getString(pos:Int, len:Int, ?encoding:Encoding):String;
 
     /**
      * Encodes a string.
+     *
+     * Null-terminator is not written.
+     *
+     * @see DataView.setStringFull
      */
     public function setString(position:Int, string:String, ?encoding:Encoding):Void;
+
+    /**
+     * Returns a decoded string.
+     *
+     * @param pos Position of the view to start reading.
+     * @param len Amount of bytes (not code units or code points) to decode.
+     *     If not provided, a null-terminator is searched.
+     * @param encoding Encoding of the string.
+     */
+    public function getStringFull(pos:Int, ?len:Int,
+        encoding:callfunc.string.Encoding = UTF8):String;
+
+    /**
+     * Encodes a string.
+     *
+     * @param pos Position of the view to start writing.
+     * @param text The string to be written.
+     * @param terminator Whether to include a null-terminator.
+     * @param encoding Encoding of the string.
+     * @return Number of bytes written.
+     */
+    public function setStringFull(pos:Int, text:String,
+        encoding:callfunc.string.Encoding = UTF8,
+        terminator:Bool = false):Int;
 }

@@ -1,6 +1,6 @@
 package callfunc;
 
-import callfunc.string.Encoder;
+import callfunc.string.StringUtil;
 import callfunc.string.Encoding;
 import callfunc.core.Context;
 import haxe.Int64;
@@ -183,21 +183,28 @@ class Callfunc {
      * The C string will be encoded with the given encoding with a null
      * terminator.
      *
+     * This is equivalent of determining the number of bytes in the encoded
+     * string, allocating memory, and writing the encoded string with the
+     * pointer.
+     *
      * The caller is responsible for freeing the string.
+     *
+     * @param text String to be encoded,
+     * @param encoding Encoding such as UTF-8.
+     * @param terminator Whether to include a null-terminator.
+     * @param lengthCallback A callback that accepts the number of bytes
+     *     allocated
      */
     public function allocString(text:String,
-            encoding:Encoding = UTF8, ?lengthCallback:Int->Void):Pointer {
-        var bytes = Encoder.encode(text, encoding);
-        // To simplify logic, assume 4 null bytes is enough
-        var pointer = alloc(bytes.length + 4);
-
-        final view = pointer.getDataView(bytes.length + 4);
-
-        view.blitBytes(0, bytes);
-        view.setInt32(bytes.length, 0); // null terminator
+            encoding:Encoding = UTF8,
+            terminator:Bool = true,
+            ?lengthCallback:Int->Void):Pointer {
+        final length = StringUtil.getEncodedLength(text, encoding, terminator);
+        final pointer = alloc(length, true);
+        pointer.setString(text, encoding, terminator);
 
         if (lengthCallback != null) {
-            lengthCallback(bytes.length);
+            lengthCallback(length);
         }
 
         return pointer;

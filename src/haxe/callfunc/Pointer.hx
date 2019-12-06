@@ -2,7 +2,7 @@ package callfunc;
 
 import callfunc.core.BasicPointer;
 import callfunc.core.Context;
-import callfunc.string.Encoder;
+import callfunc.string.StringUtil;
 import callfunc.string.Encoding;
 import haxe.Int64;
 import haxe.io.Bytes;
@@ -125,25 +125,28 @@ class Pointer {
      */
     public function getString(?length:Int,
             encoding:Encoding = Encoding.UTF8):String {
-        length = length != null ? length : Encoder.stringLength(this, encoding);
-        var view = getDataView(length);
 
-        return Encoder.decode(view, encoding);
+        final length = StringUtil.getPointerNullTerminator(this, encoding);
+        final view = getDataView(length);
+        trace(length, encoding);
+
+        return view.getStringFull(0, length, encoding);
     }
 
     /**
      * Encodes the given string and writes it as a char array.
      *
-     * @param text Haxe string
-     * @param encoding
+     * @param text String to be encoded,
+     * @param encoding Encoding such as UTF-8.
+     * @param terminator Whether to include a null-terminator.
+     * @return Number of bytes written
      */
-    public function setString(text:String, encoding:Encoding = Encoding.UTF8) {
-        var bytes = Encoder.encode(text, encoding);
-        // To simplify logic, assume 4 null bytes is enough
-        var view = getDataView(bytes.length + 4);
+    public function setString(text:String, encoding:Encoding = Encoding.UTF8,
+            terminator:Bool = false, ?lengthCallback:Int->Void):Int {
+        final length = StringUtil.getEncodedLength(text, encoding, terminator);
+        final view = getDataView(length);
 
-        view.blitBytes(0, bytes);
-        view.setInt32(bytes.length, 0); // null terminator
+        return view.setStringFull(0, text, encoding, terminator);
     }
 
     #if sys

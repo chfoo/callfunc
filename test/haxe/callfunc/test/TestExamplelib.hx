@@ -75,9 +75,6 @@ class TestExamplelib extends Test {
 
         Assert.equals("HELLO WORLD!", resultString);
 
-        result.setString("abc");
-        Assert.equals("abc", result.getString());
-
         result.free();
         inputStringPointer.free();
         library.dispose();

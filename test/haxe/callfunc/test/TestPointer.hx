@@ -1,5 +1,6 @@
 package callfunc.test;
 
+import callfunc.string.Encoding;
 import haxe.Int64;
 import utest.Assert;
 
@@ -138,4 +139,15 @@ class TestPointer extends utest.Test {
         pointer.free();
     }
     #end
+
+    public function testString() {
+        var callfunc = Callfunc.instance();
+        var pointer = callfunc.alloc(100, true);
+
+        pointer.setString("abcdé", true);
+        Assert.equals("abcdé", pointer.getString());
+
+        pointer.setString("abcdé", Encoding.UTF16LE, true);
+        Assert.equals("abcdé", pointer.getString(Encoding.UTF16LE));
+    }
 }

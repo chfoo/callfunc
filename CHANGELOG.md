@@ -11,6 +11,7 @@
   * The high level API is more object-oriented, for example, `pointer.free()`, `pointer.getString()`, etc.
   * Class `Callfunc` no longer implements `Context`; `Callfunc` wraps `Context` now. For unsupported targets, `Callfunc` wraps `DummyContext`.
     * Emscripten users still need to make `Callfunc` wrap `EmContext` and set that as the singleton.
+  * String methods now have an explicit null-terminator parameter.
   * Please review the readme to update your code to the new API.
 * Added: Support for calling variadic (varargs) functions in Emscripten
 * Added: `AnyInt` abstract for better handling of `Int` and `Int64` at runtime.
