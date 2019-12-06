@@ -35,6 +35,7 @@ class TestAll {
         runner.addCase(new callfunc.test.TestCairoSurface());
         #end
 
+        runner.addCase(new callfunc.test.TestAnyInt());
         runner.addCase(new callfunc.test.TestDataView());
         runner.addCase(new callfunc.test.TestExamplelib());
         runner.addCase(new callfunc.test.TestCallfunc());
