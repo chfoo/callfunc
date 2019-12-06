@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.5.0 (2019-12-06)
 
 * Fixed: Strings not properly null-terminated when passing them to the Callfunc C library.
 * Changed: The API was overhauled.

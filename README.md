@@ -17,7 +17,7 @@ Callfunc can also be used as a interface for calling foreign functions in other 
 
 Callfunc requires:
 
-* Haxe 4 rc2 or newer
+* Haxe 4 or newer
 * libffi 3.3-rc0 or newer
 
 Install Callfunc from Haxelib:
