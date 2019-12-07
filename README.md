@@ -380,10 +380,6 @@ Then run `brew install libffi --HEAD` and `brew info libffi` to get the library 
 
 Typically libraries are provided your distribution's package manager, but only stable versions. In this case, the library can be built and installed following the instructions in the libffi readme file. Running the install step will install it to /usr/local/lib. On Debian-based distributions, you can replace the install step with `checkinstall` to create and install a deb package.
 
-The paths for searching for libraries is more restricted when executing applications. The `LD_LIBRARY_PATH` environment can be provided to the executable. For example:
-
-`LD_LIBRARY_PATH="./:/usr/local/lib/:$LD_LIBRARY_PATH"`
-
 ### callfunc.hdll (HashLink)
 
 You will need CMake. The following commands assumes a Bash shell.
@@ -405,7 +401,7 @@ On Linux and MacOS, this will be a makefile which you can run `make`.
 
 On Windows, add `-A win32` for 32-bit. CMake will generate a Visual Studio project file or nmake config by default. Consult documentation on CMake generators for other configs such as Mingw-w64.
 
-The generated library will be in `out/out/callfunc/`.
+The generated library will be in `out/out/callfunc/`. Please see section "Library paths" for running without installing the libraries.
 
 ### CPP target
 
@@ -419,6 +415,18 @@ For example:
 * To add the dynamic library link path `-L` flag, add `<flag value="-L/usr/local/lib"/>` to the `<linker>` section.
 
 Adjust the paths or create new sections for your platform/compiler as needed.
+
+### Library paths
+
+When running applications without installation on MacOS or Linux, the paths for searching for libraries is more restricted than Windows. That is, the system, by default, will not load libraries in the current directory or in the directory of the application.
+
+On Linux, the `LD_LIBRARY_PATH` environment can be provided to the executable. For example:
+
+`LD_LIBRARY_PATH="./:/usr/local/lib/:$LD_LIBRARY_PATH" hl myApplication.hl`
+
+On MacOS, use `DYLD_LIBRARY_PATH` instead of `LD_LIBRARY_PATH`.
+
+When using the precompiled libraries provided by this project on recent versions of MacOS, they need to be manually approved to load by deleting the quarantine attribute such as `xattr -d com.apple.quarantine callfunc.hdll`.
 
 ## Javascript
 
