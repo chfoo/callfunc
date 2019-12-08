@@ -36,3 +36,5 @@ script:
   - source script/export_ld_path.sh && out/hl/test/test
   - haxe hxml/example_curl.cpp.hxml -D callfunc_unit_test
   - haxe hxml/example_curl.hl.hxml -D callfunc_unit_test
+  - haxe hxml/example_random.cpp.hxml -D callfunc_unit_test
+  - haxe hxml/example_random.hl.hxml -D callfunc_unit_test
