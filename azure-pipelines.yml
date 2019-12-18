@@ -1,0 +1,62 @@
+strategy:
+  matrix:
+    linux:
+      IMAGE: 'ubuntu-18.04'
+      PLATFORM: linux-x86-64
+    mac:
+      IMAGE: 'macos-10.13'
+      PLATFORM: macos
+
+pool:
+  vmImage: $(IMAGE)
+
+jobs:
+  - job: install_dependencies
+    steps:
+      - script: script/get_libffi.sh download $(PLATFORM)
+      - script: script/get_libffi.sh install $(PLATFORM)
+      - script: script/get_haxe_bin.sh download $(PLATFORM)
+      - script: script/get_haxe_bin.sh install $(PLATFORM)
+      - script: sudo apt-get install libpng-dev libturbojpeg-dev libvorbis-dev libopenal-dev libsdl2-dev libmbedtls-dev libuv1-dev
+        condition: and(
+            succeeded(),
+            eq(variables['Agent.OS'], 'Linux')
+          )
+      - script: script/get_hashlink.sh download $(PLATFORM)
+      - script: brew bundle
+        condition: and(
+            succeeded(),
+            eq(variables['Agent.OS'], 'Darwin')
+          )
+      - script: script/get_hashlink.sh install $(PLATFORM)
+
+  - job: install_hxml
+    dependsOn: install_dependencies
+    steps:
+      - script: yes | haxelib install hxcpp
+      - script: yes | haxelib install hashlink
+      - script: yes | haxelib install test.hxml
+
+  - job: build_unit_test
+    dependsOn: install_hxml
+    steps:
+      - script: mkdir -p out/
+      - script: cmake .. -DCMAKE_BUILD_TYPE=Debug -DLIBFFI_INCLUDE_PATH:PATH=/usr/local/include/ -DLIBFFI_LIB_PATH:PATH=/usr/local/lib/
+        workingDirectory: out/
+      - script: cmake --build . --config Debug
+        workingDirectory: out/
+      - script: haxe hxml/test.cpp.hxml -D callfunc_unit_test
+      - script: haxe hxml/test.hl.hxml -D callfunc_unit_test
+      - script: haxe hxml/test.hl.c.hxml -D callfunc_unit_test
+      - script: gcc -g -o out/hl/test/test out/hl/test/test.c -I out/hl/test/ -std=c11 -lhl -lm out/callfunc/callfunc.hdll
+      - script: haxe hxml/example_curl.cpp.hxml -D callfunc_unit_test
+      - script: haxe hxml/example_curl.hl.hxml -D callfunc_unit_test
+      - script: haxe hxml/example_random.cpp.hxml -D callfunc_unit_test
+      - script: haxe hxml/example_random.hl.hxml -D callfunc_unit_test
+
+  - job: run_unit_test
+    dependsOn: build_unit_test
+    steps:
+      - script: source script/export_ld_path.sh && ./out/cpp/TestAll-debug
+      - script: source script/export_ld_path.sh && hl out/hl/test.hl
+      - script: source script/export_ld_path.sh && out/hl/test/test

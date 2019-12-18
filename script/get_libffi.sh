@@ -1,12 +1,40 @@
 #!/bin/bash
 
 set -e
-SCRIPT_DIR=$(dirname "$BASH_SOURCE")
+SCRIPT_DIR="$PWD"/$(dirname "$BASH_SOURCE")
 
-mkdir -p "$SCRIPT_DIR/../out"
-cd "$SCRIPT_DIR/../out"
+function download {
+    mkdir -p "$SCRIPT_DIR/../out"
+    cd "$SCRIPT_DIR/../out"
+    source "$SCRIPT_DIR/curl_opts.sh"
 
-curl -L -s -S -f -m 60 -O "https://github.com/libffi/libffi/releases/download/v3.3/libffi-3.3.tar.gz"
+    curl $CURL_OPTS -O "https://github.com/libffi/libffi/releases/download/v3.3/libffi-3.3.tar.gz"
 
-tar -xf libffi-3.3.tar.gz
-mv libffi-3.3 libffi
+    tar -xf libffi-3.3.tar.gz
+    mv libffi-3.3 libffi
+}
+
+function install {
+    cd "$SCRIPT_DIR/../out/libffi"
+
+    ## Running autogen is only required for git sources,
+    ## not needed for tarball releases
+    # ./autogen.sh
+    ./configure --disable-docs
+    make
+    sudo make install
+}
+
+COMMAND=$1
+
+case $COMMAND in
+    download)
+        download
+        ;;
+    install)
+        install
+        ;;
+    *)
+        echo "Unknown command $COMMAND"
+        exit 2
+esac
