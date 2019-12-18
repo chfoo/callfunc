@@ -49,12 +49,14 @@ function install {
     cd "$SCRIPT_DIR/../out/neko"
 
     case $PLATFORM in
-        linux-x86-64|macos) install_unix ;;
+        linux-x86-64|macos) install_unix $PLATFORM ;;
         windows-x86|windows-x86-64) install_windows ;;
     esac
 }
 
 function install_unix {
+    PLATFORM=$1
+
     for name in neko nekoc nekoml nekotools; do
         sudo cp -p -P $name /usr/local/bin/
     done
@@ -75,6 +77,10 @@ function install_unix {
 
     sudo cp -p -P nekoml.std /usr/local/lib/neko/
 
+    if [[ $PLATFORM =~ ^linux ]]; then
+        sudo ldconfig
+    fi
+
     export NEKOPATH=/usr/local/lib/neko/
 }
 
@@ -85,7 +91,7 @@ function install_windows {
         C_DIR="/c"
     fi
 
-    cp -r -p -P neko $C_DIR/c/
+    cp -R -p -P neko $C_DIR/c/
 
     export NEKOPATH=/c/neko/
     export PATH=$NEKOPATH:$PATH

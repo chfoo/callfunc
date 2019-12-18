@@ -58,7 +58,7 @@ function install_unix {
     done
 
     sudo mkdir -p /usr/local/lib/haxe/
-    sudo cp -r -p -P std /usr/local/lib/haxe/
+    sudo cp -R -p -P std /usr/local/lib/haxe/
 
     export HAXE_STD_PATH=/usr/local/lib/haxe/std
 
@@ -73,7 +73,7 @@ function install_windows {
         C_DIR="/c"
     fi
 
-    cp -r -p -P haxe $C_DIR/c/
+    cp -R -p -P haxe $C_DIR/c/
 
     export HAXE_STD_PATH=$C_DIR/c/haxe/std
     export PATH=$C_DIR/c/haxe/:$PATH
