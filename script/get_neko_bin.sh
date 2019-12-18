@@ -79,7 +79,7 @@ function install_unix {
 }
 
 function install_windows {
-    if [ -d "/mnt/c" ]; do
+    if [ -d "/mnt/c" ]; then
         C_DIR="/mnt/c"
     else
         C_DIR="/c"
