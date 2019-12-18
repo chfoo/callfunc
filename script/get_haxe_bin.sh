@@ -62,8 +62,8 @@ function install_unix {
 
     export HAXE_STD_PATH=/usr/local/lib/haxe/std
 
-    sudo mkdir -p /usr/local/lib/haxe/lib
-    haxelib setup /usr/local/lib/haxe/lib
+    mkdir -p ./lib
+    haxelib setup ./lib
 }
 
 function install_windows {
