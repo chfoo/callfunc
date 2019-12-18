@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-#include "../../../out/out/examplelib/examplelib_Export.h"
+#include "../../../out/examplelib/examplelib_Export.h"
 
 #ifdef __cplusplus
 extern "C" {

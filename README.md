@@ -401,7 +401,7 @@ On Linux and MacOS, this will be a makefile which you can run `make`.
 
 On Windows, add `-A win32` for 32-bit. CMake will generate a Visual Studio project file or nmake config by default. Consult documentation on CMake generators for other configs such as Mingw-w64.
 
-The generated library will be in `out/out/callfunc/`. Please see section "Library paths" for running without installing the libraries.
+The generated library will be in `out/callfunc/`. Please see section "Library paths" for running without installing the libraries.
 
 ### CPP target
 

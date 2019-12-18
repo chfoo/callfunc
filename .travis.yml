@@ -30,7 +30,7 @@ script:
   - haxe hxml/test.cpp.hxml -D callfunc_unit_test
   - haxe hxml/test.hl.hxml -D callfunc_unit_test
   - haxe hxml/test.hl.c.hxml -D callfunc_unit_test
-  - gcc -g -o out/hl/test/test out/hl/test/test.c -I out/hl/test/ -std=c11 -lhl -lm out/out/callfunc/callfunc.hdll
+  - gcc -g -o out/hl/test/test out/hl/test/test.c -I out/hl/test/ -std=c11 -lhl -lm out/callfunc/callfunc.hdll
   - source script/export_ld_path.sh && ./out/cpp/TestAll-debug
   - source script/export_ld_path.sh && hl out/hl/test.hl
   - source script/export_ld_path.sh && out/hl/test/test

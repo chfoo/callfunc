@@ -2,8 +2,8 @@
 
 SCRIPT_DIR=$(dirname "$BASH_SOURCE")
 
-NEW_PATHS="$SCRIPT_DIR/../out/out/callfunc/"
-NEW_PATHS+=":$SCRIPT_DIR/../out/out/examplelib/"
+NEW_PATHS="$SCRIPT_DIR/../out/callfunc/"
+NEW_PATHS+=":$SCRIPT_DIR/../out/examplelib/"
 NEW_PATHS+=":$SCRIPT_DIR/../out/libffi/destdir/lib/"
 NEW_PATHS+=":/usr/local/lib/"
 
