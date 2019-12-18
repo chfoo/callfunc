@@ -392,10 +392,10 @@ You will need CMake. The following commands assumes a Bash shell.
 
         cmake .. -DCMAKE_BUILD_TYPE=Release
 
-To specify the include and linker paths add (adjust paths as needed):
+To optionally specify the include and linker paths, add (adjust paths as needed):
 
 * For libffi: `-DLIBFFI_INCLUDE_PATH:PATH=/usr/local/include/ -DLIBFFI_LIB_PATH:PATH=/usr/local/lib/`. For vcpkg, please add the toolchain define as reported at the end of libffi install. (Use `vcpkg integrate install` to get the path.)
-* For HashLink: `-DHLINCLUDE_PATH:PATH=/usr/local/include/ -DHL_LIB_PATH:PATH=/usr/local/lib/`.
+* For HashLink: `-DHL_INCLUDE_PATH:PATH=/usr/local/include/ -DHL_LIB_PATH:PATH=/usr/local/lib/`.
 
 On Linux and MacOS, this will be a makefile which you can run `make`.
 
