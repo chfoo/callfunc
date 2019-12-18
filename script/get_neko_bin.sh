@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -e -x
 SCRIPT_DIR="$PWD"/$(dirname "$BASH_SOURCE")
 
 # install paths based on https://github.com/travis-ci/travis-build/blob/2d9a70b31e1669c4126994561a395a08b65ad737/lib/travis/build/script/haxe.rb
@@ -56,24 +56,24 @@ function install {
 
 function install_unix {
     for name in neko nekoc nekom nekotools; do
-        sudo cp -p $name /usr/local/bin/
+        sudo cp -p -P $name /usr/local/bin/
     done
 
     for name in libneko.*; do
-        sudo cp -p $name /usr/local/lib/
+        sudo cp -p -P $name /usr/local/lib/
     done
 
     for name in include/*; do
-        sudo cp -p $name /usr/local/include/
+        sudo cp -p -P $name /usr/local/include/
     done
 
     sudo mkdir -p /usr/local/lib/neko/
 
     for name in *.ndll; do
-        sudo cp -p $name /usr/local/lib/neko/
+        sudo cp -p -P $name /usr/local/lib/neko/
     done
 
-    sudo cp -p nekoml.std /usr/local/lib/neko/
+    sudo cp -p -P nekoml.std /usr/local/lib/neko/
 
     export NEKOPATH=/usr/local/lib/neko/
 }
@@ -85,7 +85,7 @@ function install_windows {
         C_DIR="/c"
     fi
 
-    cp -r -p neko $C_DIR/c/
+    cp -r -p -P neko $C_DIR/c/
 
     export NEKOPATH=/c/neko/
     export PATH=$NEKOPATH:$PATH

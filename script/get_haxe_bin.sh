@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -e -x
 SCRIPT_DIR="$PWD"/$(dirname "$BASH_SOURCE")
 
 # install paths based on https://github.com/travis-ci/travis-build/blob/2d9a70b31e1669c4126994561a395a08b65ad737/lib/travis/build/script/haxe.rb
@@ -54,11 +54,11 @@ function install {
 
 function install_unix {
     for name in haxe haxelib; do
-        sudo cp -p $name /usr/local/bin/
+        sudo cp -p -P $name /usr/local/bin/
     done
 
     sudo mkdir -p /usr/local/lib/haxe/
-    sudo cp -r -p std /usr/local/lib/haxe/
+    sudo cp -r -p -P std /usr/local/lib/haxe/
 
     export HAXE_STD_PATH=/usr/local/lib/haxe/std
 
@@ -73,7 +73,7 @@ function install_windows {
         C_DIR="/c"
     fi
 
-    cp -r -p haxe $C_DIR/c/
+    cp -r -p -P haxe $C_DIR/c/
 
     export HAXE_STD_PATH=$C_DIR/c/haxe/std
     export PATH=$C_DIR/c/haxe/:$PATH
