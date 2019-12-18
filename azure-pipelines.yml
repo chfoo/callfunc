@@ -1,14 +1,13 @@
-strategy:
-  matrix:
-    linux:
-      IMAGE: 'ubuntu-18.04'
-      PLATFORM: linux-x86-64
-    mac:
-      IMAGE: 'macos-10.13'
-      PLATFORM: macos
-
 jobs:
   - job: install_dependencies
+    strategy:
+      matrix:
+        linux:
+          IMAGE: 'ubuntu-18.04'
+          PLATFORM: linux-x86-64
+        mac:
+          IMAGE: 'macos-10.13'
+          PLATFORM: macos
     pool:
       vmImage: $(IMAGE)
     steps:
