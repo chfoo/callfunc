@@ -7,11 +7,10 @@ strategy:
       IMAGE: 'macos-10.13'
       PLATFORM: macos
 
-pool:
-  vmImage: $(IMAGE)
-
 jobs:
   - job: install_dependencies
+    pool:
+      vmImage: $(IMAGE)
     steps:
       - script: script/get_libffi.sh download $(PLATFORM)
       - script: script/get_libffi.sh install $(PLATFORM)
