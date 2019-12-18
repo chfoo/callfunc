@@ -37,12 +37,11 @@ jobs:
       - script: yes | haxelib install hashlink
       - script: yes | haxelib install test.hxml
 
+      # cmake is installed in /usr/local at version 1.12 which is too old
       - script: |
-          curl -L -s -S -f -m 60 https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | sudo apt-key add -
-          sudo apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
-          sudo apt-get update
-          sudo apt-get remove cmake
-          sudo apt-get install cmake
+          curl -L -s -S -f -m 60 -o /tmp/cmake.sh https://github.com/Kitware/CMake/releases/download/v3.16.1/cmake-3.16.1-Linux-x86_64.sh
+          chmod +x /tmp/cmake.sh
+          /tmp/cmake.sh --skip-license --prefix=/usr/local/
         condition: and(
             succeeded(),
             eq(variables['Agent.OS'], 'Linux')
