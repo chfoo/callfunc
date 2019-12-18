@@ -1,5 +1,5 @@
 jobs:
-  - job: install_dependencies
+  - job: everything
     strategy:
       matrix:
         linux:
@@ -33,16 +33,10 @@ jobs:
           )
       - script: script/get_hashlink.sh install $(PLATFORM)
 
-  - job: install_hxml
-    dependsOn: install_dependencies
-    steps:
       - script: yes | haxelib install hxcpp
       - script: yes | haxelib install hashlink
       - script: yes | haxelib install test.hxml
 
-  - job: build_unit_test
-    dependsOn: install_hxml
-    steps:
       - script: mkdir -p out/
       - script: cmake .. -DCMAKE_BUILD_TYPE=Debug -DLIBFFI_INCLUDE_PATH:PATH=/usr/local/include/ -DLIBFFI_LIB_PATH:PATH=/usr/local/lib/
         workingDirectory: out/
@@ -57,9 +51,6 @@ jobs:
       - script: haxe hxml/example_random.cpp.hxml -D callfunc_unit_test
       - script: haxe hxml/example_random.hl.hxml -D callfunc_unit_test
 
-  - job: run_unit_test
-    dependsOn: build_unit_test
-    steps:
       - script: source script/export_ld_path.sh && ./out/cpp/TestAll-debug
       - script: source script/export_ld_path.sh && hl out/hl/test.hl
       - script: source script/export_ld_path.sh && out/hl/test/test
