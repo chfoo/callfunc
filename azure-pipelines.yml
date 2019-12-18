@@ -13,6 +13,8 @@ jobs:
     steps:
       - script: script/get_libffi.sh download $(PLATFORM)
       - script: script/get_libffi.sh install $(PLATFORM)
+      - script: script/get_neko_bin.sh download $(PLATFORM)
+      - script: script/get_neko_bin.sh install $(PLATFORM)
       - script: script/get_haxe_bin.sh download $(PLATFORM)
       - script: script/get_haxe_bin.sh install $(PLATFORM)
       - script: sudo apt-get install libpng-dev libturbojpeg-dev libvorbis-dev libopenal-dev libsdl2-dev libmbedtls-dev libuv1-dev
