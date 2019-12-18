@@ -55,7 +55,7 @@ function install {
 }
 
 function install_unix {
-    for name in neko nekoc nekom nekotools; do
+    for name in neko nekoc nekoml nekotools; do
         sudo cp -p -P $name /usr/local/bin/
     done
 
