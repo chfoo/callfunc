@@ -14,10 +14,10 @@ function download {
     ARCHIVE_DIR="haxe_20191129081926_dcfaf4ac0"
 
     case $PLATFORM in
-        macos)
+        linux-x86-64)
             FILE="haxe-4.0.3-linux64.tar.gz"
             ;;
-        linux-x86-64)
+        macos)
             FILE="haxe-4.0.3-osx.tar.gz"
             ;;
         windows-x86)
