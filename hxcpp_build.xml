@@ -2,7 +2,7 @@
     <files id="haxe">
         <compilerflag value="-DCALLFUNC_CPP" unless="windows"/>
         <compilerflag value="/DCALLFUNC_CPP" if="windows"/>
-        <compilerflag value="-I$/usr/local/include/" if="callfunc_unit_test" />
+        <compilerflag value="-I/usr/local/include/" if="callfunc_unit_test" />
         <compilerflag value="-I${this_dir}/src/c/" unless="haxelib:callfunc||windows"/>
         <compilerflag value="/I${this_dir}/src/c/" if="windows" unless="haxelib:callfunc"/>
         <compilerflag value="-I${haxelib:callfunc}/src/c/" if="haxelib:callfunc" unless="windows" />
