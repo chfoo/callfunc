@@ -37,6 +37,17 @@ jobs:
       - script: yes | haxelib install hashlink
       - script: yes | haxelib install test.hxml
 
+      - script: |
+          curl -L -s -S -f -m 60 https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | sudo apt-key add -
+          sudo apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
+          sudo apt-get update
+          sudo apt-get remove cmake
+          sudo apt-get install cmake
+        condition: and(
+            succeeded(),
+            eq(variables['Agent.OS'], 'Linux')
+          )
+
       - script: mkdir -p out/
       - script: cmake .. -DCMAKE_BUILD_TYPE=Debug -DLIBFFI_INCLUDE_PATH:PATH=/usr/local/include/ -DLIBFFI_LIB_PATH:PATH=/usr/local/lib/
         workingDirectory: out/
