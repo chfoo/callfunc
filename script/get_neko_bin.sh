@@ -56,24 +56,24 @@ function install {
 
 function install_unix {
     for name in neko nekoc nekom nekotools; do
-        sudo cp $name /usr/local/bin/
+        sudo cp -p $name /usr/local/bin/
     done
 
     for name in libneko.*; do
-        sudo cp $name /usr/local/lib/
+        sudo cp -p $name /usr/local/lib/
     done
 
     for name in include/*; do
-        sudo cp $name /usr/local/include/
+        sudo cp -p $name /usr/local/include/
     done
 
     sudo mkdir -p /usr/local/lib/neko/
 
     for name in *.ndll; do
-        sudo cp $name /usr/local/lib/neko/
+        sudo cp -p $name /usr/local/lib/neko/
     done
 
-    sudo cp nekoml.std /usr/local/lib/neko/
+    sudo cp -p nekoml.std /usr/local/lib/neko/
 
     export NEKOPATH=/usr/local/lib/neko/
 }
@@ -85,7 +85,7 @@ function install_windows {
         C_DIR="/c"
     fi
 
-    cp -r neko $C_DIR/c/
+    cp -r -p neko $C_DIR/c/
 
     export NEKOPATH=/c/neko/
     export PATH=$NEKOPATH:$PATH
