@@ -8,6 +8,10 @@ import signal
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+
 
 def main():
     print('Starting server...', file=sys.stderr)
@@ -41,7 +45,9 @@ def main():
     print('Loaded.', file=sys.stderr)
 
     try:
-        header_element = browser.find_element_by_css_selector(".header")
+        header_element = WebDriverWait(browser, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, ".header"))
+        )
         print(header_element.text, file=sys.stderr)
 
         summary_element = browser.find_element_by_css_selector(".headerinfo")
