@@ -7,6 +7,7 @@ import signal
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import NoSuchElementException
 
 def main():
     print('Starting server...', file=sys.stderr)
@@ -39,11 +40,16 @@ def main():
     browser.get('http://localhost:6931/test.html')
     print('Loaded.', file=sys.stderr)
 
-    header_element = browser.find_element_by_css_selector(".header")
-    print(header_element.text, file=sys.stderr)
+    try:
+        header_element = browser.find_element_by_css_selector(".header")
+        print(header_element.text, file=sys.stderr)
 
-    summary_element = browser.find_element_by_css_selector(".headerinfo")
-    print(summary_element.text, file=sys.stderr)
+        summary_element = browser.find_element_by_css_selector(".headerinfo")
+        print(summary_element.text, file=sys.stderr)
+    except NoSuchElementException:
+        print('Failed to find element', file=sys.stderr)
+        body_element = browser.find_element_by_tag_name('body')
+        print(body_element.text[:1000], file=sys.stderr)
 
     if header_element.text == 'TEST OK':
         test_result = True
