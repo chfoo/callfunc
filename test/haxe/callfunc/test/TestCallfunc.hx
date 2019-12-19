@@ -100,12 +100,10 @@ class TestCallfunc extends utest.Test {
         Assert.notEquals(CoreDataType.SLong, callfunc.context.toCoreDataType(DataType.SLong, true));
         Assert.notEquals(CoreDataType.ULong, callfunc.context.toCoreDataType(DataType.ULong, true));
 
-        try {
-            callfunc.context.toCoreDataType(DataType.Size);
-            callfunc.context.toCoreDataType(DataType.PtrDiff);
-            callfunc.context.toCoreDataType(DataType.WChar);
-        } catch (error:String) {
-            Assert.warn('Possible error or just unsupported on platform: $error');
+        for (dataType in [DataType.Size, DataType.PtrDiff, DataType.WChar]) {
+            if (callfunc.sizeOf(dataType) > 0) {
+                callfunc.context.toCoreDataType(dataType);
+            }
         }
     }
 }
