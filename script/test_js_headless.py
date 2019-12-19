@@ -8,10 +8,14 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
 def main():
+    print('Starting server...')
+
     script_dir = os.path.dirname(__file__)
     root_dir = os.path.join(script_dir, '..')
     html_path = os.path.join(root_dir, 'test.html')
     server_process = subprocess.Popen(['emrun', '--no_browser', '--no_emrun_detect', html_path])
+
+    print('Starting Chrome...')
 
     chrome_options = Options()
     chrome_options.add_argument("--headless")
@@ -21,7 +25,9 @@ def main():
     test_result = False
 
     try:
+        print('Loading page...')
         browser.get('http://localhost:6931/test.html')
+        print('Loaded.')
 
         header_element = browser.find_element_by_css_selector(".header")
         print(header_element.text)
