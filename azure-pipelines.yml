@@ -82,7 +82,5 @@ jobs:
       - script: python3 -m pip install selenium --user
       - script: cmake .. -DCMAKE_BUILD_TYPE=Debug
         workingDirectory: out/
-      - script: cmake --build . --config Debug
-        workingDirectory: out/
       - script: source out/emsdk/emsdk_env.sh && script/test_build_emscripten_module.sh
       - script: source out/emsdk/emsdk_env.sh && script/test_js_headless.py
