@@ -47,12 +47,7 @@ class TestCallfunc extends utest.Test {
         Assert.isTrue(callfunc.sizeOf(DataType.ComplexLongDouble) >= 0);
         Assert.isTrue(callfunc.sizeOf(DataType.Size) >= 0);
         Assert.isTrue(callfunc.sizeOf(DataType.PtrDiff) >= 0);
-
-        try {
-            Assert.isTrue(callfunc.sizeOf(DataType.WChar) >= 0);
-        } catch (error:String) {
-            Assert.warn('Possible error or just unsupported on platform: $error');
-        }
+        Assert.isTrue(callfunc.sizeOf(DataType.WChar) >= 0);
     }
 
     public function testGetPointer() {
@@ -105,8 +100,12 @@ class TestCallfunc extends utest.Test {
         Assert.notEquals(CoreDataType.SLong, callfunc.context.toCoreDataType(DataType.SLong, true));
         Assert.notEquals(CoreDataType.ULong, callfunc.context.toCoreDataType(DataType.ULong, true));
 
-        callfunc.context.toCoreDataType(DataType.Size);
-        callfunc.context.toCoreDataType(DataType.PtrDiff);
-        callfunc.context.toCoreDataType(DataType.WChar);
+        try {
+            callfunc.context.toCoreDataType(DataType.Size);
+            callfunc.context.toCoreDataType(DataType.PtrDiff);
+            callfunc.context.toCoreDataType(DataType.WChar);
+        } catch (error:String) {
+            Assert.warn('Possible error or just unsupported on platform: $error');
+        }
     }
 }
