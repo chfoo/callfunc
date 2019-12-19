@@ -15,6 +15,7 @@ jobs:
     pool:
       vmImage: $(IMAGE)
     steps:
+      # Runtimes and dependencies
       - script: script/get_libffi.sh download $(PLATFORM)
       - script: script/get_libffi.sh install $(PLATFORM)
       - script: script/get_neko_bin.sh download $(PLATFORM)
@@ -37,6 +38,7 @@ jobs:
           )
       - script: script/get_hashlink.sh install $(PLATFORM)
 
+      # Haxe dependencies
       - script: haxelib --always --quiet install hxcpp
       - script: haxelib --always --quiet install hashlink
       - script: haxelib --always --quiet install test.hxml
@@ -51,6 +53,14 @@ jobs:
             eq(variables['Agent.OS'], 'Linux')
           )
 
+      # Unit test files
+      - script: brew install cairo
+        condition: and(
+            succeeded(),
+            eq(variables['Agent.OS'], 'Darwin')
+          )
+
+      # Build unit tests
       - script: mkdir -p out/
       - script: cmake .. -DCMAKE_BUILD_TYPE=Debug -DLIBFFI_INCLUDE_PATH:PATH=$(LIBFFI_INCLUDE_PATH) -DLIBFFI_LIB_PATH:FILEPATH=$(LIBFFI_LIB_PATH)
         workingDirectory: out/
@@ -65,6 +75,7 @@ jobs:
       - script: haxe hxml/example_random.cpp.hxml -D callfunc_unit_test
       - script: haxe hxml/example_random.hl.hxml -D callfunc_unit_test
 
+      # Run unit tests
       - script: source script/export_ld_path.sh && ./out/cpp/TestAll-debug
       - script: source script/export_ld_path.sh && hl out/hl/test.hl
       - script: source script/export_ld_path.sh && out/hl/test/test
