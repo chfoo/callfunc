@@ -1,7 +1,7 @@
 #!/bin/bash
 
-set -e
-SCRIPT_DIR=$(dirname "$BASH_SOURCE")
+set -e -x
+SCRIPT_DIR="$PWD"/$(dirname "$BASH_SOURCE")
 
 mkdir -p "$SCRIPT_DIR/../out"
 cd "$SCRIPT_DIR/../out"
