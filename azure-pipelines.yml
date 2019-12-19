@@ -5,9 +5,13 @@ jobs:
         linux:
           IMAGE: 'ubuntu-18.04'
           PLATFORM: linux-x86-64
+          LIBFFI_LIB_PATH: "/usr/local/lib/libffi.so"
+          LIBFFI_INCLUDE_PATH: "/usr/local/include/"
         mac:
           IMAGE: 'macos-10.13'
           PLATFORM: macos
+          LIBFFI_LIB_PATH: "/usr/local/lib/libffi.dylib"
+          LIBFFI_INCLUDE_PATH: "/usr/local/include/"
     pool:
       vmImage: $(IMAGE)
     steps:
@@ -33,9 +37,9 @@ jobs:
           )
       - script: script/get_hashlink.sh install $(PLATFORM)
 
-      - script: haxelib --always install hxcpp
-      - script: haxelib --always install hashlink
-      - script: haxelib --always install test.hxml
+      - script: haxelib --always --quiet install hxcpp
+      - script: haxelib --always --quiet install hashlink
+      - script: haxelib --always --quiet install test.hxml
 
       # cmake is installed in /usr/local at version 1.12 which is too old
       - script: |
@@ -48,7 +52,7 @@ jobs:
           )
 
       - script: mkdir -p out/
-      - script: cmake .. -DCMAKE_BUILD_TYPE=Debug -DLIBFFI_INCLUDE_PATH:PATH=/usr/local/include/ -DLIBFFI_LIB_PATH:PATH=/usr/local/lib/
+      - script: cmake .. -DCMAKE_BUILD_TYPE=Debug -DLIBFFI_INCLUDE_PATH:PATH=$(LIBFFI_INCLUDE_PATH) -DLIBFFI_LIB_PATH:PATH=$(LIBFFI_LIB_PATH)
         workingDirectory: out/
       - script: cmake --build . --config Debug
         workingDirectory: out/

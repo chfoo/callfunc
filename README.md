@@ -394,8 +394,8 @@ You will need CMake. The following commands assumes a Bash shell.
 
 To optionally specify the include and linker paths, add (adjust paths as needed):
 
-* For libffi: `-DLIBFFI_INCLUDE_PATH:PATH=/usr/local/include/ -DLIBFFI_LIB_PATH:PATH=/usr/local/lib/`. For vcpkg, please add the toolchain define as reported at the end of libffi install. (Use `vcpkg integrate install` to get the path.)
-* For HashLink: `-DHL_INCLUDE_PATH:PATH=/usr/local/include/ -DHL_LIB_PATH:PATH=/usr/local/lib/`.
+* For libffi: `-DLIBFFI_INCLUDE_PATH:PATH=/usr/local/include/ -DLIBFFI_LIB_PATH:PATH=/usr/local/lib/libffi.so`. For vcpkg, please add the toolchain define as reported at the end of libffi install. (Use `vcpkg integrate install` to get the path.)
+* For HashLink: `-DHL_INCLUDE_PATH:PATH=/usr/local/include/ -DHL_LIB_PATH:PATH=/usr/local/lib/libhl.so`.
 
 On Linux and MacOS, this will be a makefile which you can run `make`.
 

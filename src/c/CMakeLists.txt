@@ -2,18 +2,32 @@ cmake_minimum_required(VERSION 3.13)
 project(callfunc)
 
 set(LIBFFI_INCLUDE_PATH "" CACHE PATH "Include directory for libffi (ffi.h)")
-set(LIBFFI_LIB_PATH "" CACHE PATH "Link directory for libffi (libffi.{so,dll,dylib})")
+set(LIBFFI_LIB_PATH "" CACHE FILEPATH "Filename of libffi shared library (libffi.{so,dll,dylib})")
 set(HL_INCLUDE_PATH "" CACHE PATH "Include directory for HashLink (hl.h)")
-set(HL_LIB_PATH "" CACHE PATH "Link directory for HashLink (libhl.{so,dll,dylib})")
+set(HL_LIB_PATH "" CACHE FILEPATH "Filename HashLink shared library (libhl.{so,dll,dylib})")
 
 add_library(callfunc_hdll SHARED callfunc.c)
-target_include_directories(callfunc_hdll BEFORE PRIVATE "${LIBFFI_INCLUDE_PATH}" "${HL_INCLUDE_PATH}")
-target_link_directories(callfunc_hdll BEFORE PRIVATE "${LIBFFI_LIB_PATH}" "${HL_LIB_PATH}")
+
+if(${LIBFFI_INCLUDE_PATH})
+    target_include_directories(callfunc_hdll PRIVATE "${LIBFFI_INCLUDE_PATH}")
+endif()
+
+if(${HL_INCLUDE_PATH})
+    target_include_directories(callfunc_hdll PRIVATE "${HL_INCLUDE_PATH}")
+endif()
+
+if(${LIBFFI_LIB_PATH})
+    target_link_libraries(callfunc_hdll PRIVATE "${LIBFFI_LIB_PATH}")
+endif()
+
+if(${HL_LIB_PATH})
+    target_link_libraries(callfunc_hdll PRIVATE "${HL_LIB_PATH}")
+endif()
 
 if(NOT WIN32)
-    target_link_libraries(callfunc_hdll dl ffi hl)
+    target_link_libraries(callfunc_hdll PRIVATE dl ffi hl)
 else()
-    target_link_libraries(callfunc_hdll libffi libhl)
+    target_link_libraries(callfunc_hdll PRIVATE libffi libhl)
 endif()
 
 if(MSVC)
