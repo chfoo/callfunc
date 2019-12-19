@@ -30,7 +30,7 @@ install:
   - yes | haxelib install test.hxml
 
 script:
-  - mkdir -p out/ && cd out/ && /usr/bin/cmake .. -DCMAKE_BUILD_TYPE=Debug -DLIBFFI_INCLUDE_PATH:PATH=/usr/local/include/ -DLIBFFI_LIB_PATH:PATH=/usr/local/lib/libffi.so
+  - mkdir -p out/ && cd out/ && /usr/bin/cmake .. -DCMAKE_BUILD_TYPE=Debug -DLIBFFI_INCLUDE_PATH:PATH=/usr/local/include/ -DLIBFFI_LIB_PATH:FILEPATH=/usr/local/lib/libffi.so
   - make && make examplelib
   - cd ../
   - haxe hxml/test.cpp.hxml -D callfunc_unit_test

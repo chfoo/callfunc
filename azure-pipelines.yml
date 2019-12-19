@@ -52,7 +52,7 @@ jobs:
           )
 
       - script: mkdir -p out/
-      - script: cmake .. -DCMAKE_BUILD_TYPE=Debug -DLIBFFI_INCLUDE_PATH:PATH=$(LIBFFI_INCLUDE_PATH) -DLIBFFI_LIB_PATH:PATH=$(LIBFFI_LIB_PATH)
+      - script: cmake .. -DCMAKE_BUILD_TYPE=Debug -DLIBFFI_INCLUDE_PATH:PATH=$(LIBFFI_INCLUDE_PATH) -DLIBFFI_LIB_PATH:FILEPATH=$(LIBFFI_LIB_PATH)
         workingDirectory: out/
       - script: cmake --build . --config Debug
         workingDirectory: out/
