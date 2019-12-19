@@ -1,0 +1,10 @@
+# cmake is installed in /usr/local at version 1.12 which is too old
+steps:
+  - script: |
+      curl -L -s -S -f -m 60 -o /tmp/cmake.sh https://github.com/Kitware/CMake/releases/download/v3.16.1/cmake-3.16.1-Linux-x86_64.sh
+      chmod +x /tmp/cmake.sh
+      sudo /tmp/cmake.sh --skip-license --prefix=/usr/local/
+    condition: and(
+        succeeded(),
+        eq(variables['Agent.OS'], 'Linux')
+      )

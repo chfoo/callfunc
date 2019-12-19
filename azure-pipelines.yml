@@ -43,15 +43,7 @@ jobs:
       - script: haxelib --always --quiet install hashlink
       - script: haxelib --always --quiet install test.hxml
 
-      # cmake is installed in /usr/local at version 1.12 which is too old
-      - script: |
-          curl -L -s -S -f -m 60 -o /tmp/cmake.sh https://github.com/Kitware/CMake/releases/download/v3.16.1/cmake-3.16.1-Linux-x86_64.sh
-          chmod +x /tmp/cmake.sh
-          sudo /tmp/cmake.sh --skip-license --prefix=/usr/local/
-        condition: and(
-            succeeded(),
-            eq(variables['Agent.OS'], 'Linux')
-          )
+      - template: script/azure-pipeline-templates/install_cmake.yml
 
       # Unit test files
       - script: brew install cairo
@@ -84,6 +76,11 @@ jobs:
     pool:
       vmImage: ubuntu-18.04
     steps:
+      - template: script/azure-pipeline-templates/install_cmake.yml
+      - script: cmake .. -DCMAKE_BUILD_TYPE=Debug
+        workingDirectory: out/
+      - script: cmake --build . --config Debug
+        workingDirectory: out/
       - script: script/get_emsdk.sh
       - script: script/get_chromedriver.sh
       - script: python3 -m pip install selenium --user
