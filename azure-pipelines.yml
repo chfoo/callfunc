@@ -1,0 +1,81 @@
+jobs:
+  - job: everything
+    strategy:
+      matrix:
+        linux:
+          IMAGE: 'ubuntu-18.04'
+          PLATFORM: linux-x86-64
+          LIBFFI_LIB_PATH: "/usr/local/lib/libffi.so"
+          LIBFFI_INCLUDE_PATH: "/usr/local/include/"
+        mac:
+          IMAGE: 'macos-10.13'
+          PLATFORM: macos
+          LIBFFI_LIB_PATH: "/usr/local/lib/libffi.dylib"
+          LIBFFI_INCLUDE_PATH: "/usr/local/include/"
+    pool:
+      vmImage: $(IMAGE)
+    steps:
+      # Runtimes and dependencies
+      - script: script/get_libffi.sh download $(PLATFORM)
+      - script: script/get_libffi.sh install $(PLATFORM)
+      - script: script/get_neko_bin.sh download $(PLATFORM)
+      - script: script/get_neko_bin.sh install $(PLATFORM)
+      - script: script/get_haxe_bin.sh download $(PLATFORM)
+      - script: script/get_haxe_bin.sh install $(PLATFORM)
+      - script: |
+          sudo apt-get update
+          sudo apt-get install libpng-dev libturbojpeg-dev libvorbis-dev libopenal-dev libsdl2-dev libmbedtls-dev libuv1-dev
+        condition: and(
+            succeeded(),
+            eq(variables['Agent.OS'], 'Linux')
+          )
+      - script: script/get_hashlink.sh download $(PLATFORM)
+      - script: brew bundle
+        workingDirectory: out/hashlink/
+        condition: and(
+            succeeded(),
+            eq(variables['Agent.OS'], 'Darwin')
+          )
+      - script: script/get_hashlink.sh install $(PLATFORM)
+
+      # Haxe dependencies
+      - script: haxelib --always --quiet install hxcpp
+      - script: haxelib --always --quiet install hashlink
+      - script: haxelib --always --quiet install test.hxml
+
+      # cmake is installed in /usr/local at version 1.12 which is too old
+      - script: |
+          curl -L -s -S -f -m 60 -o /tmp/cmake.sh https://github.com/Kitware/CMake/releases/download/v3.16.1/cmake-3.16.1-Linux-x86_64.sh
+          chmod +x /tmp/cmake.sh
+          sudo /tmp/cmake.sh --skip-license --prefix=/usr/local/
+        condition: and(
+            succeeded(),
+            eq(variables['Agent.OS'], 'Linux')
+          )
+
+      # Unit test files
+      - script: brew install cairo
+        condition: and(
+            succeeded(),
+            eq(variables['Agent.OS'], 'Darwin')
+          )
+
+      # Build unit tests
+      - script: mkdir -p out/
+      - script: cmake .. -DCMAKE_BUILD_TYPE=Debug -DLIBFFI_INCLUDE_PATH:PATH=$(LIBFFI_INCLUDE_PATH) -DLIBFFI_LIB_PATH:FILEPATH=$(LIBFFI_LIB_PATH)
+        workingDirectory: out/
+      - script: cmake --build . --config Debug
+        workingDirectory: out/
+      - script: haxe hxml/test.cpp.hxml -D callfunc_unit_test
+      - script: haxe hxml/test.hl.hxml -D callfunc_unit_test
+      - script: haxe hxml/test.hl.c.hxml -D callfunc_unit_test
+      - script: gcc -g -o out/hl/test/test out/hl/test/test.c -I out/hl/test/ -std=c11 -lhl -lm out/callfunc/callfunc.hdll
+      - script: haxe hxml/example_curl.cpp.hxml -D callfunc_unit_test
+      - script: haxe hxml/example_curl.hl.hxml -D callfunc_unit_test
+      - script: haxe hxml/example_random.cpp.hxml -D callfunc_unit_test
+      - script: haxe hxml/example_random.hl.hxml -D callfunc_unit_test
+
+      # Run unit tests
+      - script: source script/export_ld_path.sh && ./out/cpp/TestAll-debug
+      - script: source script/export_ld_path.sh && hl out/hl/test.hl
+      - script: source script/export_ld_path.sh && out/hl/test/test
