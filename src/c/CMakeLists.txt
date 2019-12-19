@@ -8,26 +8,36 @@ set(HL_LIB_PATH "" CACHE FILEPATH "Filename HashLink shared library (libhl.{so,d
 
 add_library(callfunc_hdll SHARED callfunc.c)
 
-if(${LIBFFI_INCLUDE_PATH})
+if(LIBFFI_INCLUDE_PATH)
     target_include_directories(callfunc_hdll PRIVATE "${LIBFFI_INCLUDE_PATH}")
 endif()
 
-if(${HL_INCLUDE_PATH})
+if(HL_INCLUDE_PATH)
     target_include_directories(callfunc_hdll PRIVATE "${HL_INCLUDE_PATH}")
 endif()
 
-if(${LIBFFI_LIB_PATH})
+if(LIBFFI_LIB_PATH)
     target_link_libraries(callfunc_hdll PRIVATE "${LIBFFI_LIB_PATH}")
+else()
+    if(NOT WIN32)
+        target_link_libraries(callfunc_hdll PRIVATE ffid)
+    else()
+        target_link_libraries(callfunc_hdll PRIVATE libffi)
+    endif()
 endif()
 
-if(${HL_LIB_PATH})
+if(HL_LIB_PATH)
     target_link_libraries(callfunc_hdll PRIVATE "${HL_LIB_PATH}")
+else()
+    if(NOT WIN32)
+        target_link_libraries(callfunc_hdll PRIVATE hl)
+    else()
+        target_link_libraries(callfunc_hdll PRIVATE libhl)
+    endif()
 endif()
 
 if(NOT WIN32)
-    target_link_libraries(callfunc_hdll PRIVATE dl ffi hl)
-else()
-    target_link_libraries(callfunc_hdll PRIVATE libffi libhl)
+    target_link_libraries(callfunc_hdll PRIVATE dl)
 endif()
 
 if(MSVC)
