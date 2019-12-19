@@ -72,6 +72,19 @@ jobs:
       - script: source script/export_ld_path.sh && hl out/hl/test.hl
       - script: source script/export_ld_path.sh && out/hl/test/test
 
+      # Build release library
+      - script: mkdir -p out-release/
+      - script: cmake .. -DCMAKE_BUILD_TYPE=Release -DLIBFFI_INCLUDE_PATH:PATH=$(LIBFFI_INCLUDE_PATH) -DLIBFFI_LIB_PATH:FILEPATH=$(LIBFFI_LIB_PATH)
+        workingDirectory: out-release/
+      - script: cmake --build . --config Release
+        workingDirectory: out-release/
+
+      # Publish releases
+      - publish: out-release/callfunc/callfunc.hdll
+        artifact: callfunc-hdll-$(PLATFORM)
+      - publish: $(LIBFFI_LIB_PATH)
+        artifact: libffi-$(PLATFORM)
+
   - job: emscripten_test
     pool:
       vmImage: ubuntu-18.04
