@@ -1,8 +1,9 @@
 #!/bin/bash
 
-set -e
+set -e -x
 SCRIPT_DIR="$PWD"/$(dirname "$BASH_SOURCE")
 
+mkdir -p $SCRIPT_DIR/../out/js/
 cd $SCRIPT_DIR/../test/c/examplelib
 
 emcc -Wall -Werror -O3 examplelib.c -o $SCRIPT_DIR/../out/js/em.js \

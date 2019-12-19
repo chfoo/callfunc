@@ -43,15 +43,7 @@ jobs:
       - script: haxelib --always --quiet install hashlink
       - script: haxelib --always --quiet install test.hxml
 
-      # cmake is installed in /usr/local at version 1.12 which is too old
-      - script: |
-          curl -L -s -S -f -m 60 -o /tmp/cmake.sh https://github.com/Kitware/CMake/releases/download/v3.16.1/cmake-3.16.1-Linux-x86_64.sh
-          chmod +x /tmp/cmake.sh
-          sudo /tmp/cmake.sh --skip-license --prefix=/usr/local/
-        condition: and(
-            succeeded(),
-            eq(variables['Agent.OS'], 'Linux')
-          )
+      - template: script/azure-pipeline-templates/install_cmake.yml
 
       # Unit test files
       - script: brew install cairo
@@ -79,3 +71,22 @@ jobs:
       - script: source script/export_ld_path.sh && ./out/cpp/TestAll-debug
       - script: source script/export_ld_path.sh && hl out/hl/test.hl
       - script: source script/export_ld_path.sh && out/hl/test/test
+
+  - job: emscripten_test
+    pool:
+      vmImage: ubuntu-18.04
+    steps:
+      - script: script/get_neko_bin.sh download linux-x86-64
+      - script: script/get_neko_bin.sh install linux-x86-64
+      - script: script/get_haxe_bin.sh download linux-x86-64
+      - script: script/get_haxe_bin.sh install linux-x86-64
+      - template: script/azure-pipeline-templates/install_cmake.yml
+      - script: script/get_emsdk.sh
+      - script: script/get_chromedriver.sh
+      - script: python3 -m pip install selenium --user
+      - script: cmake .. -DCMAKE_BUILD_TYPE=Debug
+        workingDirectory: out/
+      - script: source out/emsdk/emsdk_env.sh && script/test_build_emscripten_module.sh
+      - script: haxelib --always --quiet install test.hxml
+      - script: haxe hxml/test.js.hxml
+      - script: source out/emsdk/emsdk_env.sh && python3 script/test_js_headless.py
