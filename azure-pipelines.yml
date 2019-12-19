@@ -81,7 +81,8 @@ jobs:
       - script: source script/export_ld_path.sh && out/hl/test/test
 
   - job: emscripten_test
-    pool: ubuntu-18.04
+    pool:
+      vmImage: ubuntu-18.04
     steps:
       - script: script/get_emsdk.sh
       - script: script/get_chromedriver.sh
