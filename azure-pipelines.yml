@@ -79,3 +79,12 @@ jobs:
       - script: source script/export_ld_path.sh && ./out/cpp/TestAll-debug
       - script: source script/export_ld_path.sh && hl out/hl/test.hl
       - script: source script/export_ld_path.sh && out/hl/test/test
+
+  - job: emscripten_test
+    pool: ubuntu-18.04
+    steps:
+      - script: script/get_emsdk.sh
+      - script: script/get_chromedriver.sh
+      - script: python3 -m pip install selenium --user
+      - script: source out/emsdk/emsdk_env.sh && script/test_build_emscripten_module.sh
+      - script: source out/emsdk/emsdk_env.sh && script/test_js_headless.py
