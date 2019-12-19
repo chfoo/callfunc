@@ -76,6 +76,10 @@ jobs:
     pool:
       vmImage: ubuntu-18.04
     steps:
+      - script: script/get_neko_bin.sh download linux-x86-64
+      - script: script/get_neko_bin.sh install linux-x86-64
+      - script: script/get_haxe_bin.sh download linux-x86-64
+      - script: script/get_haxe_bin.sh install linux-x86-64
       - template: script/azure-pipeline-templates/install_cmake.yml
       - script: script/get_emsdk.sh
       - script: script/get_chromedriver.sh
