@@ -77,12 +77,12 @@ jobs:
       vmImage: ubuntu-18.04
     steps:
       - template: script/azure-pipeline-templates/install_cmake.yml
+      - script: script/get_emsdk.sh
+      - script: script/get_chromedriver.sh
+      - script: python3 -m pip install selenium --user
       - script: cmake .. -DCMAKE_BUILD_TYPE=Debug
         workingDirectory: out/
       - script: cmake --build . --config Debug
         workingDirectory: out/
-      - script: script/get_emsdk.sh
-      - script: script/get_chromedriver.sh
-      - script: python3 -m pip install selenium --user
       - script: source out/emsdk/emsdk_env.sh && script/test_build_emscripten_module.sh
       - script: source out/emsdk/emsdk_env.sh && script/test_js_headless.py
