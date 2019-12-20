@@ -159,6 +159,9 @@ jobs:
       - powershell: haxelib --always --quiet install hashlink
       - powershell: haxelib --always --quiet install test.hxml
 
+      # Unit test files
+      - powershell: vcpkg.exe install cairo:$(ARCH_NAME)-windows
+
       # Build unit tests
       - bash: mkdir -p out/
       - powershell: cmake .. -DCMAKE_BUILD_TYPE=Debug $(CMAKE_ARGS) $(EXTRA_CMAKE_ARGS)
@@ -166,8 +169,10 @@ jobs:
       - powershell: cmake --build . --config Debug
         workingDirectory: out/
       - bash: |
-          echo "##vso[task.prependpath]$Build_SourcesDirectory/out/callfunc/Debug/"
+          echo "##vso[task.prependpath]$BUILD_SOURCESDIRECTORY/out/callfunc/Debug/"
+          echo "##vso[task.prependpath]$BUILD_SOURCESDIRECTORY/out/examplelib/Debug/"
           echo "##vso[task.prependpath]$VCPKG_INSTALLATION_ROOT/installed/$(ARCH_NAME)-windows/bin/"
+      - bash: 'echo "Path is now: $PATH"'
       - powershell: haxe hxml/test.cpp.hxml -D callfunc_unit_test
           $(HXCPP_BUILD_DEFINES)
       - powershell: haxe hxml/test.hl.hxml -D callfunc_unit_test
