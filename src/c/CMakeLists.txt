@@ -8,33 +8,36 @@ set(HL_LIB_PATH "" CACHE FILEPATH "Filename HashLink shared library (libhl.{so,d
 
 add_library(callfunc_hdll SHARED callfunc.c)
 
-if(LIBFFI_INCLUDE_PATH)
-    target_include_directories(callfunc_hdll PRIVATE "${LIBFFI_INCLUDE_PATH}")
+if(NOT LIBFFI_INCLUDE_PATH)
+    find_path(LIBFFI_INCLUDE_PATH_AUTO ffi.h)
 endif()
 
-if(HL_INCLUDE_PATH)
-    target_include_directories(callfunc_hdll PRIVATE "${HL_INCLUDE_PATH}")
+if(NOT HL_INCLUDE_PATH)
+    find_path(LIBFFI_INCLUDE_PATH_AUTO hl.h)
 endif()
 
-if(LIBFFI_LIB_PATH)
-    target_link_libraries(callfunc_hdll PRIVATE "${LIBFFI_LIB_PATH}")
-else()
+target_include_directories(callfunc_hdll PRIVATE "${LIBFFI_INCLUDE_PATH}" "${LIBFFI_INCLUDE_PATH_AUTO}")
+target_include_directories(callfunc_hdll PRIVATE "${HL_INCLUDE_PATH}" "${LIBFFI_INCLUDE_PATH_AUTO}")
+
+if(NOT LIBFFI_LIB_PATH)
     if(NOT WIN32)
-        target_link_libraries(callfunc_hdll PRIVATE ffi)
+        find_library(LIBFFI_LIB_PATH_AUTO ffi)
     else()
-        target_link_libraries(callfunc_hdll PRIVATE libffi)
+        find_library(LIBFFI_LIB_PATH_AUTO libffi)
     endif()
 endif()
 
-if(HL_LIB_PATH)
-    target_link_libraries(callfunc_hdll PRIVATE "${HL_LIB_PATH}")
-else()
+target_link_libraries(callfunc_hdll PRIVATE "${LIBFFI_LIB_PATH}" "${LIBFFI_LIB_PATH_AUTO}")
+
+if(NOT HL_LIB_PATH)
     if(NOT WIN32)
-        target_link_libraries(callfunc_hdll PRIVATE hl)
+        find_library(HL_LIB_PATH_AUTO hl)
     else()
-        target_link_libraries(callfunc_hdll PRIVATE libhl)
+        find_library(HL_LIB_PATH_AUTO libhl)
     endif()
 endif()
+
+target_link_libraries(callfunc_hdll PRIVATE "${HL_LIB_PATH}" "${HL_LIB_PATH_AUTO}")
 
 if(NOT WIN32)
     target_link_libraries(callfunc_hdll PRIVATE dl)

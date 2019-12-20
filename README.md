@@ -428,6 +428,10 @@ On MacOS, use `DYLD_LIBRARY_PATH` instead of `LD_LIBRARY_PATH`.
 
 When using the precompiled libraries provided by this project on recent versions of MacOS, they need to be manually approved to load by deleting the quarantine attribute such as `xattr -d com.apple.quarantine callfunc.hdll`.
 
+### Troubleshooting compilation
+
+If you have trouble getting the library or dependencies built, check the .travis.yml and azure-pipelines.yml files.
+
 ## Javascript
 
 There are no C libraries needed to be compiled for the Javascript target.
