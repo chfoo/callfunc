@@ -1,0 +1,28 @@
+diff --git a/libs/sdl/gl.c b/libs/sdl/gl.c
+index 2917b35..7a72655 100644
+--- a/libs/sdl/gl.c
++++ b/libs/sdl/gl.c
+@@ -13,7 +13,7 @@
+ #	define glDispatchCompute(...) hl_error("Not supported on OSX")
+ #	define glMemoryBarrier(...) hl_error("Not supported on OSX")
+ #elif defined(_WIN32)
+-#	include <SDL.h>
++#	include <SDL2/SDL.h>
+ #	include <GL/GLU.h>
+ #	include <glext.h>
+ #elif defined(HL_CONSOLE)
+diff --git a/libs/sdl/sdl.c b/libs/sdl/sdl.c
+index dc5c331..89f1c0c 100644
+--- a/libs/sdl/sdl.c
++++ b/libs/sdl/sdl.c
+@@ -3,8 +3,8 @@
+ #include <hl.h>
+
+ #if defined(_WIN32) || defined(__ANDROID__)
+-#	include <SDL.h>
+-#	include <SDL_syswm.h>
++#	include <SDL2/SDL.h>
++#	include <SDL2/SDL_syswm.h>
+ #else
+ #	include <SDL2/SDL.h>
+ #endif

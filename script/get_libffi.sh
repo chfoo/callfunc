@@ -25,14 +25,61 @@ function install {
     sudo make install
 }
 
+function install_vcpkg_windows {
+    local PLATFORM=$1
+
+    pushd $VCPKG_INSTALLATION_ROOT
+
+    if [[ ! -f "./vcpkg.exe" ]]; then
+        echo "vcpkg.exe not found in this directory"
+        exit 1
+    fi
+
+    git remote add driver1998 https://github.com/driver1998/vcpkg/
+    git fetch driver1998 libffi
+    git checkout driver1998/libffi
+
+    case $PLATFORM in
+        windows-x86)
+            ./vcpkg.exe install libffi:x86-windows
+            ;;
+        windows-x86-64)
+            ./vcpkg.exe install libffi:x64-windows
+            ;;
+    esac
+
+    git checkout origin master
+    popd
+}
+
 COMMAND=$1
+PLATFORM=$2
 
 case $COMMAND in
     download)
-        download
+        case $PLATFORM in
+            linux-x86-64|macos)
+                download
+                ;;
+            *)
+                echo "Uknown platform $PLATFORM"
+                exit 2
+                ;;
+        esac
         ;;
     install)
-        install
+        case $PLATFORM in
+            linux-x86-64|macos)
+                install
+                ;;
+            windows-x86|windows-x86-64)
+                install_vcpkg_windows $PLATFORM
+                ;;
+            *)
+                echo "Uknown platform $PLATFORM"
+                exit 2
+                ;;
+        esac
         ;;
     *)
         echo "Unknown command $COMMAND"
