@@ -3,12 +3,7 @@
 set -e -x
 SCRIPT_DIR="$PWD"/$(dirname "$BASH_SOURCE")
 
-function download {
-    local PLATFORM=$1
-    mkdir -p "$SCRIPT_DIR/../out"
-    cd "$SCRIPT_DIR/../out"
-    source "$SCRIPT_DIR/curl_opts.sh"
-
+function get_vars {
     case $PLATFORM in
         windows-x86)
             URL="https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/8.1.0/threads-posix/dwarf/i686-8.1.0-release-posix-dwarf-rt_v6-rev0.7z/download"
@@ -27,6 +22,15 @@ function download {
             exit 2
             ;;
     esac
+}
+
+function download {
+    local PLATFORM=$1
+    mkdir -p "$SCRIPT_DIR/../out"
+    cd "$SCRIPT_DIR/../out"
+    source "$SCRIPT_DIR/curl_opts.sh"
+
+    get_vars $PLATFORM
 
     curl $CURL_OPTS -o $FILE "$URL"
 
@@ -57,9 +61,10 @@ function install {
 
 
 function install_windows {
-    mkdir -p /c/mingw-w64
+    get_vars $PLATFORM
 
-    cp -R -p -P -v $RELEASE_NAME /c/mingw-w64/
+    mkdir -p /c/mingw-w64
+    cp -R -p -P -v "$RELEASE_NAME" /c/mingw-w64/
 }
 
 COMMAND=$1
