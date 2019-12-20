@@ -97,10 +97,12 @@ jobs:
           IMAGE: 'windows-2019'
           PLATFORM: windows-x86
           ARCH_NAME: x86
-        windows64:
-          IMAGE: 'windows-2019'
-          PLATFORM: windows-x86-64
-          ARCH_NAME: x64
+          MINGW_W64: c:/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/i686-w64-mingw32-gcc.exe
+        # windows64:
+        #   IMAGE: 'windows-2019'
+        #   PLATFORM: windows-x86-64
+        #   ARCH_NAME: x64
+        #   MINGW_W64: c:/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/x86_64-w64-mingw32-gcc.exe
     pool:
       vmImage: $(IMAGE)
     steps:
@@ -110,26 +112,30 @@ jobs:
       - bash: script/get_neko_bin.sh install $(PLATFORM)
       - bash: script/get_haxe_bin.sh download $(PLATFORM)
       - bash: script/get_haxe_bin.sh install $(PLATFORM)
-      - task: Cache@2
-        inputs:
-          key: vcpkg | $(PLATFORM) | v1
-          path: c:/vcpkg/
-          cacheHitVar: CACHE_RESTORED_vcpkg
-      - script: vcpkg.exe install
-          fmt:$(ARCH_NAME)-windows
-          openal-soft:$(ARCH_NAME)-windows
-          sdl2:$(ARCH_NAME)-windows
-          mbedtls:$(ARCH_NAME)-windows
-          libuv:$(ARCH_NAME)-windows
-          cairo:$(ARCH_NAME)-windows
-        condition: and(
-            succeeded(),
-            ne(variables.CACHE_RESTORED_vcpkg, 'true')
-          )
-      - bash: script/get_hashlink.sh download $(PLATFORM)
-      - bash: patch -p1 --binary < "../../script/hashlink_sdl.patch"
-        workingDirectory: out/hashlink/
-      - bash: script/get_hashlink.sh install $(PLATFORM)
+      - bash: script/get_mingw_bin.sh download $(PLATFORM)
+      - bash: script/get_mingw_bin.sh install $(PLATFORM)
+      # - task: Cache@2
+      #   inputs:
+      #     key: vcpkg | $(PLATFORM) | v1
+      #     path: c:/vcpkg/
+      #     cacheHitVar: CACHE_RESTORED_vcpkg
+      # - script: vcpkg.exe install
+      #     fmt:$(ARCH_NAME)-windows
+      #     openal-soft:$(ARCH_NAME)-windows
+      #     sdl2:$(ARCH_NAME)-windows
+      #     mbedtls:$(ARCH_NAME)-windows
+      #     libuv:$(ARCH_NAME)-windows
+      #     cairo:$(ARCH_NAME)-windows
+      #   condition: and(
+      #       succeeded(),
+      #       ne(variables.CACHE_RESTORED_vcpkg, 'true')
+      #     )
+      # - bash: script/get_hashlink.sh download $(PLATFORM)
+      # - bash: patch -p1 --binary < "../../script/hashlink_sdl.patch"
+      #   workingDirectory: out/hashlink/
+      # - bash: script/get_hashlink.sh install $(PLATFORM)
+      - bash: script/get_hashlink_bin.sh download $(PLATFORM)
+      - bash: script/get_hashlink_bin.sh install $(PLATFORM)
 
       # Haxe dependencies
       - script: haxelib --always --quiet install hxcpp
@@ -150,7 +156,7 @@ jobs:
       - script: haxe hxml/test.hl.hxml -D callfunc_unit_test
       - script: haxe hxml/test.hl.c.hxml -D callfunc_unit_test
       ## TODO:
-      # - script: gcc -g -o out/hl/test/test out/hl/test/test.c -I out/hl/test/ -std=c11 -lhl -lm out/callfunc/callfunc.hdll
+      - script: $(MINGW_W64) -g -o out/hl/test/test out/hl/test/test.c -I out/hl/test/ -std=c11 -lhl -lm out/callfunc/callfunc.hdll
       - script: haxe hxml/example_curl.cpp.hxml -D callfunc_unit_test
       - script: haxe hxml/example_curl.hl.hxml -D callfunc_unit_test
       - script: haxe hxml/example_random.cpp.hxml -D callfunc_unit_test
@@ -159,7 +165,7 @@ jobs:
       # Run unit tests
       - script: ./out/cpp/TestAll-debug
       - script: hl out/hl/test.hl
-      # - script: out/hl/test/test
+      - script: out/hl/test/test
 
       # Build release library
       - bash: mkdir -p out-release/

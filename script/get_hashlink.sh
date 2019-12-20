@@ -36,7 +36,7 @@ function install_msbuild {
             ;;
     esac
 
-    $MSBUILD hl.sln \
+    "$MSBUILD" hl.sln \
         /p:Configuration=Release \
         /p:Platform=$BUILD_PLATFORM \
         /p:WindowsTargetPlatformVersion=10.0 \
