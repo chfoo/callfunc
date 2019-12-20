@@ -85,15 +85,9 @@ function install_unix {
 }
 
 function install_windows {
-    if [ -d "/mnt/c" ]; then
-        C_DIR="/mnt/c"
-    else
-        C_DIR="/c"
-    fi
+    cp -R -p -P neko /c/
 
-    cp -R -p -P neko $C_DIR/
-
-    NEKOPATH=$C_DIR/neko/
+    NEKOPATH=c:/neko/
 
     echo "##vso[task.setvariable variable=NEKOPATH;]$NEKOPATH"
     echo "##vso[task.prependpath]$NEKOPATH"

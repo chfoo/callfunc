@@ -42,21 +42,14 @@ function install_msbuild {
         /p:WindowsTargetPlatformVersion=10.0 \
         /p:PlatformToolset=v142
 
-    mkdir -p $C_DIR/hl
-    cp -R -p -P Release/* $C_DIR/hl/
+    mkdir -p /c/hl
+    cp -R -p -P Release/* /c/hl/
 
-    echo "##vso[task.prependpath]$C_DIR/hl/"
+    echo "##vso[task.prependpath]c:/hl/"
 }
 
 function find_msbuild {
-    if [ -d "/mnt/c" ]; then
-        C_DIR="/mnt/c"
-    else
-        C_DIR="/c"
-    fi
-
-    MSBUILD=`"$C_DIR/Program Files (x86)/Microsoft Visual Studio/Installer"/vswhere.exe -latest -requires Microsoft.Component.MSBuild -find "MSBuild/**/Bin/MSBuild.exe"`
-    MSBUILD=${MSBUILD:2} # cut off the "c:"
+    MSBUILD=`"c:/Program Files (x86)/Microsoft Visual Studio/Installer"/vswhere.exe -latest -requires Microsoft.Component.MSBuild -find "MSBuild/**/Bin/MSBuild.exe"`
     MSBUILD=${MSBUILD//\\/\//} # replace backslash to forward slash
 }
 

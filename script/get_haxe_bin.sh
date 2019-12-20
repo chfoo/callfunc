@@ -67,20 +67,14 @@ function install_unix {
 }
 
 function install_windows {
-    if [ -d "/mnt/c" ]; then
-        C_DIR="/mnt/c"
-    else
-        C_DIR="/c"
-    fi
+    cp -R -p -P haxe /c/
 
-    cp -R -p -P haxe $C_DIR/
-
-    HAXE_STD_PATH="$C_DIR/haxe/std"
+    HAXE_STD_PATH="c:/haxe/std"
     echo "##vso[task.setvariable variable=HAXE_STD_PATH;]$HAXE_STD_PATH"
-    echo "##vso[task.prependpath]$C_DIR/haxe/"
+    echo "##vso[task.prependpath]c:/haxe/"
 
-    mkdir -p $C_DIR/c/haxe/lib
-    haxelib setup $C_DIR/c/haxe/lib
+    mkdir -p /c/haxe/lib
+    haxelib setup c:/haxe/lib
 }
 
 COMMAND=$1
