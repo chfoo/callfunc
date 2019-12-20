@@ -70,8 +70,8 @@ function install_windows {
     mkdir -p /c/haxe
     cp -R -p -P -v * /c/haxe/
 
-    HAXE_STD_PATH="c:/haxe/std"
-    echo "##vso[task.setvariable variable=HAXE_STD_PATH;]$HAXE_STD_PATH"
+    HAXE_STD_PATH="c:/haxe/std/"
+    echo "##vso[task.setvariable variable=HAXE_STD_PATH]$HAXE_STD_PATH"
     echo "##vso[task.prependpath]c:/haxe/"
 
     mkdir -p /c/haxe/lib
