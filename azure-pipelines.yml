@@ -156,7 +156,7 @@ jobs:
         workingDirectory: out/
       - script: cmake --build . --config Debug
         workingDirectory: out/
-      - script: echo "##vso[task.prependpath]out/callfunc/Debug/"
+      - script: echo "##vso[task.prependpath]$Build_SourcesDirectory/out/callfunc/Debug/"
       - script: haxe hxml/test.cpp.hxml -D callfunc_unit_test
       - script: haxe hxml/test.hl.hxml -D callfunc_unit_test
       - script: haxe hxml/test.hl.c.hxml -D callfunc_unit_test
@@ -201,8 +201,9 @@ jobs:
       - script: script/get_emsdk.sh
       - script: script/get_chromedriver.sh
       - script: python3 -m pip install selenium --user
-      - script: cmake ../test/c/examplelib/ -DCMAKE_BUILD_TYPE=Debug
-        workingDirectory: out/
+      - script: mkdir -p out/examplelib/
+      - script: cmake ../../test/c/examplelib/ -DCMAKE_BUILD_TYPE=Debug
+        workingDirectory: out/examplelib/
       - script: source out/emsdk/emsdk_env.sh && script/test_build_emscripten_module.sh
       - script: haxelib --always --quiet install test.hxml
       - script: haxe hxml/test.js.hxml
