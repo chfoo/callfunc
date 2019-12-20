@@ -101,11 +101,17 @@ jobs:
           PLATFORM: windows-x86
           ARCH_NAME: x86
           EXTRA_CMAKE_ARGS: -A Win32
+          HXCPP_BUILD_DEFINES: >-
+            -D callfunc_libffi_msbuild_include="$env:VCPKG_INSTALLATION_ROOT"/installed/x86-windows/include/
+            -D callfunc_libffi_msbuild_lib="$env:VCPKG_INSTALLATION_ROOT"/installed/x86-windows/lib/
         # windows64:
         #   IMAGE: 'windows-2019'
         #   PLATFORM: windows-x86-64
         #   ARCH_NAME: x64
         #   EXTRA_CMAKE_ARGS: -A x64
+        #   HXCPP_BUILD_DEFINES: >-
+        #     -D callfunc_libffi_msbuild_include="$env:VCPKG_INSTALLATION_ROOT"/installed/x64-windows/include/
+        #     -D callfunc_libffi_msbuild_lib="$env:VCPKG_INSTALLATION_ROOT"/installed/x64-windows/lib/
     pool:
       vmImage: $(IMAGE)
     variables:
@@ -157,7 +163,8 @@ jobs:
       - script: cmake --build . --config Debug
         workingDirectory: out/
       - bash: echo "##vso[task.prependpath]$Build_SourcesDirectory/out/callfunc/Debug/"
-      - script: haxe hxml/test.cpp.hxml -D callfunc_unit_test
+      - powershell: haxe hxml/test.cpp.hxml -D callfunc_unit_test
+          $(HXCPP_BUILD_DEFINES)
       - script: haxe hxml/test.hl.hxml -D callfunc_unit_test
       - script: haxe hxml/test.hl.c.hxml -D callfunc_unit_test
       - script: >-
@@ -166,9 +173,11 @@ jobs:
           -std=c11
           -Lc:/hl/ -llibhl -municode -limagehlp -ldbghelp
           out/callfunc/Debug/callfunc.hdll
-      - script: haxe hxml/example_curl.cpp.hxml -D callfunc_unit_test
+      - powershell: haxe hxml/example_curl.cpp.hxml -D callfunc_unit_test
+          $(HXCPP_BUILD_DEFINES)
       - script: haxe hxml/example_curl.hl.hxml -D callfunc_unit_test
-      - script: haxe hxml/example_random.cpp.hxml -D callfunc_unit_test
+      - powershell: haxe hxml/example_random.cpp.hxml -D callfunc_unit_test
+          $(HXCPP_BUILD_DEFINES)
       - script: haxe hxml/example_random.hl.hxml -D callfunc_unit_test
 
       # Run unit tests
