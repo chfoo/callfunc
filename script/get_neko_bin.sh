@@ -45,7 +45,7 @@ function download {
 }
 
 function install {
-    PLATFORM=$1
+    local PLATFORM=$1
     cd "$SCRIPT_DIR/../out/neko"
 
     case $PLATFORM in
@@ -55,7 +55,7 @@ function install {
 }
 
 function install_unix {
-    PLATFORM=$1
+    local PLATFORM=$1
 
     for name in neko nekoc nekoml nekotools; do
         sudo cp -p -P $name /usr/local/bin/
@@ -85,16 +85,15 @@ function install_unix {
 }
 
 function install_windows {
-    if [ -d "/mnt/c" ]; then
-        C_DIR="/mnt/c"
-    else
-        C_DIR="/c"
-    fi
+    mkdir -p /c/neko
+    cp -R -p -P -v * /c/neko/
 
-    cp -R -p -P neko $C_DIR/c/
+    NEKOPATH=c:/neko/
 
-    export NEKOPATH=/c/neko/
-    export PATH=$NEKOPATH:$PATH
+    set +x
+    echo "##vso[task.setvariable variable=NEKOPATH]$NEKOPATH"
+    echo "##vso[task.prependpath]$NEKOPATH"
+    set -x
 }
 
 COMMAND=$1

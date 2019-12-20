@@ -1,5 +1,7 @@
+# So much time spent on trying to get this file to work......
+
 jobs:
-  - job: everything
+  - job: nix
     strategy:
       matrix:
         linux:
@@ -12,6 +14,7 @@ jobs:
           PLATFORM: macos
           LIBFFI_LIB_PATH: "/usr/local/lib/libffi.dylib"
           LIBFFI_INCLUDE_PATH: "/usr/local/include/"
+
     pool:
       vmImage: $(IMAGE)
     steps:
@@ -54,14 +57,17 @@ jobs:
 
       # Build unit tests
       - script: mkdir -p out/
-      - script: cmake .. -DCMAKE_BUILD_TYPE=Debug -DLIBFFI_INCLUDE_PATH:PATH=$(LIBFFI_INCLUDE_PATH) -DLIBFFI_LIB_PATH:FILEPATH=$(LIBFFI_LIB_PATH)
+      - script: cmake .. -DCMAKE_BUILD_TYPE=Debug
+          -DLIBFFI_INCLUDE_PATH:PATH=$(LIBFFI_INCLUDE_PATH)
+          -DLIBFFI_LIB_PATH:FILEPATH=$(LIBFFI_LIB_PATH)
         workingDirectory: out/
       - script: cmake --build . --config Debug
         workingDirectory: out/
       - script: haxe hxml/test.cpp.hxml -D callfunc_unit_test
       - script: haxe hxml/test.hl.hxml -D callfunc_unit_test
       - script: haxe hxml/test.hl.c.hxml -D callfunc_unit_test
-      - script: gcc -g -o out/hl/test/test out/hl/test/test.c -I out/hl/test/ -std=c11 -lhl -lm out/callfunc/callfunc.hdll
+      - script: gcc -g -o out/hl/test/test out/hl/test/test.c
+          -I out/hl/test/ -std=c11 -lhl -lm out/callfunc/callfunc.hdll
       - script: haxe hxml/example_curl.cpp.hxml -D callfunc_unit_test
       - script: haxe hxml/example_curl.hl.hxml -D callfunc_unit_test
       - script: haxe hxml/example_random.cpp.hxml -D callfunc_unit_test
@@ -69,8 +75,145 @@ jobs:
 
       # Run unit tests
       - script: source script/export_ld_path.sh && ./out/cpp/TestAll-debug
+        continueOnError: true
       - script: source script/export_ld_path.sh && hl out/hl/test.hl
+        continueOnError: true
       - script: source script/export_ld_path.sh && out/hl/test/test
+        continueOnError: true
+
+      # Build release library
+      - script: mkdir -p out-release/
+      - script: cmake .. -DCMAKE_BUILD_TYPE=Release
+          -DLIBFFI_INCLUDE_PATH:PATH=$(LIBFFI_INCLUDE_PATH)
+          -DLIBFFI_LIB_PATH:FILEPATH=$(LIBFFI_LIB_PATH)
+        workingDirectory: out-release/
+      - script: cmake --build . --config Release
+        workingDirectory: out-release/
+
+      # Publish releases
+      - publish: out-release/callfunc/callfunc.hdll
+        artifact: callfunc-hdll-$(PLATFORM)
+      - publish: $(LIBFFI_LIB_PATH)
+        artifact: libffi-$(PLATFORM)
+
+  - job: windows
+    strategy:
+      matrix:
+        windows:
+          IMAGE: 'windows-2019'
+          PLATFORM: windows-x86
+          ARCH_NAME: x86
+          EXTRA_CMAKE_ARGS: -A Win32
+          HXCPP_BUILD_DEFINES: >-
+            -D callfunc_libffi_msbuild_include="$env:VCPKG_INSTALLATION_ROOT"/installed/x86-windows/include/
+            -D callfunc_libffi_msbuild_lib="$env:VCPKG_INSTALLATION_ROOT"/installed/x86-windows/lib/
+        # windows64:
+        #   IMAGE: 'windows-2019'
+        #   PLATFORM: windows-x86-64
+        #   ARCH_NAME: x64
+        #   EXTRA_CMAKE_ARGS: -A x64
+        #   HXCPP_BUILD_DEFINES: >-
+        #     -D callfunc_libffi_msbuild_include="$env:VCPKG_INSTALLATION_ROOT"/installed/x64-windows/include/
+        #     -D callfunc_libffi_msbuild_lib="$env:VCPKG_INSTALLATION_ROOT"/installed/x64-windows/lib/
+    pool:
+      vmImage: $(IMAGE)
+    variables:
+      CMAKE_ARGS: >-
+        -DHL_INCLUDE_PATH:PATH=c:/hl/include
+        -DHL_LIB_PATH:FILEPATH=c:\hl\libhl.lib
+        -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT"\scripts\buildsystems\vcpkg.cmake
+    steps:
+      # Runtimes and dependencies
+      - task: Cache@2
+        inputs:
+          key: vcpkg | $(PLATFORM) | v1
+          path: c:/vcpkg/
+          cacheHitVar: CACHE_RESTORED_vcpkg
+      - bash: script/get_libffi.sh install $(PLATFORM)
+        condition: and(
+            succeeded(),
+            ne(variables.CACHE_RESTORED_vcpkg, 'true')
+          )
+      - bash: script/get_neko_bin.sh download $(PLATFORM)
+      - bash: script/get_neko_bin.sh install $(PLATFORM)
+      - bash: script/get_haxe_bin.sh download $(PLATFORM)
+      - bash: script/get_haxe_bin.sh install $(PLATFORM)
+      - bash: script/get_mingw_bin.sh download $(PLATFORM)
+      - bash: script/get_mingw_bin.sh install $(PLATFORM)
+      # - script: vcpkg.exe install
+      #     fmt:$(ARCH_NAME)-windows
+      #     openal-soft:$(ARCH_NAME)-windows
+      #     sdl2:$(ARCH_NAME)-windows
+      #     mbedtls:$(ARCH_NAME)-windows
+      #     libuv:$(ARCH_NAME)-windows
+      #     cairo:$(ARCH_NAME)-windows
+      #   condition: and(
+      #       succeeded(),
+      #       ne(variables.CACHE_RESTORED_vcpkg, 'true')
+      #     )
+      # - bash: script/get_hashlink.sh download $(PLATFORM)
+      # - bash: patch -p1 --binary < "../../script/hashlink_sdl.patch"
+      #   workingDirectory: out/hashlink/
+      # - bash: script/get_hashlink.sh install $(PLATFORM)
+      - bash: script/get_hashlink_bin.sh download $(PLATFORM)
+      - bash: script/get_hashlink_bin.sh install $(PLATFORM)
+
+      # Haxe dependencies
+      - powershell: haxelib --always --quiet install hxcpp
+      - powershell: haxelib --always --quiet install hashlink
+      - powershell: haxelib --always --quiet install test.hxml
+
+      # Unit test files
+      - powershell: vcpkg.exe install cairo:$(ARCH_NAME)-windows
+
+      # Build unit tests
+      - bash: mkdir -p out/
+      - powershell: cmake .. -DCMAKE_BUILD_TYPE=Debug $(CMAKE_ARGS) $(EXTRA_CMAKE_ARGS)
+        workingDirectory: out/
+      - powershell: cmake --build . --config Debug
+        workingDirectory: out/
+      - bash: |
+          echo "##vso[task.prependpath]$BUILD_SOURCESDIRECTORY/out/callfunc/Debug/"
+          echo "##vso[task.prependpath]$BUILD_SOURCESDIRECTORY/out/examplelib/Debug/"
+          echo "##vso[task.prependpath]$VCPKG_INSTALLATION_ROOT/installed/$(ARCH_NAME)-windows/bin/"
+      - bash: 'echo "Path is now: $PATH"'
+      - powershell: haxe hxml/test.cpp.hxml -D callfunc_unit_test
+          $(HXCPP_BUILD_DEFINES)
+      - powershell: haxe hxml/test.hl.hxml -D callfunc_unit_test
+      - powershell: haxe hxml/test.hl.c.hxml -D callfunc_unit_test
+      - powershell: >-
+          gcc.exe -g -o out/hl/test/test out/hl/test/test.c
+          -Ic:/hl/include -I out/hl/test/
+          -std=c11
+          -Lc:/hl/ -llibhl -municode -limagehlp -ldbghelp
+          out/callfunc/Debug/callfunc.hdll
+      - powershell: haxe hxml/example_curl.cpp.hxml -D callfunc_unit_test
+          $(HXCPP_BUILD_DEFINES)
+      - powershell: haxe hxml/example_curl.hl.hxml -D callfunc_unit_test
+      - powershell: haxe hxml/example_random.cpp.hxml -D callfunc_unit_test
+          $(HXCPP_BUILD_DEFINES)
+      - powershell: haxe hxml/example_random.hl.hxml -D callfunc_unit_test
+
+      # Run unit tests
+      - powershell: ./out/cpp/TestAll-debug
+        continueOnError: true
+      - powershell: hl out/hl/test.hl
+        continueOnError: true
+      - powershell: out/hl/test/test
+        continueOnError: true
+
+      # Build release library
+      - bash: mkdir -p out-release/
+      - powershell: cmake .. -DCMAKE_BUILD_TYPE=Release $(CMAKE_ARGS) $(EXTRA_CMAKE_ARGS)
+        workingDirectory: out-release/
+      - script: cmake --build . --config Release
+        workingDirectory: out-release/
+
+      # Publish releases
+      - publish: out-release/callfunc/Release/callfunc.hdll
+        artifact: callfunc-hdll-$(PLATFORM)
+      - publish: out-release/callfunc/Release/libffi.dll
+        artifact: libffi-$(PLATFORM)
 
   - job: emscripten_test
     pool:
@@ -84,8 +227,9 @@ jobs:
       - script: script/get_emsdk.sh
       - script: script/get_chromedriver.sh
       - script: python3 -m pip install selenium --user
-      - script: cmake .. -DCMAKE_BUILD_TYPE=Debug
-        workingDirectory: out/
+      - script: mkdir -p out/examplelib/
+      - script: cmake ../../test/c/examplelib/ -DCMAKE_BUILD_TYPE=Debug
+        workingDirectory: out/examplelib/
       - script: source out/emsdk/emsdk_env.sh && script/test_build_emscripten_module.sh
       - script: haxelib --always --quiet install test.hxml
       - script: haxe hxml/test.js.hxml

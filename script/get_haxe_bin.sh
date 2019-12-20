@@ -6,7 +6,7 @@ SCRIPT_DIR="$PWD"/$(dirname "$BASH_SOURCE")
 # install paths based on https://github.com/travis-ci/travis-build/blob/2d9a70b31e1669c4126994561a395a08b65ad737/lib/travis/build/script/haxe.rb
 
 function download {
-    PLATFORM=$1
+    local PLATFORM=$1
     mkdir -p "$SCRIPT_DIR/../out"
     cd "$SCRIPT_DIR/../out"
     source "$SCRIPT_DIR/curl_opts.sh"
@@ -43,7 +43,7 @@ function download {
 }
 
 function install {
-    PLATFORM=$1
+    local PLATFORM=$1
     cd "$SCRIPT_DIR/../out/haxe"
 
     case $PLATFORM in
@@ -67,19 +67,17 @@ function install_unix {
 }
 
 function install_windows {
-    if [ -d "/mnt/c" ]; then
-        C_DIR="/mnt/c"
-    else
-        C_DIR="/c"
-    fi
+    mkdir -p /c/haxe
+    cp -R -p -P -v * /c/haxe/
 
-    cp -R -p -P haxe $C_DIR/c/
+    HAXE_STD_PATH="c:/haxe/std/"
+    set +x
+    echo "##vso[task.setvariable variable=HAXE_STD_PATH]$HAXE_STD_PATH"
+    echo "##vso[task.prependpath]c:/haxe/"
+    set -x
 
-    export HAXE_STD_PATH=$C_DIR/c/haxe/std
-    export PATH=$C_DIR/c/haxe/:$PATH
-
-    mkdir -p $C_DIR/c/haxe/lib
-    haxelib setup $C_DIR/c/haxe/lib
+    mkdir -p /c/haxe/lib
+    /c/haxe/haxelib setup c:/haxe/lib
 }
 
 COMMAND=$1

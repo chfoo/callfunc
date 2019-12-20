@@ -7,6 +7,7 @@
         <compilerflag value="/I${this_dir}/src/c/" if="windows" unless="haxelib:callfunc"/>
         <compilerflag value="-I${haxelib:callfunc}/src/c/" if="haxelib:callfunc" unless="windows" />
         <compilerflag value="/I${haxelib:callfunc}/src/c/" if="haxelib:callfunc windows" />
+        <compilerflag value="/I${callfunc_libffi_msbuild_include}" if="callfunc_libffi_msbuild_include" />
         <file name="${this_dir}/src/c/callfunc_hxcpp.cpp">
             <depend name="${this_dir}/src/c/callfunc.h"/>
             <depend name="${this_dir}/src/c/callfunc.c"/>
@@ -16,5 +17,6 @@
         <lib name="-lffi" unless="windows"/>
         <lib base="libffi" if="windows"/>
         <flag value="-L/usr/local/lib" if="callfunc_unit_test" />
+        <flag value="-libpath:${callfunc_libffi_msbuild_lib}" if="callfunc_libffi_msbuild_lib" />
     </target>
 </xml>

@@ -394,12 +394,12 @@ You will need CMake. The following commands assumes a Bash shell.
 
 To optionally specify the include and linker paths, add (adjust paths as needed):
 
-* For libffi: `-DLIBFFI_INCLUDE_PATH:PATH=/usr/local/include/ -DLIBFFI_LIB_PATH:FILEPATH=/usr/local/lib/libffi.so`. For vcpkg, please add the toolchain define as reported at the end of libffi install. (Use `vcpkg integrate install` to get the path.)
+* For libffi: `-DLIBFFI_INCLUDE_PATH:PATH=/usr/local/include/ -DLIBFFI_LIB_PATH:FILEPATH=/usr/local/lib/libffi.so`. For vcpkg, please add the toolchain define (`CMAKE_TOOLCHAIN_FILE`) as reported at the end of libffi install. (Use `vcpkg integrate install` to get the path.)
 * For HashLink: `-DHL_INCLUDE_PATH:PATH=/usr/local/include/ -DHL_LIB_PATH:FILEPATH=/usr/local/lib/libhl.so`.
 
 On Linux and MacOS, this will be a makefile which you can run `make`.
 
-On Windows, add `-A win32` for 32-bit. CMake will generate a Visual Studio project file or nmake config by default. Consult documentation on CMake generators for other configs such as Mingw-w64.
+On Windows, add `-A Win32` for 32-bit. CMake will generate a Visual Studio project file or nmake config by default. Consult documentation on CMake generators for other configs such as Mingw-w64.
 
 The generated library will be in `out/callfunc/`. Please see section "Library paths" for running without installing the libraries.
 
@@ -427,6 +427,10 @@ On Linux, the `LD_LIBRARY_PATH` environment can be provided to the executable. F
 On MacOS, use `DYLD_LIBRARY_PATH` instead of `LD_LIBRARY_PATH`.
 
 When using the precompiled libraries provided by this project on recent versions of MacOS, they need to be manually approved to load by deleting the quarantine attribute such as `xattr -d com.apple.quarantine callfunc.hdll`.
+
+### Troubleshooting compilation
+
+If you have trouble getting the library or dependencies built, check the .travis.yml and azure-pipelines.yml files.
 
 ## Javascript
 
