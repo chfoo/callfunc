@@ -147,7 +147,7 @@ jobs:
       - powershell: cmake .. -DCMAKE_BUILD_TYPE=Debug
           -DHL_INCLUDE_PATH:PATH=../hashlink/src/
           -DHL_LIB_PATH:FILEPATH=c:\hl\libhl.lib
-          -DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake
+          -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT"\scripts\buildsystems\vcpkg.cmake
         workingDirectory: out/
       - script: cmake --build . --config Debug
         workingDirectory: out/
@@ -172,7 +172,7 @@ jobs:
       - powershell: cmake .. -DCMAKE_BUILD_TYPE=Release
           -DHL_INCLUDE_PATH:PATH=../hashlink/src/
           -DHL_LIB_PATH:FILEPATH=c:\hl\libhl.lib
-          -DCMAKE_TOOLCHAIN_FILE=$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake
+          -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT"\scripts\buildsystems\vcpkg.cmake
         workingDirectory: out-release/
       - script: cmake --build . --config Release
         workingDirectory: out-release/
