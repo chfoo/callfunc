@@ -65,6 +65,8 @@ function install_windows {
 
     mkdir -p /c/mingw-w64
     cp -R -p -P -v "$RELEASE_NAME" /c/mingw-w64/
+
+    echo "##vso[task.prependpath]c:/mingw-w64/$RELEASE_NAME/$ARCHIVE_DIR/bin"
 }
 
 COMMAND=$1

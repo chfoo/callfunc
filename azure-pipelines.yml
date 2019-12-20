@@ -64,7 +64,8 @@ jobs:
       - script: haxe hxml/test.cpp.hxml -D callfunc_unit_test
       - script: haxe hxml/test.hl.hxml -D callfunc_unit_test
       - script: haxe hxml/test.hl.c.hxml -D callfunc_unit_test
-      - script: gcc -g -o out/hl/test/test out/hl/test/test.c -I out/hl/test/ -std=c11 -lhl -lm out/callfunc/callfunc.hdll
+      - script: gcc -g -o out/hl/test/test out/hl/test/test.c
+          -I out/hl/test/ -std=c11 -lhl -lm out/callfunc/callfunc.hdll
       - script: haxe hxml/example_curl.cpp.hxml -D callfunc_unit_test
       - script: haxe hxml/example_curl.hl.hxml -D callfunc_unit_test
       - script: haxe hxml/example_random.cpp.hxml -D callfunc_unit_test
@@ -97,14 +98,19 @@ jobs:
           IMAGE: 'windows-2019'
           PLATFORM: windows-x86
           ARCH_NAME: x86
-          MINGW_W64: c:/mingw-w64/i686-8.1.0-posix-dwarf-rt_v6-rev0/mingw32/bin/i686-w64-mingw32-gcc.exe
+          EXTRA_CMAKE_ARGS: -A Win32
         # windows64:
         #   IMAGE: 'windows-2019'
         #   PLATFORM: windows-x86-64
         #   ARCH_NAME: x64
-        #   MINGW_W64: c:/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/x86_64-w64-mingw32-gcc.exe
+        #   EXTRA_CMAKE_ARGS: -A x64
     pool:
       vmImage: $(IMAGE)
+    variables:
+      CMAKE_ARGS: >
+        -DHL_INCLUDE_PATH:PATH=../hashlink/src/
+        -DHL_LIB_PATH:FILEPATH=c:\hl\libhl.lib
+        -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT"\scripts\buildsystems\vcpkg.cmake
     steps:
       # Runtimes and dependencies
       - bash: script/get_libffi.sh install $(PLATFORM)
@@ -144,10 +150,7 @@ jobs:
 
       # Build unit tests
       - bash: mkdir -p out/
-      - powershell: cmake .. -DCMAKE_BUILD_TYPE=Debug
-          -DHL_INCLUDE_PATH:PATH=../hashlink/src/
-          -DHL_LIB_PATH:FILEPATH=c:\hl\libhl.lib
-          -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT"\scripts\buildsystems\vcpkg.cmake
+      - powershell: cmake .. -DCMAKE_BUILD_TYPE=Debug $(CMAKE_ARGS) $(EXTRA_CMAKE_ARGS)
         workingDirectory: out/
       - script: cmake --build . --config Debug
         workingDirectory: out/
@@ -155,8 +158,12 @@ jobs:
       - script: haxe hxml/test.cpp.hxml -D callfunc_unit_test
       - script: haxe hxml/test.hl.hxml -D callfunc_unit_test
       - script: haxe hxml/test.hl.c.hxml -D callfunc_unit_test
-      ## TODO:
-      - script: $(MINGW_W64) -g -o out/hl/test/test out/hl/test/test.c -I out/hl/test/ -std=c11 -lhl -lm out/callfunc/callfunc.hdll
+      - script: >
+          gcc.exe -g -o out/hl/test/test out/hl/test/test.c
+          -Ic:/hl/include -I out/hl/test/
+          -std=c11
+          -Lc:/hl/ -llibhl -municode -limagehlp -ldbghelp
+          out/callfunc/Debug/callfunc.hdll
       - script: haxe hxml/example_curl.cpp.hxml -D callfunc_unit_test
       - script: haxe hxml/example_curl.hl.hxml -D callfunc_unit_test
       - script: haxe hxml/example_random.cpp.hxml -D callfunc_unit_test
@@ -169,10 +176,7 @@ jobs:
 
       # Build release library
       - bash: mkdir -p out-release/
-      - powershell: cmake .. -DCMAKE_BUILD_TYPE=Release
-          -DHL_INCLUDE_PATH:PATH=../hashlink/src/
-          -DHL_LIB_PATH:FILEPATH=c:\hl\libhl.lib
-          -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT"\scripts\buildsystems\vcpkg.cmake
+      - powershell: cmake .. -DCMAKE_BUILD_TYPE=Release $(CMAKE_ARGS) $(EXTRA_CMAKE_ARGS)
         workingDirectory: out-release/
       - script: cmake --build . --config Release
         workingDirectory: out-release/
