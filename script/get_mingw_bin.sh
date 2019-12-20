@@ -45,8 +45,10 @@ function install {
     cd "$SCRIPT_DIR/../out/"
 
     case $PLATFORM in
-        windows-x86|windows-x86-64) install_windows ;;
-        case *)
+        windows-x86|windows-x86-64)
+            install_windows
+            ;;
+        *)
             echo "Unknown platform $PLATFORM"
             exit 2
             ;;
