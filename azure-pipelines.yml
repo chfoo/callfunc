@@ -1,3 +1,5 @@
+# So much time spent on trying to get this file to work......
+
 jobs:
   - job: nix
     strategy:
@@ -107,7 +109,7 @@ jobs:
     pool:
       vmImage: $(IMAGE)
     variables:
-      CMAKE_ARGS: >
+      CMAKE_ARGS: >-
         -DHL_INCLUDE_PATH:PATH=../hashlink/src/
         -DHL_LIB_PATH:FILEPATH=c:\hl\libhl.lib
         -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT"\scripts\buildsystems\vcpkg.cmake
@@ -158,7 +160,7 @@ jobs:
       - script: haxe hxml/test.cpp.hxml -D callfunc_unit_test
       - script: haxe hxml/test.hl.hxml -D callfunc_unit_test
       - script: haxe hxml/test.hl.c.hxml -D callfunc_unit_test
-      - script: >
+      - script: >-
           gcc.exe -g -o out/hl/test/test out/hl/test/test.c
           -Ic:/hl/include -I out/hl/test/
           -std=c11
