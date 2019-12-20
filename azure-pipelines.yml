@@ -156,7 +156,7 @@ jobs:
         workingDirectory: out/
       - script: cmake --build . --config Debug
         workingDirectory: out/
-      - script: echo "##vso[task.prependpath]$Build_SourcesDirectory/out/callfunc/Debug/"
+      - bash: echo "##vso[task.prependpath]$Build_SourcesDirectory/out/callfunc/Debug/"
       - script: haxe hxml/test.cpp.hxml -D callfunc_unit_test
       - script: haxe hxml/test.hl.hxml -D callfunc_unit_test
       - script: haxe hxml/test.hl.c.hxml -D callfunc_unit_test
