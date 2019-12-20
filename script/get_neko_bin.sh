@@ -85,7 +85,8 @@ function install_unix {
 }
 
 function install_windows {
-    cp -R -p -P -v neko /c/
+    mkdir -p /c/neko
+    cp -R -p -P -v * /c/neko/
 
     NEKOPATH=c:/neko/
 
