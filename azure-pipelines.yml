@@ -110,7 +110,7 @@ jobs:
       vmImage: $(IMAGE)
     variables:
       CMAKE_ARGS: >-
-        -DHL_INCLUDE_PATH:PATH=../hashlink/src/
+        -DHL_INCLUDE_PATH:PATH=c:/hl/include
         -DHL_LIB_PATH:FILEPATH=c:\hl\libhl.lib
         -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT"\scripts\buildsystems\vcpkg.cmake
     steps:
@@ -201,7 +201,7 @@ jobs:
       - script: script/get_emsdk.sh
       - script: script/get_chromedriver.sh
       - script: python3 -m pip install selenium --user
-      - script: cmake .. -DCMAKE_BUILD_TYPE=Debug
+      - script: cmake ../test/c/examplelib/ -DCMAKE_BUILD_TYPE=Debug
         workingDirectory: out/
       - script: source out/emsdk/emsdk_env.sh && script/test_build_emscripten_module.sh
       - script: haxelib --always --quiet install test.hxml
