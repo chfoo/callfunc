@@ -36,7 +36,7 @@ function download {
         *.7z) 7z x "$FILE" ;;
     esac
 
-    mdkir -p "$RELEASE_NAME"
+    mkdir -p "$RELEASE_NAME"
     mv "$ARCHIVE_DIR" "$RELEASE_NAME"/
 }
 
