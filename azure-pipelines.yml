@@ -152,22 +152,22 @@ jobs:
       - bash: script/get_hashlink_bin.sh install $(PLATFORM)
 
       # Haxe dependencies
-      - script: haxelib --always --quiet install hxcpp
-      - script: haxelib --always --quiet install hashlink
-      - script: haxelib --always --quiet install test.hxml
+      - powershell: haxelib --always --quiet install hxcpp
+      - powershell: haxelib --always --quiet install hashlink
+      - powershell: haxelib --always --quiet install test.hxml
 
       # Build unit tests
       - bash: mkdir -p out/
       - powershell: cmake .. -DCMAKE_BUILD_TYPE=Debug $(CMAKE_ARGS) $(EXTRA_CMAKE_ARGS)
         workingDirectory: out/
-      - script: cmake --build . --config Debug
+      - powershell: cmake --build . --config Debug
         workingDirectory: out/
       - bash: echo "##vso[task.prependpath]$Build_SourcesDirectory/out/callfunc/Debug/"
       - powershell: haxe hxml/test.cpp.hxml -D callfunc_unit_test
           $(HXCPP_BUILD_DEFINES)
-      - script: haxe hxml/test.hl.hxml -D callfunc_unit_test
-      - script: haxe hxml/test.hl.c.hxml -D callfunc_unit_test
-      - script: >-
+      - powershell: haxe hxml/test.hl.hxml -D callfunc_unit_test
+      - powershell: haxe hxml/test.hl.c.hxml -D callfunc_unit_test
+      - powershell: >-
           gcc.exe -g -o out/hl/test/test out/hl/test/test.c
           -Ic:/hl/include -I out/hl/test/
           -std=c11
@@ -175,15 +175,15 @@ jobs:
           out/callfunc/Debug/callfunc.hdll
       - powershell: haxe hxml/example_curl.cpp.hxml -D callfunc_unit_test
           $(HXCPP_BUILD_DEFINES)
-      - script: haxe hxml/example_curl.hl.hxml -D callfunc_unit_test
+      - powershell: haxe hxml/example_curl.hl.hxml -D callfunc_unit_test
       - powershell: haxe hxml/example_random.cpp.hxml -D callfunc_unit_test
           $(HXCPP_BUILD_DEFINES)
-      - script: haxe hxml/example_random.hl.hxml -D callfunc_unit_test
+      - powershell: haxe hxml/example_random.hl.hxml -D callfunc_unit_test
 
       # Run unit tests
-      - script: ./out/cpp/TestAll-debug
-      - script: hl out/hl/test.hl
-      - script: out/hl/test/test
+      - powershell: ./out/cpp/TestAll-debug
+      - powershell: hl out/hl/test.hl
+      - powershell: out/hl/test/test
 
       # Build release library
       - bash: mkdir -p out-release/
