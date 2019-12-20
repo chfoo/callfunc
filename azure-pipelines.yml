@@ -75,8 +75,11 @@ jobs:
 
       # Run unit tests
       - script: source script/export_ld_path.sh && ./out/cpp/TestAll-debug
+        continueOnError: true
       - script: source script/export_ld_path.sh && hl out/hl/test.hl
+        continueOnError: true
       - script: source script/export_ld_path.sh && out/hl/test/test
+        continueOnError: true
 
       # Build release library
       - script: mkdir -p out-release/
@@ -162,7 +165,9 @@ jobs:
         workingDirectory: out/
       - powershell: cmake --build . --config Debug
         workingDirectory: out/
-      - bash: echo "##vso[task.prependpath]$Build_SourcesDirectory/out/callfunc/Debug/"
+      - bash: |
+          echo "##vso[task.prependpath]$Build_SourcesDirectory/out/callfunc/Debug/"
+          echo "##vso[task.prependpath]$VCPKG_INSTALLATION_ROOT/installed/$(ARCH_NAME)-windows/bin/"
       - powershell: haxe hxml/test.cpp.hxml -D callfunc_unit_test
           $(HXCPP_BUILD_DEFINES)
       - powershell: haxe hxml/test.hl.hxml -D callfunc_unit_test
@@ -182,8 +187,11 @@ jobs:
 
       # Run unit tests
       - powershell: ./out/cpp/TestAll-debug
+        continueOnError: true
       - powershell: hl out/hl/test.hl
+        continueOnError: true
       - powershell: out/hl/test/test
+        continueOnError: true
 
       # Build release library
       - bash: mkdir -p out-release/
