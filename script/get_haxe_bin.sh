@@ -74,7 +74,7 @@ function install_windows {
     echo "##vso[task.prependpath]c:/haxe/"
 
     mkdir -p /c/haxe/lib
-    haxelib setup c:/haxe/lib
+    /c/haxe/haxelib setup c:/haxe/lib
 }
 
 COMMAND=$1
