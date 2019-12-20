@@ -43,7 +43,7 @@ function install_msbuild {
         /p:PlatformToolset=v142
 
     mkdir -p /c/hl
-    cp -R -p -P Release/* /c/hl/
+    cp -R -p -P -v Release/* /c/hl/
 
     echo "##vso[task.prependpath]c:/hl/"
 }
