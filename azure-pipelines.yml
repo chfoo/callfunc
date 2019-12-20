@@ -105,7 +105,6 @@ jobs:
       vmImage: $(IMAGE)
     steps:
       # Runtimes and dependencies
-      - bash: script/get_libffi.sh download $(PLATFORM)
       - bash: script/get_libffi.sh install $(PLATFORM)
       - bash: script/get_neko_bin.sh download $(PLATFORM)
       - bash: script/get_neko_bin.sh install $(PLATFORM)
