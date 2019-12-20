@@ -17,7 +17,7 @@ index dc5c331..89f1c0c 100644
 +++ b/libs/sdl/sdl.c
 @@ -3,8 +3,8 @@
  #include <hl.h>
-
+ 
  #if defined(_WIN32) || defined(__ANDROID__)
 -#	include <SDL.h>
 -#	include <SDL_syswm.h>

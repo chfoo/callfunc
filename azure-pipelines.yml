@@ -110,6 +110,11 @@ jobs:
       - bash: script/get_neko_bin.sh install $(PLATFORM)
       - bash: script/get_haxe_bin.sh download $(PLATFORM)
       - bash: script/get_haxe_bin.sh install $(PLATFORM)
+      - task: Cache@2
+        inputs:
+          key: vcpkg | $(PLATFORM) | v1
+          path: c:/vcpkg/
+          cacheHitVar: CACHE_RESTORED_vcpkg
       - script: vcpkg.exe install
           fmt:$(ARCH_NAME)-windows
           openal-soft:$(ARCH_NAME)-windows
@@ -117,6 +122,10 @@ jobs:
           mbedtls:$(ARCH_NAME)-windows
           libuv:$(ARCH_NAME)-windows
           cairo:$(ARCH_NAME)-windows
+        condition: and(
+            succeeded(),
+            ne(variables.CACHE_RESTORED_vcpkg, 'true')
+          )
       - bash: script/get_hashlink.sh download $(PLATFORM)
       - bash: patch -p1 --binary < "../../script/hashlink_sdl.patch"
         workingDirectory: out/hashlink/
