@@ -90,8 +90,10 @@ function install_windows {
 
     NEKOPATH=c:/neko/
 
+    set +x
     echo "##vso[task.setvariable variable=NEKOPATH]$NEKOPATH"
     echo "##vso[task.prependpath]$NEKOPATH"
+    set -x
 }
 
 COMMAND=$1

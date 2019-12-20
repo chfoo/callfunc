@@ -45,7 +45,9 @@ function install_msbuild {
     mkdir -p /c/hl
     cp -R -p -P -v Release/* /c/hl/
 
+    set +x
     echo "##vso[task.prependpath]c:/hl/"
+    set -x
 }
 
 function find_msbuild {

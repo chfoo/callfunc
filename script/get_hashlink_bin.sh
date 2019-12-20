@@ -63,7 +63,9 @@ function install_windows {
     mkdir -p /c/hl
     cp -R -p -P -v * /c/hl/
 
+    set +x
     echo "##vso[task.prependpath]c:/hl/"
+    set -x
 }
 
 COMMAND=$1
