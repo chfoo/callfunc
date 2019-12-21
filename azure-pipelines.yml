@@ -126,10 +126,14 @@ jobs:
       # Runtimes and dependencies
       - task: Cache@2
         inputs:
-          key: vcpkg | $(PLATFORM) | v1
+          key: vcpkg | $(PLATFORM) | v2
           path: c:/vcpkg/
           cacheHitVar: CACHE_RESTORED_vcpkg
       - bash: script/get_libffi.sh install $(PLATFORM)
+        condition: and(
+            succeeded(),
+            ne(variables.CACHE_RESTORED_vcpkg, 'true')
+          )
       - bash: script/get_neko_bin.sh download $(PLATFORM)
       - bash: script/get_neko_bin.sh install $(PLATFORM)
       - bash: script/get_haxe_bin.sh download $(PLATFORM)
