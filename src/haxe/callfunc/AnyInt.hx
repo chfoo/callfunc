@@ -20,7 +20,8 @@ abstract AnyInt(Dynamic) from Dynamic to Dynamic {
      * Converts value to `Int`.
      *
      * If the value is `Int`, it is returned unchanged. If it is `Int64`, the
-     * value will be converted or truncated with data loss.
+     * value will be converted or truncated with data loss. This is performed
+     * by taking the "low" value.
      *
      * @param checkTruncation If `true`, an exception will be thrown if the
      *     value cannot be converted with data loss.
@@ -33,10 +34,15 @@ abstract AnyInt(Dynamic) from Dynamic to Dynamic {
         if (Std.is(value, Int)) {
             return value;
         } else if (Int64.is(value)) {
+            final int64Value:Int64 = value;
             if (!checkTruncation) {
-                return (value:Int64).low;
+                return int64Value.low;
             } else {
-                return Int64.toInt((value:Int64));
+                if (int64Value.high == 0) {
+                    return int64Value.low;
+                } else {
+                    throw 'Data loss when truncated: ${int64Value.high}_${int64Value.low}';
+                }
             }
         } else {
             throw WRONG_TYPE_ERROR;

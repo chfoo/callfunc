@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* Fixed: `AnyInt.toInt(true)` now properly checks for truncation. (It formerly used `Int64.toInt` which does numerical conversion, rather then truncation.)
+
 ## 0.5.0 (2019-12-06)
 
 * Fixed: Strings not properly null-terminated when passing them to the Callfunc C library.
