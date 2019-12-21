@@ -15,10 +15,10 @@ before_install:
   - sudo apt-get install -y libcairo2 libpng-dev libjpeg-turbo8-dev libturbojpeg libvorbis-dev libopenal-dev libsdl2-dev libmbedtls-dev libuv1-dev
   - sudo ln -s /usr/lib/x86_64-linux-gnu/libturbojpeg.so.0.1.0 /usr/lib/x86_64-linux-gnu/libturbojpeg.so
   # dependencies
-  - script/get_libffi.sh download
-  - script/get_libffi.sh install
-  - script/get_hashlink.sh download
-  - script/get_hashlink.sh install
+  - script/get_libffi.sh download linux-x86-64
+  - script/get_libffi.sh install linux-x86-64
+  - script/get_hashlink.sh download linux-x86-64
+  - script/get_hashlink.sh install linux-x86-64
 
 install:
   - yes | haxelib install hxcpp
