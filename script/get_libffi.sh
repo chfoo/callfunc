@@ -37,7 +37,8 @@ function install_vcpkg_windows {
 
     git remote add driver1998 https://github.com/driver1998/vcpkg/
     git fetch driver1998 libffi
-    git checkout driver1998/libffi
+    # Commit is on branch driver1998/libffi
+    git checkout 65893deb834da0b347f8bde7e571ac54441df9ff
 
     case $PLATFORM in
         windows-x86)
