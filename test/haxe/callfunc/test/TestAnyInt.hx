@@ -8,11 +8,23 @@ class TestAnyInt extends Test {
     public function testToInt() {
         var a:AnyInt = 123;
         var b:AnyInt = Int64.make(123, 456);
+        var b2:AnyInt = Int64.make(0, 456);
         var c:AnyInt = "abc";
 
         Assert.equals(123, a.toInt());
         Assert.equals(456, b.toInt());
-        Assert.raises(b.toInt.bind(true), String);
+
+        // FIXME: bind on abstract on Hashlink broken?
+        // Assert.raises(b.toInt.bind(true), String);
+
+        try {
+            b.toInt(true);
+            Assert.fail();
+        } catch (error:String) {
+            Assert.pass();
+        }
+
+        Assert.equals(456, b2.toInt(true));
 
         Assert.raises(() -> c.toInt(), String);
     }
