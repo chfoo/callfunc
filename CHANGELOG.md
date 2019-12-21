@@ -3,6 +3,7 @@
 ## Unreleased
 
 * Fixed: `AnyInt.toInt(true)` now properly checks for truncation. (It formerly used `Int64.toInt` which does numerical conversion, rather then truncation.)
+* Fixed: removed `trace()` in `Pointer.getString()`.
 
 ## 0.5.0 (2019-12-06)
 

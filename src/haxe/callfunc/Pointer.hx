@@ -128,7 +128,6 @@ class Pointer {
 
         final length = StringUtil.getPointerNullTerminator(this, encoding);
         final view = getDataView(length);
-        trace(length, encoding);
 
         return view.getStringFull(0, length, encoding);
     }
