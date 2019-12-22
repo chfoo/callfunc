@@ -75,6 +75,8 @@ struct CallfuncFunction {
     struct CallfuncLibrary * library;
     ffi_cif cif;
     void(*function)(void);
+    void ** arg_pointers;
+    bool * arg_pointer_allocated;
 };
 
 struct CallfuncStructType {

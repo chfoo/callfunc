@@ -162,6 +162,8 @@ void callfunc_del_function(struct CallfuncFunction * function) {
         function->cif.arg_types = NULL;
     }
 
+    free(function->arg_pointers);
+    free(function->arg_pointer_allocated);
     free(function);
 }
 
@@ -194,6 +196,11 @@ CallfuncError callfunc_function_define(
             num_fixed_params, num_params, return_type, parameter_types);
     }
 
+    function->arg_pointers = (void **) malloc(num_params * sizeof(void *));
+    function->arg_pointer_allocated = (bool *) malloc(num_params * sizeof(bool));
+    _CALLFUNC_ABORT_NULL(function->arg_pointers);
+    _CALLFUNC_ABORT_NULL(function->arg_pointer_allocated);
+
     return _check_ffi_status(status);
 }
 
@@ -211,11 +218,6 @@ void callfunc_function_call(struct CallfuncFunction * function,
     buffer_index += 4;
     buffer_index += CALLFUNC_MAX_RETURN_SIZE;
 
-    void ** arg_pointers = (void **) malloc(num_args * sizeof(void *));
-    bool * arg_pointer_allocated = (bool *) malloc(num_args * sizeof(bool *));
-    _CALLFUNC_ABORT_NULL(arg_pointers);
-    _CALLFUNC_ABORT_NULL(arg_pointer_allocated);
-
     for (size_t index = 0; index < num_args; index++) {
         assert(buffer_index < buffer_length);
         ffi_type * arg_type = function->cif.arg_types[index];
@@ -226,12 +228,12 @@ void callfunc_function_call(struct CallfuncFunction * function,
                     argument_buffer, buffer_index, arg_type->size);
 
             arg_size = sizeof(void *);
-            arg_pointers[index] = copied_struct;
-            arg_pointer_allocated[index] = true;
+            function->arg_pointers[index] = copied_struct;
+            function->arg_pointer_allocated[index] = true;
         } else {
             arg_size = arg_type->size;
-            arg_pointers[index] = &argument_buffer[buffer_index];
-            arg_pointer_allocated[index] = false;
+            function->arg_pointers[index] = &argument_buffer[buffer_index];
+            function->arg_pointer_allocated[index] = false;
         }
 
         buffer_index += arg_size;
@@ -240,27 +242,25 @@ void callfunc_function_call(struct CallfuncFunction * function,
     assert(buffer_index == buffer_length);
 
     if (function->cif.rtype->type == FFI_TYPE_STRUCT) {
+        // API user is responsible for freeing this buffer
         void * return_buffer = malloc(function->cif.rtype->size);
 
         ffi_call(&function->cif, function->function,
-            return_buffer, arg_pointers);
+            return_buffer, function->arg_pointers);
 
         memcpy(&argument_buffer[4], &return_buffer, sizeof(void *));
     } else {
         ffi_call(&function->cif, function->function,
-            &return_value, arg_pointers);
+            &return_value, function->arg_pointers);
 
         memcpy(&argument_buffer[4], &return_value, sizeof(ffi_arg));
     }
 
     for (size_t index = 0; index < num_args; index++) {
-        if (arg_pointer_allocated[index]) {
-            free(arg_pointers[index]);
+        if (function->arg_pointer_allocated[index]) {
+            free(function->arg_pointers[index]);
         }
     }
-
-    free(arg_pointers);
-    free(arg_pointer_allocated);
 }
 
 struct CallfuncStructType * callfunc_new_struct_type() {
