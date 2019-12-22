@@ -178,8 +178,10 @@ jobs:
           echo "##vso[task.prependpath]$VCPKG_INSTALLATION_ROOT/installed/$(ARCH_NAME)-windows/bin/"
       - powershell: |
           echo "Path:"
+          echo $env.path
           [System.Environment]::GetEnvironmentVariable("PATH", "User")
           [System.Environment]::GetEnvironmentVariable("PATH", "Machine")
+          [System.Environment]::GetEnvironmentVariable("PATH", "Process")
       - powershell: haxe hxml/test.cpp.hxml -D callfunc_unit_test
           $(HXCPP_BUILD_DEFINES)
       - powershell: haxe hxml/test.hl.hxml -D callfunc_unit_test
