@@ -4,9 +4,9 @@
     "license": "MIT",
     "tags": ["native"],
     "description": "Foreign function interface library using libffi",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "classPath": "src/haxe",
-    "releasenote": "Overhauled API. (See changelog)",
+    "releasenote": "Fix mistake trace. (See changelog)",
     "contributors": ["chfoo"],
     "dependencies": {
         "safety": "",

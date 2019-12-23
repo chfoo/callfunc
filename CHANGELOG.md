@@ -1,8 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.5.1 (2019-12-23)
 
-* Fixed: removed `trace()` in `Pointer.getString()`.
+* Fixed: removed mistakenly added `trace()` in `Pointer.getString()`.
 
 ## 0.5.0 (2019-12-06)
 
