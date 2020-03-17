@@ -1,8 +1,8 @@
 # Callfunc
 
-Callfunc is a foreign function interface library for Haxe. It uses [libffi](https://github.com/libffi/libffi) for the actual native function execution. The use of libffi allows loading and calling arbitrary functions from dynamic libraries at runtime. If you have used Python, this is the same concept of the ctypes module.
+Callfunc is a foreign function interface (FFI) library for Haxe. It uses [libffi](https://github.com/libffi/libffi) for the actual native function execution. The use of libffi allows loading and calling arbitrary functions from dynamic libraries at runtime. If you have used Python, this is the same concept of the ctypes module.
 
-As described in the libffi readme, there will be some costs to performance. As well, Callfunc can only operate on the [ABI](https://en.wikipedia.org/wiki/Application_binary_interface) of a library. There will be a loss of safety such as C enums and typedefs. Regardless, Callfunc can be useful for easily calling native libraries or creating a library binding without having to maintain various wrappers for different targets.
+There will be performance costs when using this library due to serialization and libffi overhead (described in a later section). As well, Callfunc can only operate on the [ABI](https://en.wikipedia.org/wiki/Application_binary_interface) of a library. There will be a loss of safety such as C enums and typedefs. Regardless, Callfunc can be useful for easily calling native libraries or creating a library binding without having to maintain various wrappers for different targets.
 
 Supported targets:
 
@@ -416,7 +416,11 @@ For example:
 
 Adjust the paths or create new sections for your platform/compiler as needed.
 
-### Library paths
+### Troubleshooting compilation
+
+If you have trouble getting the library or dependencies built, check the .travis.yml and azure-pipelines.yml files.
+
+## Library paths
 
 When running applications without installation on MacOS or Linux, the paths for searching for libraries is more restricted than Windows. That is, the system, by default, will not load libraries in the current directory or in the directory of the application.
 
@@ -428,13 +432,25 @@ On MacOS, use `DYLD_LIBRARY_PATH` instead of `LD_LIBRARY_PATH`.
 
 When using the precompiled libraries provided by this project on recent versions of MacOS, they need to be manually approved to load by deleting the quarantine attribute such as `xattr -d com.apple.quarantine callfunc.hdll`.
 
-### Troubleshooting compilation
+### Library installation
 
-If you have trouble getting the library or dependencies built, check the .travis.yml and azure-pipelines.yml files.
+If you want to manually install the libraries on Windows, the libraries can be placed in a folder that is in the PATH environment variable. For example, if you have HashLink executable's folder in PATH, you can put the hdll there too.
+
+If you want to manually install the libraries on Linux/MacOS, it is standard practice to put the libraries in `/usr/local/lib`. (However, this may not work in all Linux distributions.) For more information, see the man page for dlopen(3).
+
+When distributing your application, you should be using a software toolkit to produce an installer, a package for a distro's package manager, or a self-contained executable.
 
 ## Javascript
 
 There are no C libraries needed to be compiled for the Javascript target.
+
+## Performance
+
+This library comprises of two layers, the Haxe code and the libffi C wrapper library. Because Haxe representations of data types is not straightforward, the values passed between the layers are serialized and deserialized.
+
+This serialization process involves creating an array for to hold all the function arguments and the return value, and packing the values into array. The C wrapper will create pointers to the array for libffi to process into the stack. libffi executes the function and the return value is serialized to the array. Finally, the Haxe code will deserialize the return value.
+
+Whether to use Callfunc depends on many factors including performance, maintainability, and ease-of-use.
 
 ## Tests
 
