@@ -26,7 +26,7 @@ def main():
     chrome_options = Options()
     chrome_options.add_argument("--headless")
 
-    driver_path = os.path.join(root_dir, 'out', 'chromedriver')
+    driver_path = os.environ.get("CHROMEWEBDRIVER", os.path.join(root_dir, 'out', 'chromedriver'))
     browser = webdriver.Chrome(options=chrome_options, executable_path=driver_path)
     test_result = False
 
