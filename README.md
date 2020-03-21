@@ -344,19 +344,14 @@ Pre-compiled libraries are included in the releases, but if you need to compile 
 
 vcpkg can be used to build libffi.
 
-At the time of writing, a [patched port](https://github.com/microsoft/vcpkg/pull/6119) of libffi for 3.3-rc0 is not in the main repository yet. The instructions below describe how to include it.
-
 If you are compiling to HashLink, note that the HashLink binary from the website is 32-bit, so you will need to build and use 32-bit versions of the libraries.
 
 1. Download and set up vcpkg
 2. Install the Visual Studio C++ workload SDK in Tools, Get Tool and Features.
-3. Add the fork: `git remote add driver1998 https://github.com/driver1998/vcpkg/`
-4. Update: `git fetch driver1998 libffi`
-5. Switch to a temporary branch: `git checkout driver1998/libffi`
-6. Run `./vcpkg install libffi:x64-windows libffi:x86-windows`
-7. Run `./vcpkg export --zip libffi:x64-windows libffi:x86-windows`
+3. Run `./vcpkg install libffi:x64-windows libffi:x86-windows`
+4. (Optional) Run `./vcpkg export --zip libffi:x64-windows libffi:x86-windows`
 
-The header and library will be in `include` and `bin` directories of the `x64-windows` (64-bit) and `x86-windows` (32-bit).
+Any exported zips are in the vcpkg folder. All installed packages are in the `installed` folder. The header and library will be in `include` and `bin` directories of the `x64-windows` (64-bit) and `x86-windows` (32-bit).
 
 For the CPP target, you may optionally use MinGW-w64 if you have trouble compiling with the Haxe HXCPP and VS toolchain. In your `~/.hxcpp_config.xml` or `%HOMEPATH%/.hxcpp_config.xml`, under the "VARS" section, set `mingw` to `1`.
 
@@ -436,7 +431,7 @@ When using the precompiled libraries provided by this project on recent versions
 
 If you want to manually install the libraries on Windows, the libraries can be placed in a folder that is in the PATH environment variable. For example, if you have HashLink executable's folder in PATH, you can put the hdll there too.
 
-If you want to manually install the libraries on Linux/MacOS, it is standard practice to put the libraries in `/usr/local/lib`. (However, this may not work in all Linux distributions.) For more information, see the man page for dlopen(3).
+If you want to manually install the libraries on Linux/MacOS, it is standard practice to put the libraries in `/usr/local/lib`. (However, this may not work in all Linux distributions. You can put a symlink in `/usr/lib` to the hdll using `ln -i -s /usr/local/lib/callfunc.hdll /usr/lib/`) For more information, see the man page for dlopen(3).
 
 When distributing your application, you should be using a software toolkit to produce an installer, a package for a distro's package manager, or a self-contained executable.
 
