@@ -10,7 +10,7 @@ jobs:
           LIBFFI_LIB_PATH: "/usr/local/lib/libffi.so"
           LIBFFI_INCLUDE_PATH: "/usr/local/include/"
         mac:
-          IMAGE: 'macos-10.13'
+          IMAGE: 'macos-10.14'
           PLATFORM: macos
           LIBFFI_LIB_PATH: "/usr/local/lib/libffi.dylib"
           LIBFFI_INCLUDE_PATH: "/usr/local/include/"
