@@ -44,7 +44,6 @@ function install_vcpkg_windows {
             ;;
     esac
 
-    git checkout -
     popd
 }
 
