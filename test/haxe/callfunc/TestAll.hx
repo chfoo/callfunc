@@ -13,7 +13,10 @@ class TestAll {
         #if sys
         if (Sys.args().indexOf("--test-performance") >= 0) {
             trace("PerformanceTest");
-            PerformanceTest.run();
+            PerformanceTest.main();
+        }
+        if (Sys.args().indexOf("--list-data-types") >= 0) {
+            ListDataTypes.main();
         }
         #end
 

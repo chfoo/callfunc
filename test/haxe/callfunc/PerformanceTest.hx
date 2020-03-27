@@ -3,7 +3,7 @@ package callfunc;
 import callfunc.test.TestExamplelib;
 
 class PerformanceTest {
-    public static function run() {
+    public static function main() {
         var ffi = Callfunc.instance();
         var library = ffi.openLibrary(TestExamplelib.getLibName());
 

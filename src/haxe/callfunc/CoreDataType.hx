@@ -65,4 +65,29 @@ abstract CoreDataType(Int) {
         }
     }
 
+    public static function getName(value:CoreDataType):String {
+        switch value {
+            case Void: return "Void";
+            case UInt8: return "UInt8";
+            case SInt8: return "SInt8";
+            case UInt16: return "UInt16";
+            case SInt16: return "SInt16";
+            case UInt32: return "UInt32";
+            case SInt32: return "SInt32";
+            case UInt64: return "UInt64";
+            case SInt64: return "SInt64";
+            case Float: return "Float";
+            case Double: return "Double";
+            case UChar: return "UChar";
+            case SChar: return "SChar";
+            case UShort: return "UShort";
+            case SShort: return "SShort";
+            case SInt: return "SInt";
+            case UInt: return "UInt";
+            case SLong: return "SLong";
+            case ULong: return "ULong";
+            case Pointer: return "Pointer";
+            case Struct: return "Struct";
+        }
+    }
 }
