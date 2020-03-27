@@ -12,7 +12,7 @@ using haxe.Int64;
 // We have a Curl class that helps define types for some type safety.
 class CurlExample {
     public static function main() {
-        var callfunc = Callfunc.instance();
+        var ffi = Callfunc.instance();
         var curl = new Curl();
 
         curl.globalInit(Curl.GLOBAL_ALL);
@@ -22,7 +22,7 @@ class CurlExample {
 
         // Allocate a ASCII/UTF8 string on the heap, pass the pointer,
         // libcurl will copy the string, then we free it.
-        var url = callfunc.allocString("https://haxe.org/");
+        var url = ffi.allocString("https://haxe.org/");
         curl.easySetOptPointer(handle, Curl.OPT_URL, url);
         url.free();
 

@@ -9,9 +9,9 @@ using callfunc.core.DataTypeTools;
 
 class TestCallfunc extends utest.Test {
     public function testAllocFree() {
-        var callfunc = Callfunc.instance();
+        var ffi = Callfunc.instance();
 
-        var pointer = callfunc.alloc(100);
+        var pointer = ffi.alloc(100);
 
         Assert.notNull(pointer);
         Assert.isFalse(pointer.isNull());
@@ -21,41 +21,41 @@ class TestCallfunc extends utest.Test {
     }
 
     public function testSizeOf() {
-        var callfunc = Callfunc.instance();
+        var ffi = Callfunc.instance();
 
-        Assert.equals(1, callfunc.sizeOf(DataType.UInt8));
-        Assert.equals(1, callfunc.sizeOf(DataType.SInt8));
-        Assert.equals(2, callfunc.sizeOf(DataType.UInt16));
-        Assert.equals(2, callfunc.sizeOf(DataType.SInt16));
-        Assert.equals(4, callfunc.sizeOf(DataType.UInt32));
-        Assert.equals(4, callfunc.sizeOf(DataType.SInt32));
-        Assert.equals(8, callfunc.sizeOf(DataType.UInt64));
-        Assert.equals(8, callfunc.sizeOf(DataType.SInt64));
-        Assert.equals(4, callfunc.sizeOf(DataType.Float));
-        Assert.equals(8, callfunc.sizeOf(DataType.Double));
-        Assert.isTrue(callfunc.sizeOf(DataType.UChar) >= 1);
-        Assert.isTrue(callfunc.sizeOf(DataType.SChar) >= 1);
-        Assert.isTrue(callfunc.sizeOf(DataType.UShort) >= 2);
-        Assert.isTrue(callfunc.sizeOf(DataType.SShort) >= 2);
-        Assert.isTrue(callfunc.sizeOf(DataType.SInt) >= 2);
-        Assert.isTrue(callfunc.sizeOf(DataType.UInt) >= 2);
-        Assert.isTrue(callfunc.sizeOf(DataType.SLong) >= 4);
-        Assert.isTrue(callfunc.sizeOf(DataType.ULong) >= 4);
-        Assert.isTrue(callfunc.sizeOf(DataType.Pointer) >= 2);
-        Assert.isTrue(callfunc.sizeOf(DataType.LongDouble) >= 0);
-        Assert.isTrue(callfunc.sizeOf(DataType.ComplexFloat) >= 0);
-        Assert.isTrue(callfunc.sizeOf(DataType.ComplexDouble) >= 0);
-        Assert.isTrue(callfunc.sizeOf(DataType.ComplexLongDouble) >= 0);
-        Assert.isTrue(callfunc.sizeOf(DataType.Size) >= 0);
-        Assert.isTrue(callfunc.sizeOf(DataType.PtrDiff) >= 0);
-        Assert.isTrue(callfunc.sizeOf(DataType.WChar) >= 0);
+        Assert.equals(1, ffi.sizeOf(DataType.UInt8));
+        Assert.equals(1, ffi.sizeOf(DataType.SInt8));
+        Assert.equals(2, ffi.sizeOf(DataType.UInt16));
+        Assert.equals(2, ffi.sizeOf(DataType.SInt16));
+        Assert.equals(4, ffi.sizeOf(DataType.UInt32));
+        Assert.equals(4, ffi.sizeOf(DataType.SInt32));
+        Assert.equals(8, ffi.sizeOf(DataType.UInt64));
+        Assert.equals(8, ffi.sizeOf(DataType.SInt64));
+        Assert.equals(4, ffi.sizeOf(DataType.Float));
+        Assert.equals(8, ffi.sizeOf(DataType.Double));
+        Assert.isTrue(ffi.sizeOf(DataType.UChar) >= 1);
+        Assert.isTrue(ffi.sizeOf(DataType.SChar) >= 1);
+        Assert.isTrue(ffi.sizeOf(DataType.UShort) >= 2);
+        Assert.isTrue(ffi.sizeOf(DataType.SShort) >= 2);
+        Assert.isTrue(ffi.sizeOf(DataType.SInt) >= 2);
+        Assert.isTrue(ffi.sizeOf(DataType.UInt) >= 2);
+        Assert.isTrue(ffi.sizeOf(DataType.SLong) >= 4);
+        Assert.isTrue(ffi.sizeOf(DataType.ULong) >= 4);
+        Assert.isTrue(ffi.sizeOf(DataType.Pointer) >= 2);
+        Assert.isTrue(ffi.sizeOf(DataType.LongDouble) >= 0);
+        Assert.isTrue(ffi.sizeOf(DataType.ComplexFloat) >= 0);
+        Assert.isTrue(ffi.sizeOf(DataType.ComplexDouble) >= 0);
+        Assert.isTrue(ffi.sizeOf(DataType.ComplexLongDouble) >= 0);
+        Assert.isTrue(ffi.sizeOf(DataType.Size) >= 0);
+        Assert.isTrue(ffi.sizeOf(DataType.PtrDiff) >= 0);
+        Assert.isTrue(ffi.sizeOf(DataType.WChar) >= 0);
     }
 
     public function testGetPointer() {
-        var callfunc = Callfunc.instance();
+        var ffi = Callfunc.instance();
         var address = Int64.make(0, 0xcafe);
 
-        var pointer = callfunc.getPointer(address);
+        var pointer = ffi.getPointer(address);
 
         Assert.notNull(pointer);
         Assert.isFalse(pointer.isNull());
@@ -65,13 +65,13 @@ class TestCallfunc extends utest.Test {
 
     #if sys
     public function testBytesToPointer() {
-        var callfunc = Callfunc.instance();
+        var ffi = Callfunc.instance();
         var bytes = Bytes.alloc(8);
 
         bytes.setInt32(0, 12345678);
         bytes.setInt32(4, 87654321);
 
-        var pointer = callfunc.bytesToPointer(bytes);
+        var pointer = ffi.bytesToPointer(bytes);
 
         Assert.notNull(pointer);
         Assert.isFalse(pointer.isNull());
@@ -88,29 +88,29 @@ class TestCallfunc extends utest.Test {
     #end
 
     public function testToCoreDataType() {
-        var callfunc = Callfunc.instance();
+        var ffi = Callfunc.instance();
 
-        Assert.same(CoreDataType.SInt8, callfunc.context.toCoreDataType(DataType.SInt8));
-        Assert.same(CoreDataType.Double, callfunc.context.toCoreDataType(DataType.Double));
-        Assert.same(CoreDataType.Void, callfunc.context.toCoreDataType(DataType.Void));
+        Assert.same(CoreDataType.SInt8, ffi.context.toCoreDataType(DataType.SInt8));
+        Assert.same(CoreDataType.Double, ffi.context.toCoreDataType(DataType.Double));
+        Assert.same(CoreDataType.Void, ffi.context.toCoreDataType(DataType.Void));
 
-        Assert.notEquals(CoreDataType.UChar, callfunc.context.toCoreDataType(DataType.UChar, true));
-        Assert.notEquals(CoreDataType.SChar, callfunc.context.toCoreDataType(DataType.SChar, true));
-        Assert.notEquals(CoreDataType.SInt, callfunc.context.toCoreDataType(DataType.SInt, true));
-        Assert.notEquals(CoreDataType.UInt, callfunc.context.toCoreDataType(DataType.UInt, true));
-        Assert.notEquals(CoreDataType.SLong, callfunc.context.toCoreDataType(DataType.SLong, true));
-        Assert.notEquals(CoreDataType.ULong, callfunc.context.toCoreDataType(DataType.ULong, true));
+        Assert.notEquals(CoreDataType.UChar, ffi.context.toCoreDataType(DataType.UChar, true));
+        Assert.notEquals(CoreDataType.SChar, ffi.context.toCoreDataType(DataType.SChar, true));
+        Assert.notEquals(CoreDataType.SInt, ffi.context.toCoreDataType(DataType.SInt, true));
+        Assert.notEquals(CoreDataType.UInt, ffi.context.toCoreDataType(DataType.UInt, true));
+        Assert.notEquals(CoreDataType.SLong, ffi.context.toCoreDataType(DataType.SLong, true));
+        Assert.notEquals(CoreDataType.ULong, ffi.context.toCoreDataType(DataType.ULong, true));
 
         for (dataType in [DataType.Size, DataType.PtrDiff, DataType.WChar]) {
-            if (callfunc.sizeOf(dataType) > 0) {
-                callfunc.context.toCoreDataType(dataType);
+            if (ffi.sizeOf(dataType) > 0) {
+                ffi.context.toCoreDataType(dataType);
             }
         }
     }
 
     public function testCoreDataTypeTable() {
-        var callfunc = Callfunc.instance();
-        final table = new CoreDataTypeTable(callfunc.context);
+        var ffi = Callfunc.instance();
+        final table = new CoreDataTypeTable(ffi.context);
 
         Assert.same(CoreDataType.SInt8, table.toCoreDataType(DataType.SInt8));
         Assert.same(CoreDataType.Double, table.toCoreDataType(DataType.Double));
@@ -124,7 +124,7 @@ class TestCallfunc extends utest.Test {
         Assert.notEquals(CoreDataType.ULong, table.toCoreDataType(DataType.ULong, true));
 
         for (dataType in [DataType.Size, DataType.PtrDiff, DataType.WChar]) {
-            if (callfunc.sizeOf(dataType) > 0) {
+            if (ffi.sizeOf(dataType) > 0) {
                 table.toCoreDataType(dataType);
             }
         }

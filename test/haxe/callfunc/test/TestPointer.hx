@@ -6,9 +6,9 @@ import utest.Assert;
 
 class TestPointer extends utest.Test {
     public function testGetSet() {
-        var callfunc = Callfunc.instance();
+        var ffi = Callfunc.instance();
 
-        var pointer = callfunc.alloc(8);
+        var pointer = ffi.alloc(8);
 
         pointer.set(-1, DataType.SInt8);
         Assert.equals(-1, pointer.get(DataType.SInt8));
@@ -45,9 +45,9 @@ class TestPointer extends utest.Test {
     }
 
     public function testPointerArray() {
-        var callfunc = Callfunc.instance();
+        var ffi = Callfunc.instance();
 
-        var pointer = callfunc.alloc(16);
+        var pointer = ffi.alloc(16);
 
         pointer.arraySet(0, 1, DataType.SInt32);
         pointer.arraySet(1, 2, DataType.SInt32);
@@ -63,9 +63,9 @@ class TestPointer extends utest.Test {
     }
 
     public function testDefaultDataType() {
-        var callfunc = Callfunc.instance();
+        var ffi = Callfunc.instance();
 
-        var pointer = callfunc.alloc(8);
+        var pointer = ffi.alloc(8);
         pointer.dataType = DataType.SInt16;
 
         function clear () {
@@ -97,8 +97,8 @@ class TestPointer extends utest.Test {
     }
 
     public function testToDataView() {
-        var callfunc = Callfunc.instance();
-        var pointer = callfunc.alloc(8, true);
+        var ffi = Callfunc.instance();
+        var pointer = ffi.alloc(8, true);
 
         pointer.set(12345678, DataType.SInt32, 0);
         pointer.set(87654321, DataType.SInt32, 4);
@@ -119,8 +119,8 @@ class TestPointer extends utest.Test {
 
     #if sys
     public function testToBytes() {
-        var callfunc = Callfunc.instance();
-        var pointer = callfunc.alloc(8, true);
+        var ffi = Callfunc.instance();
+        var pointer = ffi.alloc(8, true);
 
         pointer.set(12345678, DataType.SInt32, 0);
         pointer.set(87654321, DataType.SInt32, 4);
@@ -141,8 +141,8 @@ class TestPointer extends utest.Test {
     #end
 
     public function testString() {
-        var callfunc = Callfunc.instance();
-        var pointer = callfunc.alloc(100, true);
+        var ffi = Callfunc.instance();
+        var pointer = ffi.alloc(100, true);
 
         pointer.setString("abcdé", true);
         Assert.equals("abcdé", pointer.getString());

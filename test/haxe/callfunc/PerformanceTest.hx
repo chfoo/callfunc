@@ -4,8 +4,8 @@ import callfunc.test.TestExamplelib;
 
 class PerformanceTest {
     public static function run() {
-        var callfunc = Callfunc.instance();
-        var library = callfunc.openLibrary(TestExamplelib.getLibName());
+        var ffi = Callfunc.instance();
+        var library = ffi.openLibrary(TestExamplelib.getLibName());
 
         library.define(
             "examplelib_ints",
@@ -18,7 +18,7 @@ class PerformanceTest {
             DataType.SInt32
         );
 
-        var outputPointer = callfunc.alloc(4);
+        var outputPointer = ffi.alloc(4);
         outputPointer.dataType = DataType.SInt32;
 
         for (x in 0...1000) {
@@ -33,7 +33,7 @@ class PerformanceTest {
             return a + b;
         }
 
-        var callbackHandle = callfunc.wrapCallback(
+        var callbackHandle = ffi.wrapCallback(
             callback,
             [DataType.SInt32, DataType.SInt32],
             DataType.SInt32);

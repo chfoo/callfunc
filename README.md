@@ -47,11 +47,17 @@ Likewise, **when converting to C data types, Haxe `Int` and `Int64` will be trun
 To load a library, obtain a `Callfunc` instance and call the `newLibrary` method:
 
 ```haxe
-var callfunc = Callfunc.instance();
-var library = callfunc.openLibrary("libexample.so");
+import callfunc.Callfunc;
+
+var ffi = Callfunc.instance();
+var library = ffi.openLibrary("libexample.so");
 ```
 
 The name of the library is passed to `dlopen()` or `LoadLibrary()` on Windows.
+
+* On Windows, library names are usually "example.dll".
+* On MacOS, library names are usually "libexample.123.dylib" where 123 is the ABI version.
+* On Linux, library names are usually "libexample.so.123" where 123 is the ABI version.
 
 ## Calling functions
 
@@ -146,8 +152,8 @@ Haxe:
 ```haxe
 library.s.define("do_something", [DataType.Pointer]);
 
-var size = callfunc.sizeOf(DataType.SInt32);
-var p = callfunc.alloc(size);
+var size = ffi.sizeOf(DataType.SInt32);
+var p = ffi.alloc(size);
 
 p.dataType = DataType.SInt32;
 
@@ -185,7 +191,7 @@ var bytes = pointer.getBytes(10);
 
 To convert from `Bytes`:
 ```haxe
-var pointer = callfunc.bytesToPointer(bytes);
+var pointer = ffi.bytesToPointer(bytes);
 ```
 
 However, for better portability between targets, the `DataView` interface (and `BytesDataView` implementation) is provided:
@@ -210,10 +216,10 @@ struct {
 };
 ```
 
-Call `callfunc.defineStruct()`:
+Call `ffi.defineStruct()`:
 
 ```haxe
-var structDef = callfunc.defineStruct(
+var structDef = ffi.defineStruct(
     [DataType.SInt, DataType.Pointer],
     ["a", "b"]
 );
@@ -222,7 +228,7 @@ var structDef = callfunc.defineStruct(
 Structs can be accessed using the struct information:
 
 ```haxe
-var structPointer = callfunc.alloc(structType.size);
+var structPointer = ffi.alloc(structType.size);
 
 var a = structPointer.get(DataType.SInt, structType.offsets[0]);
 var b = structPointer.get(DataType.Pointer, structType.offsets[1]);
@@ -263,8 +269,8 @@ function myHaxeCallback(a:Int, b:Int):Int {
     return b - a;
 }
 
-var callfunc = Callfunc.instance();
-var callbackDef = callfunc.wrapCallback(
+var ffi = Callfunc.instance();
+var callbackDef = ffi.wrapCallback(
     myHaxeCallback,
     [DataType.SInt32, DataType.SInt32],
     DataType.SInt32
@@ -279,12 +285,12 @@ library.s.do_something.call(callbackDef.pointer);
 To quickly allocate a string:
 
 ```haxe
-var pointer = callfunc.allocString("Hello world!");
+var pointer = ffi.allocString("Hello world!");
 
 // By default, UTF-8 is used.
 // To use UTF-16 use:
 
-var pointer = callfunc.allocString("Hello world!", Encoding.UTF16);
+var pointer = ffi.allocString("Hello world!", Encoding.UTF16);
 ```
 
 Likewise, to decode a string:

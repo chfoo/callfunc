@@ -20,13 +20,13 @@ class TestExamplelib extends Test {
     }
 
     public function testNonexistentLibrary() {
-        var callfunc = Callfunc.instance();
-        Assert.raises(callfunc.openLibrary.bind("nonexistent-library-1234"));
+        var ffi = Callfunc.instance();
+        Assert.raises(ffi.openLibrary.bind("nonexistent-library-1234"));
     }
 
     public function testNonexistentFunction() {
-        var callfunc = Callfunc.instance();
-        var library = callfunc.openLibrary(getLibName());
+        var ffi = Callfunc.instance();
+        var library = ffi.openLibrary(getLibName());
 
         Assert.raises(library.define.bind("nonexistent_function"));
         Assert.raises(library.defineVariadic.bind("nonexistent_function", [DataType.SInt], 1));
@@ -35,8 +35,8 @@ class TestExamplelib extends Test {
     }
 
     public function testInts() {
-        var callfunc = Callfunc.instance();
-        var library = callfunc.openLibrary(getLibName());
+        var ffi = Callfunc.instance();
+        var library = ffi.openLibrary(getLibName());
 
         library.define(
             "examplelib_ints",
@@ -44,7 +44,7 @@ class TestExamplelib extends Test {
             DataType.SInt32
         );
 
-        var outputPointer = callfunc.alloc(4);
+        var outputPointer = ffi.alloc(4);
         outputPointer.dataType = DataType.SInt32;
 
         var result = library.s.examplelib_ints.call(123, 456, outputPointer);
@@ -60,8 +60,8 @@ class TestExamplelib extends Test {
     }
 
     public function testString() {
-        var callfunc = Callfunc.instance();
-        var library = callfunc.openLibrary(getLibName());
+        var ffi = Callfunc.instance();
+        var library = ffi.openLibrary(getLibName());
 
         library.define(
             "examplelib_string",
@@ -69,7 +69,7 @@ class TestExamplelib extends Test {
             DataType.Pointer
         );
 
-        var inputStringPointer = callfunc.allocString("Hello world!");
+        var inputStringPointer = ffi.allocString("Hello world!");
         var result:Pointer = library.s.examplelib_string.call(inputStringPointer);
         var resultString = result.getString();
 
@@ -81,8 +81,8 @@ class TestExamplelib extends Test {
     }
 
     public function testVariadic() {
-        var callfunc = Callfunc.instance();
-        var library = callfunc.openLibrary(getLibName());
+        var ffi = Callfunc.instance();
+        var library = ffi.openLibrary(getLibName());
 
         library.defineVariadic(
             "examplelib_variadic",
@@ -110,8 +110,8 @@ class TestExamplelib extends Test {
     }
 
     public function testCallback() {
-        var callfunc = Callfunc.instance();
-        var library = callfunc.openLibrary(getLibName());
+        var ffi = Callfunc.instance();
+        var library = ffi.openLibrary(getLibName());
 
         library.define(
             "examplelib_callback",
@@ -123,7 +123,7 @@ class TestExamplelib extends Test {
             return a + b;
         }
 
-        var callbackHandle = callfunc.wrapCallback(
+        var callbackHandle = ffi.wrapCallback(
             callback,
             [DataType.SInt32, DataType.SInt32],
             DataType.SInt32);
@@ -137,14 +137,14 @@ class TestExamplelib extends Test {
     }
 
     public function testStructType() {
-        var callfunc = Callfunc.instance();
+        var ffi = Callfunc.instance();
 
-        if (callfunc.sizeOf(DataType.SInt) != 4) {
+        if (ffi.sizeOf(DataType.SInt) != 4) {
             Assert.warn("Skipping test because it doesn't seem to be x86");
             return;
         }
 
-        var structDef = callfunc.defineStruct(
+        var structDef = ffi.defineStruct(
             [DataType.SChar, DataType.SInt],
             ["a", "b"]
         );
@@ -159,10 +159,10 @@ class TestExamplelib extends Test {
     @Ignored("not supported")
     #end
     public function testStructPassByValue() {
-        var callfunc = Callfunc.instance();
-        var library = callfunc.openLibrary(getLibName());
+        var ffi = Callfunc.instance();
+        var library = ffi.openLibrary(getLibName());
         var structDataTypes = [DataType.UChar, DataType.SInt32, DataType.Double];
-        var structDef = callfunc.defineStruct(structDataTypes, ["a", "b", "c"]);
+        var structDef = ffi.defineStruct(structDataTypes, ["a", "b", "c"]);
 
         library.define(
             "examplelib_struct_value",
@@ -170,7 +170,7 @@ class TestExamplelib extends Test {
             DataType.Struct(structDataTypes)
         );
 
-        var inputStructPointer = callfunc.alloc(structDef.size);
+        var inputStructPointer = ffi.alloc(structDef.size);
         var inputStruct = structDef.access(inputStructPointer);
         inputStruct.a = 0x65;
         inputStruct.b = 0x65;

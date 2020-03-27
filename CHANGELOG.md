@@ -3,6 +3,7 @@
 ## Unreleased
 
 * Added: `CoreDataTypeTable` for internal use to improve performance.
+* Changed: Documentation and examples were updated from `var callfunc = Callfunc.instance()` to `var ffi = Callfunc.instance()` to avoid shadowing the callfunc package.
 
 ## 0.5.1 (2019-12-23)
 

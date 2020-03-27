@@ -32,12 +32,12 @@ class Curl {
     public final easySetOptLong:(Pointer, Int, Int)->Int;
     public final easyPerform:Pointer->Int;
 
-    final callfunc:Callfunc;
+    final ffi:Callfunc;
     final library:Library;
 
     public function new() {
-        callfunc = Callfunc.instance();
-        library = callfunc.openLibrary(getLibraryName());
+        ffi = Callfunc.instance();
+        library = ffi.openLibrary(getLibraryName());
 
         globalInit = library.define(
             "curl_global_init",
@@ -84,7 +84,7 @@ class Curl {
     }
 
     public function newWriteFunction(callback:CurlWriteFunction):Callback {
-        var handle = callfunc.wrapCallback(
+        var handle = ffi.wrapCallback(
             callback,
             [DataType.Pointer, DataType.Size, DataType.Size, DataType.Pointer],
             DataType.Size

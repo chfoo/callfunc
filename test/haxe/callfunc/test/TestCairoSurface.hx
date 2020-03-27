@@ -5,8 +5,8 @@ import utest.Test;
 
 class TestCairoSurface extends Test {
     public function testSimpleDraw() {
-        var callfunc = Callfunc.instance();
-        var library = callfunc.openLibrary(TestCairoMatrix.getLibName());
+        var ffi = Callfunc.instance();
+        var library = ffi.openLibrary(TestCairoMatrix.getLibName());
 
         library.define(
             "cairo_image_surface_create",
@@ -74,7 +74,7 @@ class TestCairoSurface extends Test {
         Assert.equals(0, data.get(DataType.UInt32));
         Assert.equals(0xff000000,
             data.get(DataType.UInt32,
-                1 * callfunc.sizeOf(DataType.UInt32)));
+                1 * ffi.sizeOf(DataType.UInt32)));
 
         library.s.cairo_destroy.call(context);
         library.s.cairo_surface_destroy.call(surface);

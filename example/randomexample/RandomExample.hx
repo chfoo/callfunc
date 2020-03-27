@@ -10,7 +10,7 @@ import haxe.io.Bytes;
 // libraries.
 class RandomExample {
     static final bufferLength = 16;
-    static final callfunc = Callfunc.instance();
+    static final ffi = Callfunc.instance();
 
     public static function main() {
         final systemName = Sys.systemName();
@@ -52,7 +52,7 @@ class RandomExample {
 
     static function getWindowsBytes():Option<Bytes> {
         final STDCALL = 2;
-        final library = callfunc.openLibrary("Advapi32.dll");
+        final library = ffi.openLibrary("Advapi32.dll");
 
         library.define(
             "SystemFunction036",
@@ -61,7 +61,7 @@ class RandomExample {
             STDCALL
         );
 
-        final buffer = callfunc.alloc(bufferLength);
+        final buffer = ffi.alloc(bufferLength);
         final result = library.s.SystemFunction036.call(buffer, bufferLength);
         var bytes;
 
@@ -77,7 +77,7 @@ class RandomExample {
     }
 
     static function getLinuxBytes():Option<Bytes> {
-        final library = callfunc.openLibrary("libc.so.6");
+        final library = ffi.openLibrary("libc.so.6");
 
         library.define(
             "getrandom",
@@ -85,7 +85,7 @@ class RandomExample {
             DataType.Size
         );
 
-        final buffer = callfunc.alloc(bufferLength);
+        final buffer = ffi.alloc(bufferLength);
         final result:AnyInt = library.s.getrandom.call(buffer, bufferLength, 0);
         var bytes;
 
@@ -101,14 +101,14 @@ class RandomExample {
     }
 
     static function getMacBytes():Option<Bytes> {
-        final library = callfunc.openLibrary("libSystem.dylib");
+        final library = ffi.openLibrary("libSystem.dylib");
 
         library.define(
             "arc4random_buf",
             [DataType.Pointer, DataType.Size]
         );
 
-        final buffer = callfunc.alloc(bufferLength);
+        final buffer = ffi.alloc(bufferLength);
         library.s.arc4random_buf.call(buffer, bufferLength);
 
         final bytes =  Some(buffer.getDataView(bufferLength).toBytes());

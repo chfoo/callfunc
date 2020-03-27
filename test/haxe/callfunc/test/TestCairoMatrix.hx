@@ -19,8 +19,8 @@ class TestCairoMatrix extends utest.Test {
     }
 
     public function testMatrixScale() {
-        var callfunc = Callfunc.instance();
-        var library = callfunc.openLibrary(getLibName());
+        var ffi = Callfunc.instance();
+        var library = ffi.openLibrary(getLibName());
 
         library.define(
             "cairo_matrix_init_identity",
@@ -37,7 +37,7 @@ class TestCairoMatrix extends utest.Test {
             [DataType.Pointer, DataType.Pointer, DataType.Pointer]
         );
 
-        var matrixStructDef = callfunc.defineStruct(
+        var matrixStructDef = ffi.defineStruct(
             [DataType.Double, DataType.Double, DataType.Double,
             DataType.Double, DataType.Double, DataType.Double],
             ["xx", "yx", "xy", "yy", "x0", "y0"]
@@ -45,7 +45,7 @@ class TestCairoMatrix extends utest.Test {
 
         Assert.isTrue(matrixStructDef.size >= 8 * 6);
 
-        var matrixPointer = callfunc.alloc(matrixStructDef.size);
+        var matrixPointer = ffi.alloc(matrixStructDef.size);
         var matrix = matrixStructDef.access(matrixPointer);
 
         var i = matrixPointer.address;
@@ -61,8 +61,8 @@ class TestCairoMatrix extends utest.Test {
 
         library.s.cairo_matrix_scale.call(matrixPointer, 2.0, 1.0);
 
-        var xPointer = callfunc.alloc(callfunc.sizeOf(DataType.Double));
-        var yPointer = callfunc.alloc(callfunc.sizeOf(DataType.Double));
+        var xPointer = ffi.alloc(ffi.sizeOf(DataType.Double));
+        var yPointer = ffi.alloc(ffi.sizeOf(DataType.Double));
         xPointer.dataType = yPointer.dataType = DataType.Double;
 
         xPointer.set(10.0);

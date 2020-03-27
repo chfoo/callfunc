@@ -5,9 +5,9 @@ import utest.Test;
 
 class TestStructAccess extends Test {
     public function test() {
-        var callfunc = Callfunc.instance();
-        var pointer = callfunc.alloc(100);
-        var structDef = callfunc.defineStruct(
+        var ffi = Callfunc.instance();
+        var pointer = ffi.alloc(100);
+        var structDef = ffi.defineStruct(
             [DataType.SInt32, DataType.Double, DataType.UInt8],
             ["a", "b", "c"]
         );
