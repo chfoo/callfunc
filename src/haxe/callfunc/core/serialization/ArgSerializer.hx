@@ -80,15 +80,15 @@ class ArgSerializer extends DataValueSerializer {
     }
 
     public function serializeArgs(params:Array<DataType>, args:Array<Any>, ?buffer:Bytes):Bytes {
-        var bufferSize = getArgBufferLength(params);
+        var bufferSize;
 
         if (buffer == null) {
+            bufferSize = getArgBufferLength(params);
             buffer = Bytes.alloc(bufferSize);
         }
 
-        if (buffer.length < bufferSize) {
-            throw "Buffer too small";
-        }
+        bufferSize = buffer.length;
+        Debug.assert(buffer.length >= getArgBufferLength(params));
 
         var bufferIndex = 0;
 
