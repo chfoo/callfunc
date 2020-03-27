@@ -24,7 +24,7 @@ class EmPointer implements BasicPointer {
     }
 
     public function get(dataType:DataType, offset:Int = 0):Any {
-        final coreDataType = context.toCoreDataType(dataType, true);
+        final coreDataType = context.coreDataTypeTable.toCoreDataType(dataType, true);
 
         switch coreDataType {
             case SInt64 | UInt64: return getInt64(offset);
@@ -61,7 +61,7 @@ class EmPointer implements BasicPointer {
     }
 
     public function set(value:Any, dataType:DataType, offset:Int = 0) {
-        switch context.toCoreDataType(dataType, true) {
+        switch context.coreDataTypeTable.toCoreDataType(dataType, true) {
             case SInt64 | UInt64:
                 setInt64(NumberUtil.toInt64(value), offset);
             default:

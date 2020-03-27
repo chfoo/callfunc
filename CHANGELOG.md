@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* Added: `CoreDataTypeTable` for internal use to improve performance.
+
 ## 0.5.1 (2019-12-23)
 
 * Fixed: removed mistakenly added `trace()` in `Pointer.getString()`.

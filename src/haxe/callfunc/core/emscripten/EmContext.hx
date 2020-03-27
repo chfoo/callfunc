@@ -9,8 +9,12 @@ class EmContext implements Context {
     @:allow(callfunc.core.emscripten)
     final module:EmscriptenModule;
 
+    @:allow(callfunc.core.emscripten)
+    final coreDataTypeTable:CoreDataTypeTable;
+
     public function new(module:EmscriptenModule) {
         this.module = module;
+        coreDataTypeTable = new CoreDataTypeTable(this);
     }
 
     public function alloc(size:Int, initZero:Bool = false):BasicPointer {

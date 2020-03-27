@@ -45,7 +45,7 @@ class PointerImpl implements BasicPointer {
 
     public function get(dataType:DataType, offset:Int = 0):Any {
         ExternDef.pointerGet(nativePointer,
-            context.toCoreDataType(dataType).toInt(),
+            context.coreDataTypeTable.toCoreDataType(dataType).toInt(),
             ContextImpl.bytesToBytesData(buffer), offset);
 
         return serializer.deserializeValue(buffer, 0, dataType);
@@ -55,13 +55,13 @@ class PointerImpl implements BasicPointer {
         serializer.serializeValue(buffer, 0, dataType, value);
 
         ExternDef.pointerSet(nativePointer,
-            context.toCoreDataType(dataType).toInt(),
+            context.coreDataTypeTable.toCoreDataType(dataType).toInt(),
             ContextImpl.bytesToBytesData(buffer), offset);
     }
 
     public function arrayGet(index:Int, dataType:DataType):Any {
         ExternDef.pointerArrayGet(nativePointer,
-            context.toCoreDataType(dataType).toInt(),
+            context.coreDataTypeTable.toCoreDataType(dataType).toInt(),
             ContextImpl.bytesToBytesData(buffer), index);
 
         return serializer.deserializeValue(buffer, 0, dataType);
@@ -71,7 +71,7 @@ class PointerImpl implements BasicPointer {
         serializer.serializeValue(buffer, 0, dataType, value);
 
         ExternDef.pointerArraySet(nativePointer,
-            context.toCoreDataType(dataType).toInt(),
+            context.coreDataTypeTable.toCoreDataType(dataType).toInt(),
             ContextImpl.bytesToBytesData(buffer), index);
     }
 }

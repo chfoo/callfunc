@@ -1,5 +1,6 @@
 package callfunc.test;
 
+import callfunc.core.CoreDataTypeTable;
 import haxe.io.Bytes;
 import haxe.Int64;
 import utest.Assert;
@@ -103,6 +104,28 @@ class TestCallfunc extends utest.Test {
         for (dataType in [DataType.Size, DataType.PtrDiff, DataType.WChar]) {
             if (callfunc.sizeOf(dataType) > 0) {
                 callfunc.context.toCoreDataType(dataType);
+            }
+        }
+    }
+
+    public function testCoreDataTypeTable() {
+        var callfunc = Callfunc.instance();
+        final table = new CoreDataTypeTable(callfunc.context);
+
+        Assert.same(CoreDataType.SInt8, table.toCoreDataType(DataType.SInt8));
+        Assert.same(CoreDataType.Double, table.toCoreDataType(DataType.Double));
+        Assert.same(CoreDataType.Void, table.toCoreDataType(DataType.Void));
+
+        Assert.notEquals(CoreDataType.UChar, table.toCoreDataType(DataType.UChar, true));
+        Assert.notEquals(CoreDataType.SChar, table.toCoreDataType(DataType.SChar, true));
+        Assert.notEquals(CoreDataType.SInt, table.toCoreDataType(DataType.SInt, true));
+        Assert.notEquals(CoreDataType.UInt, table.toCoreDataType(DataType.UInt, true));
+        Assert.notEquals(CoreDataType.SLong, table.toCoreDataType(DataType.SLong, true));
+        Assert.notEquals(CoreDataType.ULong, table.toCoreDataType(DataType.ULong, true));
+
+        for (dataType in [DataType.Size, DataType.PtrDiff, DataType.WChar]) {
+            if (callfunc.sizeOf(dataType) > 0) {
+                table.toCoreDataType(dataType);
             }
         }
     }

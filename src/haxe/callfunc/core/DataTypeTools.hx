@@ -8,6 +8,8 @@ class DataTypeTools {
      * @param fixedWidth Whether integer data types are substituted to their
      *     fixed-width data types. If the data type is not an integer, it is left unchanged.
      * @throws String If the data type is not a supported core data type.
+     *
+     * @see `CoreDataTypeTable` for cached version.
      */
     public static function toCoreDataType(context:Context, dataType:DataType,
             fixedWidth:Bool = false):CoreDataType {

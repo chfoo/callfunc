@@ -13,6 +13,7 @@ class ContextImpl implements  Context {
     static final API_VERSION = 3;
 
     final sizeOfTable:Vector<Int>;
+    @:allow(callfunc.core.impl) final coreDataTypeTable:CoreDataTypeTable;
 
     public function new() {
         var version = ExternDef.apiVersion();
@@ -21,7 +22,8 @@ class ContextImpl implements  Context {
             throw 'API version mismatch. Haxe: $API_VERSION, Native: $version';
         }
 
-        sizeOfTable = getSizeOfTable();
+        sizeOfTable = inline getSizeOfTable();
+        coreDataTypeTable = new CoreDataTypeTable(this);
     }
 
     public function alloc(size:Int, initZero:Bool = false):BasicPointer {

@@ -8,13 +8,15 @@ using callfunc.core.DataTypeTools;
 
 class DataValueSerializer {
     final context:Context;
+    final coreDataTypeTable:CoreDataTypeTable;
 
     public function new(context:Context) {
         this.context = context;
+        this.coreDataTypeTable = new CoreDataTypeTable(context);
     }
 
     public function serializeDataType(buffer:Bytes, bufferIndex:Int, dataType:DataType):Int {
-        buffer.set(bufferIndex, context.toCoreDataType(dataType).toInt());
+        buffer.set(bufferIndex, coreDataTypeTable.toCoreDataType(dataType).toInt());
 
         switch dataType {
             case Struct(fields):
@@ -57,7 +59,7 @@ class DataValueSerializer {
     }
 
     public function serializeValue(buffer:Bytes, bufferIndex:Int, dataType:DataType, value:Any):Int {
-        switch context.toCoreDataType(dataType, true) {
+        switch coreDataTypeTable.toCoreDataType(dataType, true) {
             case SInt8 | UInt8:
                 buffer.set(bufferIndex, NumberUtil.toInt(value));
             case SInt16 | UInt16:
@@ -95,7 +97,7 @@ class DataValueSerializer {
     }
 
     public function deserializeValue(buffer:Bytes, bufferIndex:Int, dataType:DataType):Any {
-        switch context.toCoreDataType(dataType, true) {
+        switch coreDataTypeTable.toCoreDataType(dataType, true) {
             case UInt8:
                 return buffer.get(bufferIndex);
             case SInt8:
