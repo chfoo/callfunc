@@ -1,9 +1,10 @@
 # Changelog
 
-## Unreleased
+## 1.0.0 (2020-03-27)
 
 * Added: `CoreDataTypeTable` for internal use to improve performance.
 * Changed: Documentation and examples were updated from `var callfunc = Callfunc.instance()` to `var ffi = Callfunc.instance()` to avoid shadowing the callfunc package.
+* Version bumped to 1.0.0 to indicate stable API as for SemVer.
 
 ## 0.5.1 (2019-12-23)
 

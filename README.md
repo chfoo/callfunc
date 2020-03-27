@@ -290,7 +290,7 @@ var pointer = ffi.allocString("Hello world!");
 // By default, UTF-8 is used.
 // To use UTF-16 use:
 
-var pointer = ffi.allocString("Hello world!", Encoding.UTF16);
+var pointer = ffi.allocString("Hello world!", Encoding.UTF16LE);
 ```
 
 Likewise, to decode a string:
@@ -300,7 +300,7 @@ var string = pointer.getString();
 
 // or
 
-var string = pointer.getString(Encoding.UTF16);
+var string = pointer.getString(Encoding.UTF16LE);
 ```
 
 ## 32/64-bit integers
