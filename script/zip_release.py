@@ -6,6 +6,7 @@ uncommited files.
 import json
 import os
 import os.path
+import shutil
 import subprocess
 import sys
 import time
@@ -33,6 +34,11 @@ def main():
     subprocess.run(['git', 'archive', 'HEAD', '-o', output_path], cwd=project_dir)
 
     if '--bin' in sys.argv:
+        shutil.copy2(
+            os.path.join(project_dir, 'script', 'template', 'bin.md'),
+            os.path.join(project_dir, 'bin', 'README.md')
+        )
+
         add_bin(output_path, project_dir)
 
     if '--sign' in sys.argv:
@@ -44,6 +50,7 @@ def add_bin(zip_filename: str, project_dir: str):
     print('Adding binaries')
 
     filenames = (
+        'bin/README.md',
         'bin/libffi.txt',
         'bin/linux-x86-64/callfunc-0.5.1_4de1cf0/callfunc.hdll',
         'bin/linux-x86-64/libffi-3.3/libffi.so',
