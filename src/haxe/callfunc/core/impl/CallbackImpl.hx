@@ -12,6 +12,7 @@ class CallbackImpl implements CallbackHandle {
     final haxeFunction:Array<Any>->Any;
     final params:Array<DataType>;
     final returnType:DataType;
+    final handlerRef:Void->Void;
 
     public function new(context:ContextImpl, haxeFunction:Array<Any>->Any,
             ?params:Array<DataType>, ?returnType:DataType) {
@@ -42,8 +43,11 @@ class CallbackImpl implements CallbackHandle {
             throw NativeUtil.fromNativeString(ExternDef.getErrorMessage());
         }
 
+        // Create a dynamic and keep it from being garbage collected:
+        handlerRef = handler;
+
         error = ExternDef.callbackBind(nativePointer,
-            ContextImpl.bytesToBytesData(argBuffer), handler);
+            ContextImpl.bytesToBytesData(argBuffer), handlerRef);
 
         if (error != 0) {
             throw NativeUtil.fromNativeString(ExternDef.getErrorMessage());

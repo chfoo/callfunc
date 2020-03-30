@@ -132,6 +132,10 @@ class TestExamplelib extends Test {
 
         Assert.equals(123 + 456, result);
 
+        for (dummy in 0...10000) {
+            library.s.examplelib_callback.call(callbackHandle.pointer);
+        }
+
         library.dispose();
         callbackHandle.dispose();
     }

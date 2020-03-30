@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* Fixed: Calling foreign functions with callbacks more than once may cause segfault because an internal Callfunc function was garbage collected.
+
 ## 1.0.0 (2020-03-27)
 
 * Added: `CoreDataTypeTable` for internal use to improve performance.
