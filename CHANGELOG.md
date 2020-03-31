@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.0.1 (2020-03-31)
 
 * Fixed: Calling foreign functions with callbacks more than once may cause segfault because an internal Callfunc function was garbage collected.
 
