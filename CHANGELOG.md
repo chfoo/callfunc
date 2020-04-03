@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+* Fixed: `Library.dispose()` now disposes both the functions and library to fix memory leak of the library.
+* Fixed: Disposing functions would leak memory if they returned structures by value.
+* Added: `Library.disposeFunctions()` for use when you only want to dispose the functions.
+
+* For HashLink, using the latest callfunc.hdll is recommended to get all of the bug fixes above.
+
 ## 1.0.1 (2020-03-31)
 
 * Fixed: Calling foreign functions with callbacks more than once may cause segfault because an internal Callfunc function was garbage collected.
