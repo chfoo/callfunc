@@ -11,20 +11,20 @@ function download {
     cd "$SCRIPT_DIR/../out"
     source "$SCRIPT_DIR/curl_opts.sh"
 
-    ARCHIVE_DIR="haxe_20191129081926_dcfaf4ac0"
+    ARCHIVE_DIR="haxe_20191217082701_67feacebc"
 
     case $PLATFORM in
         linux-x86-64)
-            FILE="haxe-4.0.3-linux64.tar.gz"
+            FILE="haxe-4.0.5-linux64.tar.gz"
             ;;
         macos)
-            FILE="haxe-4.0.3-osx.tar.gz"
+            FILE="haxe-4.0.5-osx.tar.gz"
             ;;
         windows-x86)
-            FILE="haxe-4.0.3-win.zip"
+            FILE="haxe-4.0.5-win.zip"
             ;;
         windows-x86-64)
-            FILE="haxe-4.0.3-win64.zip"
+            FILE="haxe-4.0.5-win64.zip"
             ;;
         *)
             echo "Unknown platform $PLATFORM"
@@ -32,7 +32,7 @@ function download {
             ;;
     esac
 
-    curl $CURL_OPTS -O "https://github.com/HaxeFoundation/haxe/releases/download/4.0.3/$FILE"
+    curl $CURL_OPTS -O "https://github.com/HaxeFoundation/haxe/releases/download/4.0.5/$FILE"
 
     case $FILE in
         *.tar.gz) tar -xf "$FILE" ;;

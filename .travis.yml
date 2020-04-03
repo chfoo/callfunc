@@ -3,7 +3,7 @@ dist: xenial
 language: haxe
 
 haxe:
-  - "4.0.2"
+  - "4.0.5"
 
 before_install:
   # Cmake 1.13 minimum

@@ -11,8 +11,14 @@ function download {
 
     case $PLATFORM in
         windows-x86)
+            VERSION="1.10"
             FILE="hl-1.10.0-win.zip"
             ARCHIVE_DIR="hl-1.10.0-win"
+            ;;
+        windows-x86-64)
+            VERSION="1.11"
+            FILE="hl-1.11.0-win.zip"
+            ARCHIVE_DIR="hl-1.11.0-win"
             ;;
         *)
             echo "Unknown platform $PLATFORM"
@@ -20,7 +26,7 @@ function download {
             ;;
     esac
 
-    curl $CURL_OPTS -O "https://github.com/HaxeFoundation/hashlink/releases/download/1.10/$FILE"
+    curl $CURL_OPTS -O "https://github.com/HaxeFoundation/hashlink/releases/download/$VERSION/$FILE"
 
     case $FILE in
         *.tar.gz) tar -xf "$FILE" ;;

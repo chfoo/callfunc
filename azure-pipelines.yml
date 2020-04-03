@@ -107,14 +107,14 @@ jobs:
           HXCPP_BUILD_DEFINES: >-
             -D callfunc_libffi_msbuild_include="$env:VCPKG_INSTALLATION_ROOT"/installed/x86-windows/include/
             -D callfunc_libffi_msbuild_lib="$env:VCPKG_INSTALLATION_ROOT"/installed/x86-windows/lib/
-        # windows64:
-        #   IMAGE: 'windows-2019'
-        #   PLATFORM: windows-x86-64
-        #   ARCH_NAME: x64
-        #   EXTRA_CMAKE_ARGS: -A x64
-        #   HXCPP_BUILD_DEFINES: >-
-        #     -D callfunc_libffi_msbuild_include="$env:VCPKG_INSTALLATION_ROOT"/installed/x64-windows/include/
-        #     -D callfunc_libffi_msbuild_lib="$env:VCPKG_INSTALLATION_ROOT"/installed/x64-windows/lib/
+        windows64:
+          IMAGE: 'windows-2019'
+          PLATFORM: windows-x86-64
+          ARCH_NAME: x64
+          EXTRA_CMAKE_ARGS: -A x64
+          HXCPP_BUILD_DEFINES: >-
+            -D callfunc_libffi_msbuild_include="$env:VCPKG_INSTALLATION_ROOT"/installed/x64-windows/include/
+            -D callfunc_libffi_msbuild_lib="$env:VCPKG_INSTALLATION_ROOT"/installed/x64-windows/lib/
     pool:
       vmImage: $(IMAGE)
     variables:

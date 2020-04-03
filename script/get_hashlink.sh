@@ -8,10 +8,10 @@ function download {
     cd "$SCRIPT_DIR/../out"
     source "$SCRIPT_DIR/curl_opts.sh"
 
-    curl $CURL_OPTS -o hashlink-1.10.tar.gz "https://github.com/HaxeFoundation/hashlink/archive/1.10.tar.gz"
+    curl $CURL_OPTS -o hashlink-1.11.tar.gz "https://github.com/HaxeFoundation/hashlink/archive/1.11.tar.gz"
 
-    tar -xf hashlink-1.10.tar.gz
-    mv hashlink-1.10 hashlink
+    tar -xf hashlink-1.11.tar.gz
+    mv hashlink-1.11 hashlink
 }
 
 function install {
