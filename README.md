@@ -350,7 +350,7 @@ Pre-compiled libraries are included in the releases, but if you need to compile 
 
 vcpkg can be used to build libffi.
 
-If you are compiling to HashLink, note that the HashLink binary from the website is 32-bit, so you will need to build and use 32-bit versions of the libraries.
+If you are compiling to HashLink, note that the HashLink binary from the website is 32-bit or 64-bit, so you will need to build and use correct versions of the libraries. For HashLink 1.11 and newer use 64-bit ("x86-64"). For HashLink 1.10 and older, use 32-bit ("x86").
 
 1. Download and set up vcpkg
 2. Install the Visual Studio C++ workload SDK in Tools, Get Tool and Features.

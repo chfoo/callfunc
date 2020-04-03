@@ -60,6 +60,8 @@ def add_bin(zip_filename: str, project_dir: str):
         'bin/macos/libffi-3.3/libffi.7.dylib',
         'bin/windows-x86/callfunc-0.5.1_4de1cf0/callfunc.hdll',
         'bin/windows-x86/libffi-3.3/libffi.dll',
+        'bin/windows-x86-64/callfunc-1.0.1_6212904/callfunc.hdll',
+        'bin/windows-x86-64/libffi-3.3/libffi.dll',
     )
 
     zip_file = zipfile.ZipFile(zip_filename, mode='a')
