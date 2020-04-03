@@ -166,12 +166,20 @@ class Library implements Disposable {
     /**
      * Dispose all functions.
      */
-    public function dispose() {
+    public function disposeFunctions() {
         for (func in functions) {
             func.dispose();
         }
 
         functions.clear();
+    }
+
+    /**
+     * Dispose all functions and the library itself.
+     */
+    public function dispose() {
+        disposeFunctions();
+        libraryHandle.dispose();
     }
 }
 
