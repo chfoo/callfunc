@@ -457,6 +457,8 @@ Whether to use Callfunc depends on many factors including performance, maintaina
 
 To run the unit tests, please look at the .travis.yml file.
 
+For developing the native library with gcc/clang compilers, add `-D CALLFUNC_ADD_SANITIZER_FLAGS:bool=true` to the cmake command to enable the address sanitizer.
+
 ## Contributing
 
 If you have a bug report, bug fix, or missing feature, please file an issue or pull request on GitHub.

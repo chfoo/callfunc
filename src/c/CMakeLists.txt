@@ -49,6 +49,11 @@ else()
     target_compile_options(callfunc_hdll PRIVATE -Wall -Wextra -pedantic)
 endif()
 
+if(CALLFUNC_ADD_SANITIZER_FLAGS)
+    target_compile_options(callfunc_hdll PRIVATE -fno-omit-frame-pointer -fsanitize=address )
+    target_link_options(callfunc_hdll PRIVATE -fno-omit-frame-pointer -fsanitize=address )
+endif()
+
 set_target_properties(callfunc_hdll PROPERTIES
     PREFIX ""
     OUTPUT_NAME "callfunc"
