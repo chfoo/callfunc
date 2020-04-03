@@ -24,5 +24,8 @@ class TestStructAccess extends Test {
 
         Assert.raises(struct.get.bind("nonexist"));
         Assert.raises(struct.set.bind("nonexist", 123));
+
+        structDef.dispose();
+        pointer.free();
     }
 }

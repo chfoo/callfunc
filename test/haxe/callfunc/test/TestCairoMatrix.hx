@@ -76,5 +76,7 @@ class TestCairoMatrix extends utest.Test {
         matrixPointer.free();
         matrixStructDef.dispose();
         library.dispose();
+        xPointer.free();
+        yPointer.free();
     }
 }

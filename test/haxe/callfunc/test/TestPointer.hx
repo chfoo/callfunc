@@ -149,5 +149,7 @@ class TestPointer extends utest.Test {
 
         pointer.setString("abcdé", Encoding.UTF16LE, true);
         Assert.equals("abcdé", pointer.getString(Encoding.UTF16LE));
+
+        pointer.free();
     }
 }
