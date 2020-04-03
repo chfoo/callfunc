@@ -212,6 +212,8 @@ void * _callfunc_get_buffer_struct_copy(uint8_t * buffer, size_t offset,
 
 void _callfunc_rescursive_free_types(ffi_type ** types, size_t length);
 
+void _callfunc_rescursive_free_type(ffi_type * type);
+
 void * _callfunc_get_aligned_pointer(void * pointer, uint8_t data_type,
     int32_t index);
 

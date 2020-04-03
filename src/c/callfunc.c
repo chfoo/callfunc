@@ -162,6 +162,12 @@ void callfunc_del_function(struct CallfuncFunction * function) {
         function->cif.arg_types = NULL;
     }
 
+    if (function->cif.rtype != NULL
+    && function->cif.rtype->type == FFI_TYPE_STRUCT) {
+        _callfunc_rescursive_free_type(function->cif.rtype);
+        function->cif.rtype = NULL;
+    }
+
     free(function->arg_pointers);
     free(function->arg_pointer_allocated);
     free(function);
@@ -672,19 +678,31 @@ void _callfunc_rescursive_free_types(ffi_type ** types, size_t length) {
         ffi_type * type = types[index];
 
         if (type == NULL) {
+            // end of array deliminated with NULL
+            // (length is only used in the top array of parameters)
             break;
-        } else if (type->type != FFI_TYPE_STRUCT) {
-            continue;
         }
 
-        if (type->elements != NULL) {
-            _callfunc_rescursive_free_types(type->elements, SIZE_MAX);
-        }
-
-        free(type);
+        _callfunc_rescursive_free_type(type);
     }
 
     free(types);
+}
+
+void _callfunc_rescursive_free_type(ffi_type * type) {
+    if (type == NULL) {
+        return;
+    }
+
+    if (type->type != FFI_TYPE_STRUCT) {
+        return;
+    }
+
+    if (type->elements != NULL) {
+        _callfunc_rescursive_free_types(type->elements, SIZE_MAX);
+    }
+
+    free(type);
 }
 
 #define _CALLFUNC_ALIGN_HELPER(ctype) (&((ctype *) pointer)[index])
