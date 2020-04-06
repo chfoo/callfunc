@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.1.0 (2020-04-06)
 
 * Fixed: `Library.dispose()` now disposes both the functions and library to fix memory leak of the library.
 * Fixed: Disposing functions would leak memory if they returned structures by value.
