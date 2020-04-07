@@ -13,11 +13,11 @@ if(NOT LIBFFI_INCLUDE_PATH)
 endif()
 
 if(NOT HL_INCLUDE_PATH)
-    find_path(LIBFFI_INCLUDE_PATH_AUTO hl.h)
+    find_path(HL_INCLUDE_PATH_AUTO hl.h)
 endif()
 
 target_include_directories(callfunc_hdll PRIVATE "${LIBFFI_INCLUDE_PATH}" "${LIBFFI_INCLUDE_PATH_AUTO}")
-target_include_directories(callfunc_hdll PRIVATE "${HL_INCLUDE_PATH}" "${LIBFFI_INCLUDE_PATH_AUTO}")
+target_include_directories(callfunc_hdll PRIVATE "${HL_INCLUDE_PATH}" "${HL_INCLUDE_PATH_AUTO}")
 
 if(NOT LIBFFI_LIB_PATH)
     if(NOT WIN32)
