@@ -431,6 +431,8 @@ On Linux, the `LD_LIBRARY_PATH` environment can be provided to the executable. F
 
 On MacOS, use `DYLD_LIBRARY_PATH` instead of `LD_LIBRARY_PATH`.
 
+Additionally on MacOS, `otool` can be used to show what your application or `callfunc.hdll` wants to load. `install_name_tool` can be used to change the location of where a binary expects to load dependant shared libraries.
+
 When using the precompiled libraries provided by this project on recent versions of MacOS, they need to be manually approved to load by deleting the quarantine attribute such as `xattr -d com.apple.quarantine callfunc.hdll`.
 
 ### Library installation

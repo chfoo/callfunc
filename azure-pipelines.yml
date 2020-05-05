@@ -89,9 +89,13 @@ jobs:
         workingDirectory: out-release/
       - script: cmake --build . --config Release
         workingDirectory: out-release/
+      - script: cmake --install . --config Release --prefix install_dir/
+        workingDirectory: out-release/
+      - script: install_name_tool -change /usr/local/lib/libffi.dylib libffi.dylib out-release/install_dir/lib/callfunc.hdll
+        condition: eq(variables['Agent.OS'], 'Darwin')
 
       # Publish releases
-      - publish: out-release/callfunc/callfunc.hdll
+      - publish: out-release/install_dir/lib/callfunc.hdll
         artifact: callfunc-hdll-$(PLATFORM)
       - publish: $(LIBFFI_LIB_PATH)
         artifact: libffi-$(PLATFORM)
