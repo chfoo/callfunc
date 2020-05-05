@@ -61,3 +61,5 @@ set_target_properties(callfunc_hdll PROPERTIES
     C_STANDARD 99
 )
 target_compile_definitions(callfunc_hdll PRIVATE CALLFUNC_HL)
+
+install(TARGETS callfunc_hdll DESTINATION lib)
