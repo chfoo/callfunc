@@ -435,7 +435,9 @@ On Linux, the `LD_LIBRARY_PATH` environment can be provided to the executable. F
 
 `LD_LIBRARY_PATH="./:/usr/local/lib/:$LD_LIBRARY_PATH" hl myApplication.hl`
 
-On MacOS, use `DYLD_LIBRARY_PATH` instead of `LD_LIBRARY_PATH`.
+On MacOS, use `DYLD_FALLBACK_LIBRARY_PATH` (note this variable can't be exported for security reasons):
+
+`DYLD_FALLBACK_LIBRARY_PATH="./:/usr/local/lib:/lib:/usr/lib:$DYLD_FALLBACK_LIBRARY_PATH" hl myApplication.hl`
 
 Additionally on MacOS, `otool` can be used to show what your application or `callfunc.hdll` wants to load. `install_name_tool` can be used to change the location of where a binary expects to load dependant shared libraries.
 
